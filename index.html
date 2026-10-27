@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#073b63">
+  <meta name="description" content="ระบบโรงงาน SIP สำหรับรวมหน้าการใช้งานโรงงาน">
+  <link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./assets/icons/factory-192.png" type="image/png">
+  <link rel="stylesheet" href="./css/app.css?v=1.3.241">
+  <link rel="stylesheet" href="./css/pwa-install.css?v=1.3.192">
+  <link rel="stylesheet" href="./css/registration.css?v=1.3.198">
+  <link rel="stylesheet" href="./css/registration-admin.css?v=1.3.218">
+  <link rel="stylesheet" href="./css/ui-system.css?v=1.3.237">
+  <title>ระบบโรงงาน SIP</title>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">ข้ามไปยังเนื้อหาหลัก</a>
+  <header id="header-root"></header>
+  <div id="connection-banner" class="connection-banner" role="status" hidden></div>
+  <div id="update-banner" class="update-banner" role="status" hidden></div>
+  <main id="main-content" class="main-shell" tabindex="-1">
+    <div id="page-loading" class="page-loading" aria-live="polite">กำลังเปิด ระบบโรงงาน SIP…</div>
+    <section id="page-root" aria-live="polite"></section>
+    <section id="pwa-install-root" aria-label="ติดตั้งแอป" hidden></section>
+  </main>
+  <div id="nav-root"></div>
+  <div id="toast-root" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <script type="module" src="./js/pwa-install.js?v=1.3.224"></script>
+  <script type="module" src="./js/ui-polish.js?v=1.3.218"></script>
+  <script type="module" src="./js/app.js?v=1.3.241"></script>
+</body>
+</html>
+
+
+

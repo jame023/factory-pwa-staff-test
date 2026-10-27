@@ -1,0 +1,73 @@
+.registration-table-wrap{overflow-x:auto;margin-top:1rem}.registration-table{width:100%;border-collapse:collapse;font-size:.9rem}.registration-table th,.registration-table td{padding:.65rem;text-align:left;vertical-align:top;border-bottom:1px solid #dce3ea;overflow-wrap:anywhere}.registration-table td .button{display:block;width:100%;margin-bottom:.4rem}.registration-review-backdrop{position:fixed;inset:0;background:#142234aa;z-index:9000;display:grid;place-items:center;padding:1rem;overscroll-behavior:contain}.registration-review-card{background:white;color:#172c40;width:min(850px,100%);max-height:90dvh;overflow-y:auto;overscroll-behavior:contain;border-radius:1rem;padding:1.5rem}.registration-review-card form{padding-top:1rem;margin-top:1rem;border-top:1px solid #dce3ea}.registration-review-card dd{white-space:pre-wrap;overflow-wrap:anywhere}@media(max-width:640px){.registration-table{min-width:760px}.registration-review-backdrop{padding:.4rem}.registration-review-card{padding:1rem;max-height:96dvh}}
+
+/* Review inbox: compact filters, readable applicant identity, deliberate actions. */
+.registration-admin{--review-ink:#123e56;--review-accent:#076b8c;--review-border:#dce6ec;display:grid;gap:22px;min-width:0;color:var(--review-ink)}
+.registration-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:10px 0 4px}
+.registration-heading .eyebrow{font-size:.72rem;letter-spacing:.04em;margin:0 0 8px;color:#526f7e}
+.registration-heading h1{font-size:clamp(1.5rem,2.6vw,2rem);line-height:1.35;margin:0 0 8px}
+.registration-heading p{margin:0;color:#5c7380;font-size:.9rem;line-height:1.6}
+.registration-heading-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;flex-shrink:0}
+.registration-admin .button{min-height:42px;padding:9px 15px;font-size:.82rem;border-radius:9px;line-height:1.45;white-space:nowrap}
+.registration-admin .button-primary{background:var(--review-accent);border-color:var(--review-accent);color:#fff}
+.registration-admin .registration-login{font-size:.76rem;background:transparent;color:#5c7380}
+.registration-admin .card{border:1px solid var(--review-border);border-radius:16px;box-shadow:0 3px 12px #123e5604;background:#fff;min-width:0}
+.registration-filters{padding:22px 24px}
+.registration-section-heading{display:flex;align-items:center;gap:14px;margin:0 0 18px;flex-wrap:wrap}
+.registration-admin h2{font-size:1.05rem;line-height:1.5;margin:0}
+.registration-section-heading>span{color:#677e8a;font-size:.8rem}
+.registration-filter-main{display:grid;grid-template-columns:.9fr 1.3fr 1fr;gap:16px}
+.registration-admin .field{gap:7px;font-size:.82rem;font-weight:600;margin:0;min-width:0}
+.registration-admin .field input,.registration-admin .field select{height:44px;min-width:0;width:100%;border-radius:9px;font-size:.88rem;font-weight:400;background:#fff;padding:9px 12px;border:1px solid #cadbe5}
+.registration-advanced{margin-top:18px;border-top:1px solid #e7eef2;padding-top:15px}
+.registration-advanced summary{cursor:pointer;font-size:.83rem;font-weight:600;width:fit-content;line-height:1.7}
+.registration-advanced summary span{font-size:.77rem;font-weight:400;color:#6c808b;margin-left:8px}
+.registration-filter-extra{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;padding-top:16px}
+.registration-filter-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.registration-filter-actions .button-primary{min-width:160px}
+.registration-results{overflow:hidden}
+.registration-results-heading{padding:22px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid #e7eef2}
+.registration-results-heading p{font-size:.8rem;color:#6c808b;margin:6px 0 0}
+.registration-result-count{display:inline-grid;place-items:center;min-width:30px;height:26px;padding:0 8px;background:#eaf3f7;color:#07547b;border-radius:7px;font-size:.85rem;margin-left:5px}
+.registration-current-filter{font-size:.78rem;white-space:nowrap;color:#526f7e}
+.registration-admin .registration-table-wrap{margin:0;overflow-x:auto}
+.registration-admin .registration-table{min-width:0;table-layout:fixed;font-size:.86rem}
+.registration-admin .registration-table th{background:#f5f8fa;color:#637c89;font-size:.74rem;font-weight:600;padding:14px 18px;border-bottom:1px solid var(--review-border)}
+.registration-admin .registration-table td{padding:20px 18px;border-bottom:1px solid #e9eff3;line-height:1.6;vertical-align:top}
+.registration-table th:nth-child(1){width:26%}.registration-table th:nth-child(2){width:18%}.registration-table th:nth-child(3){width:17%}.registration-table th:nth-child(4){width:20%}.registration-table th:nth-child(5){width:19%}
+.registration-applicant>strong{display:block;font-size:.93rem;line-height:1.6;font-weight:650}
+.registration-meta{display:block;font-size:.76rem;color:#6a818e;margin-top:5px;line-height:1.65;overflow-wrap:anywhere}
+.registration-code{display:block;font-size:.76rem;color:#476676;background:#f0f5f8;padding:4px 8px;border-radius:6px;margin-top:10px;width:fit-content;max-width:100%;overflow-wrap:anywhere}
+.registration-group{font-weight:500;font-size:.85rem}
+.registration-date{font-size:.8rem;font-variant-numeric:tabular-nums}
+.registration-status{display:inline-block;font-size:.76rem;font-weight:600;line-height:1.5;padding:5px 10px;border-radius:7px;white-space:nowrap}
+.registration-status--pending{color:#89611c;background:#fff4d9}.registration-status--approved{color:#25724d;background:#e8f5ee}.registration-status--rejected{color:#a04747;background:#fbeeee}.registration-status--cancelled{color:#677c88;background:#edf2f5}
+.registration-row-actions{display:flex;gap:7px;flex-wrap:wrap}
+.registration-admin .registration-table td .button{display:inline-flex;align-items:center;justify-content:center;width:auto;min-height:38px;padding:8px 12px;font-size:.76rem;margin:0}
+.registration-admin .registration-detail-button{flex-basis:100%;background:#f2f7fa;border-color:#d4e2ea;color:#174f6b}
+.registration-admin .registration-reject-button{color:#9a4848;background:#fff;border-color:#eadada}
+.registration-pagination{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 24px;background:#fbfcfd}
+.registration-pagination>span{font-size:.82rem;color:#536f7f}.registration-pagination small{display:block;font-size:.73rem;color:#7b8d97;margin-top:4px}.registration-pagination>div{display:flex;gap:8px}
+.registration-empty{text-align:center!important;padding:40px 20px!important}.registration-empty strong,.registration-empty span{display:block}.registration-empty span{font-size:.85rem;color:#748892;margin-top:7px}
+.registration-admin :is(button,input,select,summary):focus-visible{outline:3px solid #77b9d1;outline-offset:3px}
+@media(max-width:1100px){.registration-heading-actions{max-width:190px}.registration-filter-extra{grid-template-columns:repeat(2,minmax(0,1fr))}.registration-admin .registration-table td,.registration-admin .registration-table th{padding-inline:12px}}
+@media(max-width:900px){
+ .registration-admin .registration-table,.registration-admin .registration-table tbody{display:block;width:100%;min-width:0}
+ .registration-admin .registration-table thead{display:none}
+ .registration-admin .registration-table tbody{padding:0 18px}
+ .registration-admin .registration-table tr{display:grid;grid-template-columns:1fr 1fr;gap:16px 22px;padding:22px 0;border-bottom:1px solid var(--review-border)}
+ .registration-admin .registration-table td{display:block;padding:0;border:0;min-width:0}
+ .registration-admin .registration-table td::before{content:attr(data-label);display:block;font-size:.72rem;color:#7a8c96;margin-bottom:7px}
+ .registration-admin .registration-applicant,.registration-admin .registration-actions-cell,.registration-admin .registration-empty{grid-column:1/-1}
+ .registration-admin .registration-applicant::before,.registration-admin .registration-actions-cell::before,.registration-admin .registration-empty::before{display:none}
+ .registration-admin .registration-detail-button{flex-basis:auto;margin-right:auto!important}
+ .registration-code{margin-top:6px}.registration-applicant>strong{font-size:1rem}
+}
+@media(max-width:600px){
+ .registration-admin{gap:16px}.registration-heading{display:block}.registration-heading-actions{max-width:none;justify-content:flex-start;margin-top:16px}
+ .registration-filters{padding:18px}.registration-section-heading{gap:5px;margin-bottom:15px}.registration-section-heading>span{width:100%}
+ .registration-filter-main{grid-template-columns:1fr;gap:14px}.registration-filter-extra{grid-template-columns:1fr;gap:14px}
+ .registration-advanced summary span{display:block;margin-left:0}.registration-filter-actions{display:grid;grid-template-columns:1fr 1.25fr}.registration-filter-actions .button-primary{min-width:0}
+ .registration-results-heading{padding:18px;align-items:flex-start}.registration-results-heading p{line-height:1.65}.registration-current-filter{display:none}
+ .registration-pagination{padding:16px 18px;flex-wrap:wrap}.registration-pagination>div{margin-left:auto}.registration-pagination .button{padding:8px 12px}
+ .registration-admin .registration-table tr{gap:16px}.registration-admin .registration-table td .button{padding:9px 12px}
+}

@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "ระบบโรงงาน SIP",
+  "short_name": "SIP",
+  "description": "แอปใช้งานภายในโรงงาน",
+  "lang": "th",
+  "start_url": "./index.html#/home",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f2f7fa",
+  "theme_color": "#073b63",
+  "icons": [
+    { "src": "./assets/icons/factory-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./assets/icons/factory-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./assets/icons/factory-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
