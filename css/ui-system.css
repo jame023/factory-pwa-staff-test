@@ -1,0 +1,513 @@
+/* Shared presentation layer. No visibility or authorization decisions here. */
+.sip-ui{--ui-ink:#153f57;--ui-muted:#637c8b;--ui-line:#dce6ed;--ui-accent:#087891;--ui-soft:#eaf4f8;--ui-radius:16px;background:#f2f7fa;color:var(--ui-ink);text-rendering:optimizeLegibility}
+.sip-ui .main-shell{max-width:1180px;padding-top:28px}
+.sip-ui .app-header{background:#ffffffed;border-bottom:1px solid var(--ui-line);box-shadow:0 2px 12px #00000005}
+.sip-ui .header-inner{min-height:72px;gap:18px}
+.sip-ui .brand-title{font-size:1rem;font-weight:700}
+.sip-ui .header-tools{gap:9px}
+.sip-ui .header-tools .button{min-height:38px;border-radius:10px;font-size:.78rem}
+.sip-ui .mode-pill,.sip-ui .badge{font-weight:600}
+.sip-ui #page-root>div:not(.workspace-hub),.sip-ui #page-root>section{min-width:0}
+.sip-ui #page-root .page-heading{gap:20px;margin:4px 0 24px;padding-bottom:22px;border-bottom:1px solid var(--ui-line);align-items:center}
+.sip-ui #page-root h1{font-size:clamp(1.5rem,2.8vw,2rem);line-height:1.4;font-weight:700;letter-spacing:-.025em}
+.sip-ui #page-root h2{line-height:1.5;font-weight:650}
+.sip-ui #page-root .page-heading p{color:var(--ui-muted);line-height:1.7}
+.sip-ui .eyebrow{font-size:.72rem;letter-spacing:.035em;color:#607f90;font-weight:600}
+.sip-ui #page-root h1[data-ui-icon]{display:flex;align-items:center;gap:13px}
+.sip-ui #page-root h1[data-ui-icon]::before{content:"";width:30px;height:30px;flex:none;background:var(--ui-accent);-webkit-mask:var(--ui-icon) center/contain no-repeat;mask:var(--ui-icon) center/contain no-repeat}
+.sip-ui button[data-ui-icon]::before,.sip-ui a.button[data-ui-icon]::before{content:"";display:inline-block;width:17px;height:17px;flex:none;background:currentColor;-webkit-mask:var(--ui-icon) center/contain no-repeat;mask:var(--ui-icon) center/contain no-repeat;vertical-align:middle}
+.sip-ui .button{border-radius:10px;font-weight:600;min-height:44px;gap:8px;transition:background-color .16s,border-color .16s,box-shadow .16s}
+.sip-ui .button-primary{box-shadow:0 3px 8px #00000012}
+.sip-ui .button:not(:disabled):hover{box-shadow:0 3px 10px #0000000a}
+.sip-ui .button:disabled{box-shadow:none}
+.sip-ui :is(button,a,input,select,textarea,summary):focus-visible{outline:3px solid #79b9d0;outline-offset:3px}
+.sip-ui .card{border-color:var(--ui-line);border-radius:var(--ui-radius);box-shadow:0 3px 14px #00000004}
+.sip-ui .card-pad{padding:24px}
+.sip-ui .card .section-title{gap:16px;align-items:center}
+.sip-ui .field{gap:8px;min-width:0}
+.sip-ui .field label,.sip-ui label.field{font-size:.83rem;font-weight:600;color:#355b70}
+.sip-ui .field input,.sip-ui .field select,.sip-ui .field textarea{min-height:46px;border:1px solid #c9d9e3;border-radius:9px;background:#fff;font-size:.9rem;font-weight:400;color:var(--ui-ink);padding:11px 12px}
+.sip-ui .field input:disabled,.sip-ui .field select:disabled{background:#f2f6f8;color:#708795}
+.sip-ui .field input:read-only{background:#f7fafb}
+.sip-ui .field input::placeholder,.sip-ui .field textarea::placeholder{color:#91a3ae}
+.sip-ui .form-grid{gap:18px}
+.sip-ui .form-actions{gap:10px;align-items:center}
+.sip-ui .help-text{font-size:.8rem;line-height:1.7;color:var(--ui-muted)}
+.sip-ui .table-wrap{border-color:var(--ui-line);border-radius:12px;scrollbar-width:thin;overscroll-behavior-x:contain}
+.sip-ui #page-root table th{font-size:.76rem;font-weight:650;line-height:1.5;background:#f3f7fa;color:#527386;padding:14px 15px}
+.sip-ui #page-root table td{font-size:.83rem;line-height:1.65;padding:16px 15px}
+.sip-ui #page-root table tbody tr:hover{background:#f7fbfd}
+.sip-ui #page-root table .button{min-height:38px;font-size:.75rem;padding:8px 11px}
+.sip-ui #page-root table .button[data-ui-icon]::before{width:14px;height:14px}
+.sip-ui #page-root table .machine-row-actions{gap:7px}
+.sip-ui .badge{font-size:.74rem;padding:5px 10px;border-radius:7px;line-height:1.4}
+.sip-ui .notice{border-radius:12px;padding:15px 17px;line-height:1.75;font-size:.87rem}
+.sip-ui .empty-state{padding:28px 20px;border-color:#cbdde7;border-radius:14px;font-size:.9rem;line-height:1.8}
+.sip-ui .toolbar{padding:16px;background:#f7fafc;border:1px solid #e0eaf0;border-radius:12px;gap:12px}
+.sip-ui .modal-card,.sip-ui .status-modal-card{border-radius:18px;box-shadow:0 24px 80px #0000002e}
+.sip-ui :is(.employee-editor,.permission-editor,.machine-editor,.item-editor,.registration-review-card) h2{font-size:1.15rem}
+.sip-ui .registration-review-card{border:1px solid var(--ui-line);padding:28px;border-radius:18px}
+.sip-ui .registration-review-card>h2{margin:0 0 22px;padding-bottom:18px;border-bottom:1px solid var(--ui-line)}
+.sip-ui .registration-review-card dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 24px}
+.sip-ui .registration-review-card dl>div{padding-bottom:12px;border-bottom:1px solid #e9f0f4}
+.sip-ui .registration-review-card dt{font-size:.76rem;color:var(--ui-muted);font-weight:500}
+.sip-ui .registration-review-card dd{font-size:.92rem;line-height:1.7;margin:5px 0 0}
+.sip-ui .registration-review-card form{padding:22px;background:#f7fafc;border:1px solid var(--ui-line);border-radius:12px;margin-top:20px}
+.sip-ui .registration-review-card h3{font-size:1rem}
+.sip-ui .registration-review-card label{line-height:1.7}
+.sip-ui .registration-review-card input[type=checkbox]{width:18px;height:18px;accent-color:var(--ui-accent)}
+.sip-ui .registration-review-card textarea{width:100%;min-height:90px;padding:12px;border:1px solid #c9d9e3;border-radius:9px}
+.sip-ui .login-screen{max-width:570px;margin:30px auto 0;padding:34px;border-top:4px solid var(--ui-accent);box-shadow:0 18px 60px #00000009}
+.sip-ui .login-brand{align-items:center;gap:17px}
+.sip-ui .login-brand img{width:64px;height:64px;object-fit:contain}
+.sip-ui .login-screen h1[data-ui-icon]::before{display:none}
+.sip-ui .login-screen h1{font-size:1.6rem}
+.sip-ui .login-description{font-size:.92rem;line-height:1.85;margin:22px 0;color:var(--ui-muted)}
+.sip-ui .login-submit{width:100%;min-height:50px;gap:10px;margin:8px 0 0}
+.sip-ui .login-submit.button-primary{background:#14875d;border-color:#14875d}
+.sip-ui .login-submit.button-primary:hover{background:#106c4b}
+.sip-ui .login-privacy{padding:16px 0 0;border-top:1px solid var(--ui-line);margin-top:24px}
+.sip-ui .registration-page{max-width:760px;gap:20px}
+.sip-ui .registration-page>header{padding:8px 0 5px}
+.sip-ui .registration-page .card{padding:24px}
+.sip-ui .registration-page dl{margin:14px 0;line-height:1.7}
+.sip-ui .registration-page dt{font-size:.78rem;color:var(--ui-muted);font-weight:500}
+.sip-ui .registration-page dd{font-size:.94rem;color:var(--ui-ink)}
+.sip-ui .registration-actions{padding-top:18px;border-top:1px solid var(--ui-line)}
+.sip-ui .bottom-nav{border-color:var(--ui-line);box-shadow:0 -3px 16px #00000003}
+.sip-ui .nav-item{font-weight:600}
+.sip-ui .nav-icon svg{width:22px;height:22px;display:block}
+.sip-ui .offline-card{border:1px solid var(--ui-line);max-width:480px;padding:34px;border-radius:20px;box-shadow:0 18px 60px #00000009}
+.sip-ui .offline-icon{display:grid;place-items:center;margin:0 auto 20px;width:72px;height:72px;border-radius:20px;background:var(--ui-soft);color:var(--ui-accent)}
+.sip-ui .offline-icon svg{width:34px;height:34px}
+.sip-ui .offline-card h1{font-size:1.6rem}
+.sip-ui .offline-card p{line-height:1.85;font-size:.93rem}
+/* Workspace menus share the same hierarchy as Admin; no new data workflows. */
+.workspace-hub{padding:8px 0;min-width:0}
+.workspace-heading{display:flex;align-items:flex-start;gap:18px;margin-bottom:26px;padding:4px 0 25px;border-bottom:1px solid var(--ui-line)}
+.workspace-heading-icon{display:grid;place-items:center;flex:none;width:60px;height:60px;color:#087891;background:#e5f2f6;border-radius:17px;margin-top:4px}
+.workspace-heading-icon svg{width:30px;height:30px}
+.workspace-kicker{font-size:.73rem;font-weight:600;color:#6a8392}
+.workspace-heading h1{margin:5px 0 8px}
+.workspace-heading p{font-size:.88rem;color:var(--ui-muted);line-height:1.7;margin:0}
+.workspace-section-title{display:flex;justify-content:space-between;align-items:center;margin:22px 0 16px;gap:15px}
+.workspace-section-title h2{font-size:1rem;margin:0}
+.workspace-section-title>span{font-size:.76rem;color:var(--ui-muted)}
+.workspace-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.workspace-card{font:inherit;text-decoration:none;text-align:left;display:flex;align-items:center;gap:15px;padding:22px 19px;background:#fff;border:1px solid var(--ui-line);border-radius:15px;color:var(--ui-ink);box-shadow:0 3px 14px #00000003;min-width:0;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.workspace-card:hover{border-color:#85b6c9;box-shadow:0 8px 24px #0000000b}
+.workspace-card:focus-visible{outline:3px solid #79b9d0;outline-offset:3px}
+.workspace-card-icon{display:grid;place-items:center;flex:none;width:46px;height:46px;border-radius:12px;background:#ecf5f8;color:#21738c}
+.workspace-card-icon svg{width:24px;height:24px}
+.workspace-card-copy{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+.workspace-card-copy strong{font-weight:650;font-size:.95rem;line-height:1.6}
+.workspace-card-copy>span{font-size:.78rem;line-height:1.7;color:var(--ui-muted)}
+.workspace-card-arrow{flex:none;color:#94adba}
+.workspace-card-arrow svg{width:18px;height:18px}
+.workspace-pending{display:flex;gap:13px;background:#f9f6ec;color:#806838;border:1px solid #eee4c8;border-radius:13px;padding:18px 20px;line-height:1.75}
+.workspace-pending>span{flex:none;padding-top:2px}
+.workspace-pending svg{width:23px;height:23px}
+.workspace-pending strong{font-size:.88rem;font-weight:650}
+.workspace-pending p{margin:4px 0 0;font-size:.8rem}
+.workspace-selector{max-width:900px;margin:auto}
+.workspace-select-hint{color:var(--ui-muted);line-height:1.8;margin:10px 0 22px;font-size:.9rem}
+.workspace-selection-error{color:#ad4141;line-height:1.8}
+.ui-access-state{text-align:center;max-width:580px;margin:26px auto;padding:38px 30px!important}
+.ui-state-icon{display:grid;place-items:center;width:76px;height:76px;border-radius:22px;background:#f5eded;color:#ad5e5e;margin:0 auto 22px}
+.ui-state-icon svg{width:35px;height:35px}
+.ui-access-state h1{justify-content:center}
+.ui-access-state h1::before{display:none!important}
+.ui-access-state p{color:var(--ui-muted);font-size:.92rem;line-height:1.85;margin:15px 0 25px}
+@media(max-width:1000px){.sip-ui #page-root table .machine-row-actions{flex-wrap:wrap}.sip-ui .header-tools{gap:6px}.sip-ui .registration-review-card{padding:24px}}
+@media(max-width:700px){
+ .sip-ui .main-shell{padding-top:18px}.sip-ui #page-root .page-heading{align-items:flex-start;flex-wrap:wrap;padding-bottom:18px;margin-bottom:20px}
+ .sip-ui #page-root .page-heading>.form-actions{margin-top:0;justify-content:flex-start}
+ .sip-ui .card-pad{padding:19px}.sip-ui .form-grid{gap:15px;grid-template-columns:1fr}
+ .sip-ui .toolbar{padding:14px}.sip-ui .registration-review-card dl{gap:14px;grid-template-columns:1fr 1fr}
+ .workspace-menu{grid-template-columns:1fr}.workspace-card{padding:18px}.workspace-heading{gap:13px}.workspace-heading-icon{width:49px;height:49px;border-radius:14px}.workspace-heading-icon svg{width:25px;height:25px}
+ .workspace-section-title>span{font-size:.7rem}.sip-ui .registration-page .card{padding:20px}
+}
+@media(max-width:900px){
+ .sip-ui .registration-admin .registration-table tr{gap:16px 22px}
+ .sip-ui .registration-admin .registration-table td{padding:0;border:0}
+ .sip-ui .registration-admin .registration-table td.registration-empty{padding:30px 15px}
+}
+@media(max-width:480px){
+ .sip-ui .header-inner{min-height:64px;gap:10px}.sip-ui .brand-title{font-size:.86rem}.sip-ui .header-tools .button{font-size:.72rem;padding:7px 9px}.sip-ui .header-tools .button::before{display:none}
+ .sip-ui .main-shell{padding-inline:12px}.sip-ui #page-root h1[data-ui-icon]::before{width:25px;height:25px}
+ .sip-ui .login-screen{padding:24px 20px;margin-top:12px}.sip-ui .login-brand{gap:12px}.sip-ui .login-brand img{width:49px;height:49px}.sip-ui .login-screen h1{font-size:1.3rem}
+ .sip-ui .registration-review-card{padding:20px;max-height:94dvh}.sip-ui .registration-review-card dl{grid-template-columns:1fr}.sip-ui .registration-review-card form{padding:16px}.sip-ui .registration-review-card .form-actions>.button{flex:1}
+ .sip-ui .registration-page .card{padding:18px}.sip-ui .offline-card{padding:25px 20px}
+ .workspace-card-copy>span{font-size:.76rem}.workspace-card{gap:12px}.workspace-section-title>span{display:none}.workspace-heading h1{font-size:1.5rem}.workspace-pending{padding:16px}
+}
+@media(prefers-reduced-motion:reduce){.sip-ui .button,.workspace-card{transition:none}}
+
+/* Pass 3.2 workspace controls use the shared app palette. */
+.workspace-switch{display:inline-flex;align-items:center;min-height:38px;padding:7px 9px;color:var(--navy,#073b63);background:#fff;border:1px solid #bccbd4;border-radius:10px;font-size:.78rem;font-weight:600;white-space:normal;max-width:100%;text-align:left;cursor:default;user-select:none}
+.workspace-card[aria-pressed="true"]{outline:3px solid var(--primary,#073b63);outline-offset:2px}
+.workspace-card[aria-disabled="true"],.admin-hub-card[aria-disabled="true"]{opacity:.68;cursor:default}
+.workspace-card:focus-visible{outline:3px solid #dc8508;outline-offset:4px}
+.workspace-card-copy{min-width:0;overflow-wrap:anywhere}
+@media(max-width:600px){.header-tools{flex-wrap:wrap;justify-content:flex-end;min-width:0}.workspace-switch{flex-basis:100%;font-size:.8rem}.header-inner{gap:10px}.brand{min-width:0}.brand-title{overflow-wrap:anywhere}}
+
+/* Workspace landing: a compact factory console with permission-based facts. */
+.workspace-selector--landing{position:relative;isolation:isolate;overflow:hidden;max-width:1080px;margin:10px auto 30px;padding:clamp(22px,4vw,42px)!important;border:1px solid #cfe1e8;border-radius:22px;background:linear-gradient(118deg,#fff 0%,#fbfdfe 62%,#edf8f8 100%);box-shadow:0 16px 42px #0000000b}
+.workspace-selector--landing::after{content:"";position:absolute;z-index:-1;right:-56px;top:-82px;width:250px;height:250px;border:1px solid #74c5c533;border-radius:44px;transform:rotate(27deg)}
+.workspace-selector--landing>h1{position:relative;margin:0 0 8px;color:#103953;font-size:clamp(1.65rem,3vw,2.25rem);letter-spacing:-.035em}
+.workspace-selector--landing>h1::before{content:"SIP  /  WORKSPACE";display:block;margin-bottom:9px;color:#07859a;font:700 .68rem/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.16em}
+.workspace-selector--landing .workspace-select-hint{position:relative;max-width:670px;margin:0 0 25px;font-size:.96rem;line-height:1.85}
+.workspace-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 28px}
+.workspace-fact{display:flex;align-items:center;gap:13px;min-width:0;padding:14px 16px;border:1px solid #d8e7ec;border-radius:15px;background:#ffffffd9;box-shadow:0 5px 16px #00000008}
+.workspace-fact-mark{display:grid;place-items:center;flex:none;width:40px;height:40px;border-radius:12px;background:#e6f5f7;color:#07859a}
+.workspace-fact-mark svg{width:21px;height:21px}
+.workspace-fact>span:last-child{display:flex;flex-direction:column;gap:3px;min-width:0}
+.workspace-fact strong{overflow:hidden;color:#103953;font-size:1.02rem;line-height:1.35;text-overflow:ellipsis;white-space:nowrap}
+.workspace-fact small{color:#607c8b;font-size:.72rem;line-height:1.45}
+.workspace-fact--selected .workspace-fact-mark{background:#e9f7ee;color:#258052}
+.workspace-fact--role .workspace-fact-mark{background:#edf2f5;color:#496375}
+.workspace-selector--landing .workspace-menu{position:relative;grid-template-columns:repeat(auto-fit,minmax(min(100%,245px),1fr));gap:15px}
+.workspace-card--choice{position:relative;align-items:flex-start;min-height:170px;padding:19px 18px;border-color:#d7e5eb;border-radius:17px;box-shadow:0 5px 17px #00000008;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.workspace-card--choice:hover{transform:translateY(-3px);border-color:var(--workspace-accent,#65aabc);box-shadow:0 12px 25px #00000012}
+.workspace-card--choice[aria-pressed="true"]{border-color:var(--workspace-accent,#07859a);outline:2px solid var(--workspace-accent,#07859a);outline-offset:1px;background:linear-gradient(145deg,#fff 55%,var(--workspace-tint,#eef8fa));box-shadow:0 9px 23px #0000000d}
+.workspace-card--choice .workspace-card-icon{width:50px;height:50px;border-radius:15px;background:var(--workspace-tint,#e6f5f7);color:var(--workspace-accent,#07859a)}
+.workspace-card--choice .workspace-card-copy{gap:6px;padding-top:1px}
+.workspace-card--choice .workspace-card-copy strong{font-size:1.02rem}
+.workspace-card--choice .workspace-card-copy>span{font-size:.8rem}
+.workspace-card-state{margin-top:7px;color:var(--workspace-accent,#07859a);font-size:.7rem;font-weight:700;letter-spacing:.01em}
+.workspace-card--choice[aria-pressed="true"] .workspace-card-state{color:#24764e}
+.workspace-card--choice .workspace-card-arrow{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#f1f6f8;color:#668596;transition:transform .18s ease,background .18s ease,color .18s ease}
+.workspace-card--choice:hover .workspace-card-arrow{transform:translateX(3px);background:var(--workspace-tint,#e6f5f7);color:var(--workspace-accent,#07859a)}
+.workspace-card--choice[data-workspace="/employee/screen"]{--workspace-accent:#07859a;--workspace-tint:#e5f5f6}
+.workspace-card--choice[data-workspace="/employee/production"]{--workspace-accent:#bd6a18;--workspace-tint:#fff3e4}
+.workspace-card--choice[data-workspace="/employee/delivery"]{--workspace-accent:#39805c;--workspace-tint:#eaf5ee}
+.workspace-card--choice[data-workspace="/employee/office"]{--workspace-accent:#286aab;--workspace-tint:#eaf3fc}
+.workspace-card--choice[data-workspace="/executive"]{--workspace-accent:#5b6470;--workspace-tint:#edf2f5}
+.workspace-selector--landing .workspace-selector-actions{margin:0 0 16px}
+.workspace-selector--landing .workspace-selection-error:empty{display:none}
+@media(max-width:700px){.workspace-selector--landing{margin:0 auto 24px;padding:22px 18px!important;border-radius:18px}.workspace-selector--landing::after{right:-145px;top:-104px;width:220px;height:220px}.workspace-facts{grid-template-columns:1fr;gap:9px;margin-bottom:22px}.workspace-fact{padding:11px 13px}.workspace-fact-mark{width:36px;height:36px}.workspace-selector--landing .workspace-menu{grid-template-columns:1fr}.workspace-card--choice{min-height:132px;padding:16px}.workspace-selector--landing .workspace-select-hint{font-size:.88rem}}
+@media(prefers-reduced-motion:reduce){.workspace-card--choice,.workspace-card--choice .workspace-card-arrow{transition:none}.workspace-card--choice:hover,.workspace-card--choice:hover .workspace-card-arrow{transform:none}}
+
+/* Factory SIP visual refresh: one steel-and-teal system across every route. */
+.sip-ui{
+  --ui-ink:#183b43;--ui-muted:#5b7477;--ui-line:#d3dfdc;--ui-accent:#087d78;
+  --ui-soft:#e5f1ec;--ui-panel:#fff;--ui-panel-soft:#f4f8f6;
+  --ui-success:#26734f;--ui-warning:#96630f;--ui-danger:#a9322a;
+  min-height:100dvh;color:var(--ui-ink);background-color:#eaf0ed;
+}
+.sip-ui .app-header{color:#f8fbf9;background:linear-gradient(105deg,#163943 0%,#1b4b50 100%);border-bottom:3px solid #d29542;box-shadow:0 5px 18px #0000001a}
+.sip-ui .brand,.sip-ui .brand-title{color:#f8fbf9}
+.sip-ui .header-back{color:#f8fbf9;background:#ffffff12;border-color:#ffffff4d}
+.sip-ui .header-back:hover:not(:disabled){background:#ffffff20}
+.sip-ui .workspace-switch{color:#254d50;background:#f8fbf9;border-color:#d4e1dd}
+.sip-ui .header-tools .badge-info{color:#f1f8f5;background:#ffffff1b}
+.sip-ui .header-tools .button{color:#173d45;background:#f8fbf9;border-color:#d8e3df}
+.sip-ui .main-shell{padding-top:30px}
+.sip-ui #page-root .page-heading{
+  position:relative;isolation:isolate;overflow:hidden;min-height:136px;align-items:center;
+  padding:clamp(22px,3vw,34px);border:1px solid #386269;border-left:1px solid #386269;
+  border-radius:20px;background:linear-gradient(112deg,#173e48 0%,#20595b 74%,#286968 100%);
+  box-shadow:0 12px 28px #0000001b;color:#f7faf8
+}
+.sip-ui #page-root .page-heading::after{content:"";position:absolute;z-index:-1;right:24px;top:-74px;width:210px;height:210px;border:1px solid #ffffff24;border-radius:34px;transform:rotate(32deg)}
+.sip-ui #page-root .page-heading h1,.sip-ui #page-root .page-heading h1[data-ui-icon]{color:#fff}
+.sip-ui #page-root .page-heading h1[data-ui-icon]::before{background:#f0bd69}
+.sip-ui #page-root .page-heading p{color:#d7e7e3}
+.sip-ui #page-root .page-heading .eyebrow{color:#f0bd69}
+.sip-ui #page-root .page-heading .button{color:#173d45;background:#fff;border-color:#d8e3df}
+.sip-ui #page-root .section-title{padding-bottom:12px;border-bottom-color:#c9d9d5}
+.sip-ui #page-root .section-title h2,.sip-ui #page-root .card>h2{color:#1d4c50}
+.sip-ui #page-root .section-title h2::before,.sip-ui #page-root .card>h2::before{width:4px;background:#d29542}
+.sip-ui #page-root .hero-card{position:relative;isolation:isolate;overflow:hidden;padding:clamp(24px,3vw,36px);border:1px solid #386269;border-radius:20px;background:linear-gradient(112deg,#173e48 0%,#20595b 74%,#286968 100%);box-shadow:0 12px 28px #0000001b}
+.sip-ui #page-root .hero-card::after{content:"";position:absolute;z-index:-1;right:24px;top:-78px;width:210px;height:210px;border:1px solid #ffffff24;border-radius:34px;transform:rotate(32deg)}
+.sip-ui #page-root .hero-card h1{color:#fff}
+.sip-ui #page-root .hero-card p{color:#d7e7e3}
+.sip-ui #page-root .hero-card .hero-date{color:#f0bd69}
+.sip-ui #page-root .card{border-color:#d3dfdc;border-radius:18px;box-shadow:0 7px 22px #0000000a}
+.sip-ui #page-root .toolbar,.sip-ui #page-root .filter-panel{border-color:#d4e1dd;background:#f4f8f6}
+.sip-ui #page-root .stat-card{border:1px solid #d5e2dd;border-radius:16px;background:linear-gradient(145deg,#fff 0%,#f5f9f6 100%);box-shadow:0 5px 16px #00000008}
+.sip-ui #page-root .stat-value{color:#08716d}
+.sip-ui #page-root table th{color:#284f52;background:#e4eeea;border-bottom-color:#cbdad5}
+.sip-ui #page-root table td{border-bottom-color:#e3ebe7}
+.sip-ui #page-root table tbody tr:nth-child(even){background:#f8fbf9}
+.sip-ui #page-root table tbody tr:hover{background:#edf5f1}
+.sip-ui #page-root :is(input,select,textarea){border-color:#bdcfca}
+.sip-ui #page-root :is(input,select,textarea):focus{border-color:#087d78;box-shadow:0 0 0 3px #087d781a}
+.sip-ui #page-root .button{box-shadow:0 2px 6px #00000009;transition:transform .16s ease,background-color .16s ease,border-color .16s ease,box-shadow .16s ease}
+.sip-ui #page-root .button-primary{color:#fff;background:#08756f;border-color:#08756f}
+.sip-ui #page-root .button-primary:hover:not(:disabled){background:#075f5c}
+.sip-ui #page-root .button:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 5px 12px #00000012}
+.sip-ui #page-root .notice{border:1px solid #c9dcda;border-left:1px solid #c9dcda;border-radius:13px;background:#edf6f4;color:#284f52}
+.sip-ui #page-root .notice-success{border-color:#c9e2d3;background:#edf7f0;color:#205d40}
+.sip-ui #page-root .notice-warning{border-color:#ebd6ad;background:#fff7e9;color:#79550d}
+.sip-ui #page-root .notice-danger{border-color:#e7c8c3;background:#fff2ef;color:#8c2d25}
+.sip-ui #page-root .empty-state{border-color:#c8d8d3;background:#f6faf7}
+.sip-ui #page-root .module-card{border-color:#d3dfdc;border-radius:16px;background:linear-gradient(145deg,#fff,#f5f9f6);box-shadow:0 5px 16px #00000008}
+.sip-ui #page-root .module-icon{color:#087d78;background:#e3f0eb}
+.sip-ui .bottom-nav{background:#f7faf8f2;border-color:#d3dfdc;box-shadow:0 -5px 20px #0000000b}
+.sip-ui .nav-item{color:#587074;transition:background-color .16s ease,color .16s ease}
+.sip-ui .nav-item[aria-current="page"]{color:#075f5c;background:#e1efea;box-shadow:inset 0 -2px #d29542}
+.sip-ui #page-root :is(.module-card,.admin-hub-card,.workspace-card,.device-card,.admin-link,.admin-module-button){transition:transform .17s ease,border-color .17s ease,box-shadow .17s ease}
+.sip-ui #page-root :is(a.module-card,a.admin-hub-card,.workspace-card,.admin-link,button.admin-module-button):hover:not([aria-disabled="true"]):not(:disabled){transform:translateY(-2px);border-color:#8caaa3;box-shadow:0 9px 20px #00000012}
+.sip-ui :is(button,a,input,select,textarea,summary):focus-visible{outline-color:#bd7b29}
+@media(max-width:700px){
+  .sip-ui .main-shell{padding-top:18px}
+  .sip-ui #page-root .page-heading{min-height:0;padding:20px;border-radius:16px}
+  .sip-ui #page-root .page-heading::after{right:-105px;top:-100px;width:190px;height:190px}
+  .sip-ui #page-root .hero-card{padding:22px;border-radius:16px}
+  .sip-ui #page-root .hero-card::after{right:-105px;top:-100px;width:190px;height:190px}
+  .sip-ui #page-root .page-heading .form-actions{margin-top:14px}
+  .sip-ui #page-root .card{border-radius:15px}
+}
+@media(prefers-reduced-motion:reduce){
+  .sip-ui #page-root .button,.sip-ui #page-root :is(.module-card,.admin-hub-card,.workspace-card,.device-card,.admin-link,.admin-module-button),.sip-ui .nav-item{transition:none}
+  .sip-ui #page-root .button:not(:disabled):hover,.sip-ui #page-root :is(a.module-card,a.admin-hub-card,.workspace-card,.admin-link,button.admin-module-button):hover{transform:none}
+}
+
+/* Larger desktop canvas and a persistent home action across all routes. */
+.sip-ui .bottom-nav {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  transform: none;
+  width: 100vw;
+  max-width: none;
+  margin: 0;
+  padding: .55rem .65rem calc(.55rem + env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-content: stretch;
+  border: 1px solid var(--ui-line);
+  border-bottom: 0;
+  border-radius: 0;
+  z-index: 40;
+}
+.sip-ui .bottom-nav .nav-item { min-height: 62px; font-size: .78rem; }
+.sip-ui .bottom-nav .nav-icon { font-size: 1.35rem; }
+.sip-ui .main-shell { padding-bottom: 8rem; }
+
+@media (min-width: 1024px) {
+  /* Keep desktop typography and controls at a familiar app scale. */
+  html { font-size: clamp(16px, 0.94vw, 18px); }
+  .sip-ui .main-shell,
+  .sip-ui .header-inner,
+  .sip-ui .connection-banner,
+  .sip-ui .update-banner {
+    box-sizing: border-box;
+    width: calc(100% - 48px);
+    max-width: 1480px;
+    margin-inline: auto;
+  }
+  .sip-ui .main-shell { padding-bottom: 6rem; }
+  .sip-ui #page-root { width: 100%; min-width: 0; }
+  .workspace-selector { width: 100%; max-width: none; }
+  .sip-ui .registration-page { width: 100%; max-width: 960px; margin-inline: auto; }
+  .sip-ui .login-screen { max-width: 620px; }
+  .sip-ui .ui-access-state { max-width: 760px; }
+}
+/* Factory SIP visual hierarchy shared by every route. */
+.sip-ui {
+  --ui-ink: #123b55;
+  --ui-muted: #5d7889;
+  --ui-line: #d5e2e9;
+  --ui-accent: #087d93;
+  --ui-soft: #e9f4f7;
+  --ui-panel: #ffffff;
+  --ui-panel-soft: #f6fafc;
+  --ui-success: #18794e;
+  --ui-warning: #8a5a0a;
+  --ui-danger: #b42318;
+  background: #edf4f7;
+  color: var(--ui-ink);
+}
+.sip-ui #page-root { color: var(--ui-ink); }
+.sip-ui #page-root .page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(16px, 2vw, 32px);
+  margin: 8px 0 28px;
+  padding: clamp(20px, 2vw, 36px);
+  border: 1px solid var(--ui-line);
+  border-radius: 18px;
+  background: linear-gradient(110deg, #fff 0%, #f4f9fb 100%);
+  box-shadow: 0 5px 18px #00000008;
+}
+.sip-ui #page-root h1 { color: #0b3854; }
+.sip-ui #page-root .page-heading h1 { margin: 0; }
+.sip-ui #page-root .page-heading p { max-width: 70ch; margin: 8px 0 0; color: var(--ui-muted); }
+.sip-ui #page-root .page-heading .eyebrow { display: block; margin-bottom: 8px; color: var(--ui-accent); font-weight: 750; }
+.sip-ui #page-root .section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--ui-line);
+}
+.sip-ui #page-root .section-title h2,
+.sip-ui #page-root .card > h2 {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: #123f5c;
+  font-size: 1.12rem;
+  font-weight: 750;
+}
+.sip-ui #page-root .section-title h2::before,
+.sip-ui #page-root .card > h2::before {
+  content: "";
+  width: 5px;
+  height: 1.15em;
+  flex: none;
+  border-radius: 5px;
+  background: var(--ui-accent);
+}
+.sip-ui #page-root h3 { color: #24536e; font-weight: 700; }
+.sip-ui #page-root .section-title p,
+.sip-ui #page-root .card .section-description { color: var(--ui-muted); line-height: 1.65; }
+.sip-ui #page-root .card {
+  border: 1px solid var(--ui-line);
+  border-radius: 18px;
+  background: var(--ui-panel);
+  box-shadow: 0 5px 20px #00000008;
+}
+.sip-ui #page-root .toolbar,
+.sip-ui #page-root .filter-panel {
+  border: 1px solid #d8e6ed;
+  border-radius: 15px;
+  background: var(--ui-panel-soft);
+}
+.sip-ui #page-root :is(.help-text, .small-muted, .employee-code-inline, .employee-updated, .field-hint) {
+  color: var(--ui-muted);
+  line-height: 1.65;
+}
+.sip-ui #page-root :is(.help-text, .small-muted, .field-hint) { font-size: .82rem; }
+.sip-ui #page-root dl > div { min-width: 0; }
+.sip-ui #page-root dt { color: var(--ui-muted); font-size: .78rem; font-weight: 650; }
+.sip-ui #page-root dd { color: var(--ui-ink); line-height: 1.65; overflow-wrap: anywhere; }
+.sip-ui #page-root table { border-collapse: separate; border-spacing: 0; }
+.sip-ui #page-root table th {
+  color: #365f75;
+  background: #eaf2f6;
+  border-bottom: 2px solid #d5e2e9;
+  font-weight: 750;
+  letter-spacing: .01em;
+}
+.sip-ui #page-root table td { border-bottom-color: #e6eef2; }
+.sip-ui #page-root table tbody tr:last-child td { border-bottom: 0; }
+.sip-ui #page-root table tbody tr:nth-child(even) { background: #fbfdfe; }
+.sip-ui #page-root table tbody tr:hover { background: #f0f7fa; }
+.sip-ui #page-root .field label,
+.sip-ui #page-root label.field { color: #31566c; font-weight: 700; }
+.sip-ui #page-root :is(input, select, textarea) { border-color: #bfd1dc; }
+.sip-ui #page-root :is(input, select, textarea):focus { border-color: var(--ui-accent); box-shadow: 0 0 0 3px #087d9320; }
+.sip-ui #page-root .button { min-height: 48px; border-radius: 11px; font-weight: 700; }
+.sip-ui #page-root .button-primary { color: #fff; background: #08758b; border-color: #08758b; }
+.sip-ui #page-root .button-primary:hover:not(:disabled) { background: #075e73; }
+.sip-ui #page-root .badge-success { color: #12623f; background: #e3f4ea; }
+.sip-ui #page-root .badge-warning { color: #795009; background: #fff2d5; }
+.sip-ui #page-root .badge-danger { color: #a21c14; background: #ffebe8; }
+.sip-ui #page-root .badge-info { color: #145c78; background: #e5f3f8; }
+.sip-ui #page-root .notice { background: #edf6f9; }
+.sip-ui #page-root .notice-success { border-left-color: var(--ui-success); background: #edf8f1; }
+.sip-ui #page-root .notice-warning { border-left-color: #c58a22; background: #fff8e9; }
+.sip-ui #page-root .notice-danger { border-left-color: var(--ui-danger); background: #fff1ef; }
+.sip-ui :is(button, a, input, select, textarea, summary):focus-visible { outline-color: #0789a0; }
+@media (max-width: 700px) {
+  .sip-ui #page-root .page-heading { display: block; padding: 20px; margin-bottom: 20px; }
+  .sip-ui #page-root .page-heading .form-actions { margin-top: 16px; }
+  .sip-ui #page-root .section-title { align-items: flex-start; flex-wrap: wrap; }
+}
+
+/* Final cascade for the full-app steel-and-teal refresh. */
+.sip-ui{
+  --ui-ink:#183b43;--ui-muted:#5b7477;--ui-line:#d3dfdc;--ui-accent:#087d78;
+  --ui-soft:#e5f1ec;--ui-panel:#fff;--ui-panel-soft:#f4f8f6;
+  --ui-success:#26734f;--ui-warning:#96630f;--ui-danger:#a9322a;
+  min-height:100dvh;color:var(--ui-ink);background:linear-gradient(180deg,#e4ece8 0,#edf2ef 420px,#e9efec 100%)
+}
+.sip-ui .app-header{color:#f8fbf9;background:linear-gradient(105deg,#163943 0%,#1b4b50 100%);border-bottom:2px solid #d29542;box-shadow:none}
+.sip-ui .brand,.sip-ui .brand-title{color:#f8fbf9}
+.sip-ui .header-back{color:#f8fbf9;background:#ffffff12;border-color:#ffffff4d}
+.sip-ui .header-back:hover:not(:disabled){background:#ffffff20}
+.sip-ui .workspace-switch{color:#254d50;background:#f8fbf9;border-color:#d4e1dd}
+.sip-ui .header-tools .badge-info{color:#f1f8f5;background:#ffffff1b}
+.sip-ui .header-tools .button{color:#173d45;background:#f8fbf9;border-color:#d8e3df}
+.sip-ui .main-shell{padding-top:30px}
+.sip-ui #page-root .page-heading{position:relative;isolation:isolate;overflow:hidden;min-height:128px;align-items:center;padding:clamp(22px,3vw,34px);border:0;border-radius:16px;background:linear-gradient(112deg,#173e48 0%,#20595b 74%,#286968 100%);box-shadow:none;color:#f7faf8}
+.sip-ui #page-root .page-heading::after{content:"";position:absolute;z-index:-1;right:24px;top:-74px;width:210px;height:210px;border:1px solid #ffffff24;border-radius:34px;transform:rotate(32deg)}
+.sip-ui #page-root .page-heading h1,.sip-ui #page-root .page-heading h1[data-ui-icon]{color:#fff}
+.sip-ui #page-root .page-heading h1[data-ui-icon]::before{background:#f0bd69}
+.sip-ui #page-root .page-heading p{color:#d7e7e3}
+.sip-ui #page-root .page-heading .eyebrow{display:none}
+.sip-ui #page-root .page-heading .button{color:#173d45;background:#fff;border-color:#d8e3df}
+.sip-ui #page-root .section-title{padding-bottom:12px;border-bottom-color:#c9d9d5}
+.sip-ui #page-root .section-title h2,.sip-ui #page-root .card>h2{color:#1d4c50}
+.sip-ui #page-root .section-title h2::before,.sip-ui #page-root .card>h2::before{width:4px;background:#d29542}
+.sip-ui #page-root .hero-card{position:relative;isolation:isolate;overflow:hidden;padding:clamp(24px,3vw,36px);border:0;border-radius:16px;background:linear-gradient(112deg,#173e48 0%,#20595b 74%,#286968 100%);box-shadow:none}
+.sip-ui #page-root .hero-card::after{content:"";position:absolute;z-index:-1;right:24px;top:-78px;width:210px;height:210px;border:1px solid #ffffff24;border-radius:34px;transform:rotate(32deg)}
+.sip-ui #page-root .hero-card h1{color:#fff}
+.sip-ui #page-root .hero-card p{color:#d7e7e3}
+.sip-ui #page-root .hero-card .hero-date{color:#f0bd69}
+.sip-ui #page-root .card{border-color:#d3dfdc;border-radius:16px;background:#fff;box-shadow:none}
+.sip-ui #page-root .workspace-selector--landing{border-color:#cfddd8;border-radius:16px;background:linear-gradient(135deg,#f9fbf9 0%,#edf4f0 100%);box-shadow:none}
+.sip-ui #page-root .workspace-fact{border-color:#d3dfdc;border-radius:14px;box-shadow:none}
+.sip-ui #page-root .workspace-card--choice,.sip-ui #page-root .workspace-card--choice[aria-pressed="true"]{box-shadow:none}
+.sip-ui #page-root .toolbar,.sip-ui #page-root .filter-panel{border-color:#d4e1dd;background:#f4f8f6}
+.sip-ui #page-root .stat-card{border:1px solid #d5e2dd;border-radius:14px;background:linear-gradient(145deg,#fff 0%,#f5f9f6 100%);box-shadow:none}
+.sip-ui #page-root .stat-value{color:#08716d}
+.sip-ui #page-root table th{color:#284f52;background:#e4eeea;border-bottom-color:#cbdad5}
+.sip-ui #page-root table td{border-bottom-color:#e3ebe7}
+.sip-ui #page-root table tbody tr:nth-child(even){background:#f8fbf9}
+.sip-ui #page-root table tbody tr:hover{background:#edf5f1}
+.sip-ui #page-root :is(input,select,textarea){border-color:#bdcfca}
+.sip-ui #page-root :is(input,select,textarea):focus{border-color:#087d78;box-shadow:0 0 0 3px #087d781a}
+.sip-ui #page-root .button{box-shadow:none;transition:transform .12s ease,background-color .16s ease,border-color .16s ease}
+.sip-ui #page-root .button-primary{color:#fff;background:#08756f;border-color:#08756f}
+.sip-ui #page-root .button-primary:hover:not(:disabled){background:#075f5c}
+.sip-ui #page-root .button:not(:disabled):active{transform:translateY(1px)}
+.sip-ui #page-root .notice{border:1px solid #c9dcda;border-left:1px solid #c9dcda;border-radius:13px;background:#edf6f4;color:#284f52}
+.sip-ui #page-root .notice-success{border-color:#c9e2d3;background:#edf7f0;color:#205d40}
+.sip-ui #page-root .notice-warning{border-color:#ebd6ad;background:#fff7e9;color:#79550d}
+.sip-ui #page-root .notice-danger{border-color:#e7c8c3;background:#fff2ef;color:#8c2d25}
+.sip-ui #page-root .empty-state{border-color:#c8d8d3;background:#f6faf7}
+.sip-ui #page-root .module-card{border-color:#d3dfdc;border-radius:14px;background:linear-gradient(145deg,#fff,#f5f9f6);box-shadow:none}
+.sip-ui #page-root .module-icon{color:#087d78;background:#e3f0eb}
+.sip-ui :is(.modal-card,.status-modal-card){box-shadow:0 24px 72px rgb(0 0 0 / .24)}
+.sip-ui .machines-page .machine-overlay>.card{border-top:1px solid #d3dfdc;box-shadow:0 24px 72px rgb(0 0 0 / .24)}
+.sip-ui .login-screen{border-top:1px solid #d3dfdc;background:linear-gradient(150deg,#fff,#f3f8f5);box-shadow:none}
+.sip-ui .bottom-nav{background:#f7faf8;border-color:#d3dfdc;box-shadow:none;backdrop-filter:none}
+.sip-ui .nav-item{color:#587074;transition:background-color .16s ease,color .16s ease}
+.sip-ui .nav-item[aria-current="page"]{color:#075f5c;background:#e1efea;box-shadow:inset 0 -2px #d29542}
+.sip-ui #page-root :is(.module-card,.admin-hub-card,.workspace-card,.device-card,.admin-link,.admin-module-button){transition:transform .17s ease,border-color .17s ease,box-shadow .17s ease}
+.sip-ui #page-root :is(a.module-card,a.admin-hub-card,.workspace-card,.admin-link,button.admin-module-button):hover:not([aria-disabled="true"]):not(:disabled){transform:translateY(-2px);border-color:#8caaa3;box-shadow:none}
+.sip-ui :is(button,a,input,select,textarea,summary):focus-visible{outline-color:#bd7b29}
+@media(max-width:700px){.sip-ui .main-shell{padding-top:18px}.sip-ui #page-root .page-heading{min-height:0;padding:20px;border-radius:14px}.sip-ui #page-root .page-heading::after{right:-105px;top:-100px;width:190px;height:190px}.sip-ui #page-root .hero-card{padding:22px;border-radius:14px}.sip-ui #page-root .hero-card::after{right:-105px;top:-100px;width:190px;height:190px}.sip-ui #page-root .page-heading .form-actions{margin-top:14px}.sip-ui #page-root .card{border-radius:14px}}
+@media(prefers-reduced-motion:reduce){.sip-ui #page-root .button,.sip-ui #page-root :is(.module-card,.admin-hub-card,.workspace-card,.device-card,.admin-link,.admin-module-button),.sip-ui .nav-item{transition:none}.sip-ui #page-root .button:not(:disabled):active,.sip-ui #page-root :is(a.module-card,a.admin-hub-card,.workspace-card,.admin-link,button.admin-module-button):hover{transform:none}}
+
+/* Pass 5.5 UI polish: keep fixed navigation clear of page actions and improve scanability. */
+.sip-ui .main-shell{padding-bottom:calc(7.25rem + env(safe-area-inset-bottom))}
+.sip-ui #page-root .route-context-actions{display:flex;flex-wrap:wrap;gap:.55rem;margin:0 0 1rem}
+.sip-ui #page-root .route-context-actions .route-return-primary{min-height:48px}
+.sip-ui #page-root .route-context-actions .route-return-secondary{min-height:46px;color:#31585b;background:#fff;border-color:#c6d5d0}
+.sip-ui #page-root .route-context-actions .route-return-secondary:hover:not(:disabled){color:#173f45;background:#f2f7f4;border-color:#8ba8a0}
+.sip-ui #page-root #orderNameSearch,.sip-ui #page-root [data-screen-item-search]{margin-bottom:.45rem}
+.sip-ui #page-root .small-muted,.sip-ui #page-root .help-text{color:#4b6265}
+.sip-ui #page-root .admin-overview{margin:0 0 1.25rem;padding:clamp(16px,2vw,24px);border:1px solid #cfddd8;border-radius:16px;background:linear-gradient(145deg,#fff 0%,#f3f8f5 100%)}
+.sip-ui #page-root .admin-overview-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.sip-ui #page-root .admin-overview-heading h2{margin:0;color:#214c50;font-size:1.05rem}
+.sip-ui #page-root .admin-overview-heading span{color:#4b6265;font-size:.8rem}
+.sip-ui #page-root .admin-stats-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.sip-ui #page-root .admin-stat-card{display:grid;align-content:start;gap:5px;min-width:0;min-height:98px;padding:15px;border:1px solid #d4e1dc;border-radius:13px;background:#fff}
+.sip-ui #page-root .admin-stat-card>span{color:#4b6265;font-size:.82rem}
+.sip-ui #page-root .admin-stat-card strong{color:#08716d;font-size:1.6rem;line-height:1.1}
+.sip-ui #page-root .admin-stat-card small{color:#4b6265;font-size:.75rem}
+.sip-ui #page-root .admin-stat-card.is-loading strong{color:#809291}
+.sip-ui #page-root .admin-stats-error{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:12px;color:#8c2d25}
+@media(min-width:1024px){.sip-ui .main-shell{padding-bottom:7.75rem}}
+@media(max-width:700px){.sip-ui #page-root .admin-stats-grid{grid-template-columns:1fr}.sip-ui #page-root .admin-overview-heading{align-items:flex-start;flex-direction:column}.sip-ui #page-root .admin-stat-card{min-height:82px}.sip-ui #page-root .route-context-actions .button{flex:1 1 auto}.sip-ui #page-root .admin-stats-error{align-items:flex-start;flex-direction:column}}
+
+/* Clear separation between content sections throughout the app. */
+.sip-ui #page-root .card { margin-block-end: 16px; }
+@media (max-width: 700px) {
+  .sip-ui #page-root .card { margin-block-end: 12px; }
+}

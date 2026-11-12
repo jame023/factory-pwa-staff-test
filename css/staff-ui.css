@@ -1,0 +1,158 @@
+/* Factory SIP, shared by the staff shell and its offline fallback. */
+.sip-ui {
+  --sip-blue: #123e60;
+  --sip-action: #086579;
+  --sip-rule: #cedde2;
+  --sip-canvas: #f2f6f7;
+  --ui-line: var(--sip-rule);
+  --ui-muted: #465e6c;
+  --ui-accent: var(--sip-action);
+  color: #183e50;
+  background: var(--sip-canvas);
+}
+.sip-ui .app-header { background: #12364a; border-bottom: 3px solid #1893a2; }
+.sip-ui .app-header .brand-mark { background: white; border-radius: 8px; }
+.sip-ui .main-shell:has(.login-screen) #pwa-install-root { max-width: 36rem; }
+.sip-ui .pwa-install-card { padding: 18px; border: 1px solid var(--sip-rule); border-radius: 12px; box-shadow: none; background: white; }
+.sip-ui .pwa-install-actions .button-primary { border-color: #95b2c1; background: #edf5f7; color: var(--sip-blue); }
+.sip-ui .pwa-install-actions .button-primary:hover { background: #ddebf0; }
+.sip-ui #page-root :is(.page-heading, .hero-card),
+.sip-ui #page-root .login-brand {
+  background-color: var(--sip-blue);
+  background-image: linear-gradient(90deg, var(--sip-blue) 38%, transparent 100%),
+    radial-gradient(circle, #7699ac 1px, transparent 1.3px);
+  background-size: auto, 14px 14px;
+  color: white;
+}
+.sip-ui #page-root :is(.page-heading, .hero-card)::after { content: none; }
+.sip-ui #page-root .login-screen {
+  max-width: 36rem;
+  padding: clamp(18px, 4vw, 30px);
+  border: 1px solid var(--sip-rule);
+  background: white;
+}
+.sip-ui #page-root .login-brand {
+  padding: clamp(18px, 4vw, 28px);
+  margin: 0 0 1.25rem;
+  border-radius: 12px;
+}
+.sip-ui #page-root .login-brand img { background: white; border-radius: 12px; padding: 4px; }
+.sip-ui #page-root .login-brand h1 { color: white; line-height: 1.35; }
+.sip-ui #page-root .login-brand .eyebrow { display: block; color: #dcecf3; }
+.sip-ui #page-root .login-actions .button { margin: 0; min-height: 52px; align-self: stretch; }
+.sip-ui #page-root .login-actions .login-register { color: var(--sip-blue); background: white; border-color: #95b2c1; }
+.sip-ui #page-root .login-actions .login-register:hover { background: #edf5f7; }
+
+.sip-ui #page-root :is(.workspace-heading, .admin-hub-heading, .registration-page > header) {
+  padding: clamp(16px, 3vw, 28px);
+  border: 1px solid var(--sip-rule);
+  border-radius: 12px;
+  background: white;
+}
+.sip-ui #page-root :is(.workspace-menu, .admin-hub-grid, .module-grid) {
+  gap: clamp(10px, 1.5vw, 18px);
+  align-items: stretch;
+}
+.sip-ui #page-root :is(.workspace-card, .admin-hub-card, .module-card, .admin-module-button) {
+  border: 1px solid var(--sip-rule);
+  border-radius: 12px;
+  background-color: white;
+  background-image: none;
+  margin-block-end: 0;
+}
+.sip-ui #page-root .workspace-card[aria-pressed="true"] {
+  border-color: var(--workspace-accent, var(--sip-action));
+  background: var(--workspace-tint, #e6f2f5);
+}
+.sip-ui #page-root :is(.workspace-card-copy strong, .module-title, .admin-hub-card-title) { color: var(--sip-blue); }
+.sip-ui #page-root .card-pad { padding: clamp(16px, 2.5vw, 26px); }
+.sip-ui #page-root .field :is(select, textarea, input:not([type=checkbox], [type=radio], [type=file], [type=hidden])) {
+  max-width: 100%;
+  font-size: max(1rem, 16px);
+}
+.sip-ui #page-root .table-wrap { border: 1px solid var(--sip-rule); background: white; }
+.sip-ui #page-root table th { background: #e7f0f3; color: #234b5d; }
+.sip-ui #page-root table td, .sip-ui #page-root .stat-value { font-variant-numeric: tabular-nums; }
+.sip-ui #page-root :is(.stat-card, .admin-stat-card) {
+  background: white;
+  border: 1px solid var(--sip-rule);
+  border-block-start: 3px solid #96bfc9;
+}
+.sip-ui #page-root :is(.toolbar, .filter-panel) { background: #edf3f5; border-color: var(--sip-rule); }
+.sip-ui .bottom-nav { background: white; border-color: var(--sip-rule); }
+.sip-ui .nav-item[aria-current=page] { color: var(--sip-blue); background: #e5f1f5; box-shadow: inset 0 -3px var(--sip-action); }
+.sip-ui #page-root .button-primary { color: white; background: var(--sip-action); border-color: var(--sip-action); }
+.sip-ui #page-root .button-primary:hover:not(:disabled) { background: #084c5e; }
+.sip-ui :is(button, a, input, select, textarea, summary):focus-visible { outline: 3px solid #1675a0; outline-offset: 3px; }
+.sip-ui .offline-card { background: white; border-block-start: 4px solid var(--sip-action); }
+.sip-ui .offline-card header { display: flex; align-items: center; gap: 12px; }
+.sip-ui .offline-icon { margin: 0; width: 40px; height: 40px; color: var(--sip-action); background: transparent; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .sip-ui #page-root :is(a.module-card, a.admin-hub-card, .workspace-card, button.admin-module-button):hover:not(:disabled, [aria-disabled=true]) {
+    border-color: #7199a9;
+    box-shadow: 0 3px 9px rgb(0 0 0 / 8%);
+  }
+}
+@media (min-width: 740px) {
+  .sip-ui #page-root .workspace-menu { grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); }
+}
+@media (max-width: 520px) {
+  .sip-ui #page-root .login-actions { grid-template-columns: minmax(0, 1fr); }
+  .sip-ui #page-root .login-brand { gap: 12px; }
+  .sip-ui #page-root .login-brand h1 { font-size: clamp(1.3rem, 5.8vw, 1.75rem); }
+}
+
+/* Colorful, semantic icon system shared across every Factory PWA page. */
+.admin-tone-violet { --admin-accent:#705fb0; --admin-accent-soft:#f0ecfa; }
+.sip-icon { display:block; width:30px; height:30px; color:inherit; overflow:visible; }
+.sip-icon--home { --sip-icon-color:#1687a3; --sip-icon-accent:#5d72be; --sip-icon-tint:#e7f4f7; }
+.sip-icon--user { --sip-icon-color:#347bb8; --sip-icon-accent:#53a48a; --sip-icon-tint:#e9f2fb; }
+.sip-icon--users { --sip-icon-color:#287e87; --sip-icon-accent:#755fba; --sip-icon-tint:#e7f4f3; }
+.sip-icon--groups { --sip-icon-color:#705fb0; --sip-icon-accent:#3a91ad; --sip-icon-tint:#f0ecfa; }
+.sip-icon--factory { --sip-icon-color:#188b9a; --sip-icon-accent:#d18b36; --sip-icon-tint:#e5f4f5; }
+.sip-icon--screen { --sip-icon-color:#168da4; --sip-icon-accent:#5a72c1; --sip-icon-tint:#e5f5f7; }
+.sip-icon--truck { --sip-icon-color:#25866c; --sip-icon-accent:#e29a42; --sip-icon-tint:#e8f5ef; }
+.sip-icon--office { --sip-icon-color:#477b9a; --sip-icon-accent:#8b68b2; --sip-icon-tint:#eaf2f7; }
+.sip-icon--calendar { --sip-icon-color:#3c79b2; --sip-icon-accent:#db7891; --sip-icon-tint:#eaf2fb; }
+.sip-icon--clock { --sip-icon-color:#625ca8; --sip-icon-accent:#d97691; --sip-icon-tint:#f0eefb; }
+.sip-icon--leave { --sip-icon-color:#b77829; --sip-icon-accent:#278b78; --sip-icon-tint:#fbf2e4; }
+.sip-icon--chart { --sip-icon-color:#347c99; --sip-icon-accent:#d97691; --sip-icon-tint:#eaf4f7; }
+.sip-icon--chart .sip-chart-axis { stroke:#537c91; }
+.sip-icon--chart .sip-chart-bar { stroke-width:.6; }
+.sip-icon--chart .sip-chart-bar--teal { fill:#34a5a1; stroke:#258984; }
+.sip-icon--chart .sip-chart-bar--pink { fill:#e48da1; stroke:#c96d84; }
+.sip-icon--chart .sip-chart-bar--blue { fill:#6a86ca; stroke:#536eb1; }
+.sip-icon--box { --sip-icon-color:#25846c; --sip-icon-accent:#4e7fc0; --sip-icon-tint:#e8f5ef; }
+.sip-icon--shield { --sip-icon-color:#3e74a5; --sip-icon-accent:#43a183; --sip-icon-tint:#eaf2f9; }
+.sip-icon--history { --sip-icon-color:#647d95; --sip-icon-accent:#d49a43; --sip-icon-tint:#edf2f6; }
+.sip-icon--search { --sip-icon-color:#3988ac; --sip-icon-accent:#7768b5; --sip-icon-tint:#e8f4f7; }
+.sip-icon--plus { --sip-icon-color:#28856d; --sip-icon-accent:#347bb8; --sip-icon-tint:#e8f5ef; }
+.sip-icon--edit { --sip-icon-color:#8560b0; --sip-icon-accent:#dc8b55; --sip-icon-tint:#f1ecf8; }
+.sip-icon--eye { --sip-icon-color:#3d7b9d; --sip-icon-accent:#5d70b6; --sip-icon-tint:#eaf3f7; }
+.sip-icon--save { --sip-icon-color:#238572; --sip-icon-accent:#3982b7; --sip-icon-tint:#e7f4f0; }
+.sip-icon--check { --sip-icon-color:#27845f; --sip-icon-accent:#49a77b; --sip-icon-tint:#e8f5ed; }
+.sip-icon--close { --sip-icon-color:#b85662; --sip-icon-accent:#e18572; --sip-icon-tint:#faeceb; }
+.sip-icon--refresh { --sip-icon-color:#27899a; --sip-icon-accent:#5985c0; --sip-icon-tint:#e6f4f6; }
+.sip-icon--arrow,.sip-icon--back { --sip-icon-color:#4888a6; --sip-icon-accent:#6a77b3; --sip-icon-tint:#eaf3f7; }
+.sip-icon--logout { --sip-icon-color:#61788a; --sip-icon-accent:#c47780; --sip-icon-tint:#eef2f5; }
+.sip-icon--login { --sip-icon-color:#26856c; --sip-icon-accent:#4483b7; --sip-icon-tint:#e8f5ef; }
+.sip-icon--info { --sip-icon-color:#287da1; --sip-icon-accent:#d6a149; --sip-icon-tint:#e9f3f7; }
+.sip-icon--lock { --sip-icon-color:#a85e64; --sip-icon-accent:#d39347; --sip-icon-tint:#f8eeee; }
+.sip-icon--wifi { --sip-icon-color:#258995; --sip-icon-accent:#6b70b3; --sip-icon-tint:#e7f4f5; }
+.sip-ui #page-root :is(.workspace-heading-icon,.workspace-card-icon,.workspace-fact-mark,.nav-icon) { border:1px solid #d9e9ef; }
+.sip-ui #page-root .workspace-card-icon { background:#e8f3f7; }
+.sip-ui #page-root .module-icon { background:#e8f3f7; border:1px solid #d9e9ef; }
+.sip-ui #page-root .admin-module-icon { color:var(--admin-accent); background:var(--admin-accent-soft); border:1px solid #d9e9ef; }
+.sip-ui #page-root .admin-module-icon svg { color:var(--admin-accent); }
+.sip-ui #page-root h1[data-ui-icon]::before,.sip-ui #page-root button[data-ui-icon]::before,.sip-ui #page-root a.button[data-ui-icon]::before { background:linear-gradient(140deg,#168ba4 0%,#5d76bd 52%,#da7891 100%); }
+.sip-ui #page-root h1[data-ui-icon]::before,.sip-ui #page-root button[data-ui-icon]::before,.sip-ui #page-root a.button[data-ui-icon]::before { background:var(--ui-icon) center/contain no-repeat; -webkit-mask:none; mask:none; }
+.sip-ui .bottom-nav .nav-icon { display:grid; place-items:center; min-width:36px; min-height:36px; border-radius:12px; background:#e8f3f7; }
+@media(prefers-reduced-motion:reduce){.sip-icon{transition:none}}
+.sip-ui #page-root .module-icon .sip-icon { width:32px; height:32px; }
+.sip-ui #page-root .workspace-card-icon .sip-icon,.sip-ui #page-root .workspace-fact-mark .sip-icon { width:30px; height:30px; }
+.sip-ui #page-root .admin-hub-icon .sip-icon { width:30px; height:30px; }
+.sip-ui #page-root .admin-module-icon .sip-icon { width:26px; height:26px; }
+.sip-ui .bottom-nav .nav-icon .sip-icon { width:26px; height:26px; }
+.sip-ui .notification-heading { display:flex; align-items:center; gap:9px; }
+.sip-ui .notification-icon { display:grid; place-items:center; width:38px; height:38px; border-radius:12px; background:#e8f3f7; }
+.sip-ui .notification-icon .sip-icon { width:26px; height:26px; }
