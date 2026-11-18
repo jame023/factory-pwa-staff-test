@@ -1,5 +1,5 @@
 export const APP_NAME = "ระบบโรงงาน SIP";
-export const APP_VERSION = "1.3.340";
+export const APP_VERSION = "1.3.376";
 export const APP_MODE = "supabase-line"; // mock | development | supabase-line | production
 
 export const MOCK_SESSION_ROLE = "employee"; // fixed by the local preview process; never selected from browser storage or URL
@@ -21,6 +21,8 @@ export const MOCK_USERS = Object.freeze([
   { id: "mock-executive", name: "ผู้บริหารตัวอย่าง", role: "executive" },
   { id: "mock-admin", name: "ผู้ดูแลตัวอย่าง", role: "admin" }
 ]);
+
+
 
 
 

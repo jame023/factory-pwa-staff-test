@@ -1,4 +1,5 @@
-const CACHE_NAME = "factory-pwa-shell-v1.3.340";
+const CACHE_NAME = "factory-pwa-shell-v1.3.376";
+importScripts('./js/report-push-worker.js?v=1.3.360');
 const APP_SHELL = [
   "./js/live-admin-context.js?v=1.3.333", "./js/machine-admin-auth.js?v=1.3.333", "./js/registration-admin-api.js?v=1.3.333", "./js/route-policy.js?v=1.3.333", "./js/router.js?v=1.3.333", "./js/supabase-app-api.js?v=1.3.333", "./js/supabase-employee-repository.js?v=1.3.333", "./pages/access/index.js?v=1.3.333", "./pages/admin/employees.js?v=1.3.333", "./pages/admin/groups.js?v=1.3.333", "./pages/admin/index.js?v=1.3.333", "./pages/admin/item-names.js?v=1.3.333", "./pages/admin/machines.js?v=1.3.333",
   "./css/staff-ui.css?v=1.3.340", "./css/ui-system.css?v=1.3.333",
@@ -30,7 +31,7 @@ const APP_SHELL = [
   "./js/permissions.js", "./js/record-schema.js", "./js/mock-api.js",
   "./js/attendance-contract.js", "./js/attendance-fixture.js", "./js/read-only-api.js",
   "./components/app-card.js", "./components/app-header.js", "./components/login-screen.js", "./components/bottom-nav.js",
-  "./components/loading.js", "./components/modal.js", "./components/toast.js", "./components/status-modal.js",
+  "./components/loading.js", "./components/modal.js", "./components/toast.js", "./components/status-modal.js", "./components/detail-dialog.js",
   "./adapters/package01.js", "./adapters/package03.js", "./adapters/package04.js",
   "./adapters/package05.js", "./adapters/package06.js", "./adapters/package07.js",
   "./adapters/package08.js", "./adapters/package09.js", "./adapters/package10.js",
@@ -41,6 +42,7 @@ const APP_SHELL = [
   "./pages/admin/index.js"
 ];
 APP_SHELL.push(...["./js/active-item-names.js?v=1.3.186", "./js/api.js?v=1.3.186", "./js/app.js?v=1.3.186", "./js/attendance-contract.js?v=1.3.186", "./js/attendance-data.js?v=1.3.186", "./js/attendance-fixture.js?v=1.3.186", "./js/auth.js?v=1.3.205", "./js/business-request.js?v=1.3.186", "./js/business-rules.js?v=1.3.269", "./js/config.js?v=1.3.269", "./js/delivery-service.js?v=1.3.269", "./js/directory-snapshot.js?v=1.3.186", "./js/item-name-admin-repository.js?v=1.3.186", "./js/leave-media.js?v=1.3.186", "./js/leave-rules.js?v=1.3.186", "./js/live-admin-context.js?v=1.3.333", "./js/live-updates.js?v=1.3.186", "./js/machine-admin-auth.js?v=1.3.333", "./js/machine-admin-repository.js?v=1.3.186", "./js/manager-attendance-fixture.js?v=1.3.186", "./js/mock-api.js?v=1.3.269", "./js/notification-read-state.js?v=1.3.186", "./js/notifications.js?v=1.3.340", "./js/offline.js?v=1.3.186", "./js/permissions.js?v=1.3.269", "./js/pkce-oauth.js?v=1.3.186", "./js/read-only-api.js?v=1.3.186", "./js/record-schema.js?v=1.3.186", "./js/report-inbox.js?v=1.3.186", "./js/router.js?v=1.3.333", "./js/session-manager.js?v=1.3.191", "./js/state.js?v=1.3.186", "./js/supabase-app-api.js?v=1.3.333", "./js/supabase-employee-repository.js?v=1.3.333", "./js/utils.js?v=1.3.186", "./components/action-popup.js?v=1.3.186", "./components/app-card.js?v=1.3.340", "./components/app-header.js?v=1.3.186", "./components/bottom-nav.js?v=1.3.340", "./components/loading.js?v=1.3.186", "./components/login-screen.js?v=1.3.186", "./components/modal.js?v=1.3.186", "./components/status-modal.js?v=1.3.186", "./components/toast.js?v=1.3.186", "./adapters/package01.js?v=1.3.186", "./adapters/package03.js?v=1.3.186", "./adapters/package04.js?v=1.3.269", "./adapters/package05.js?v=1.3.186", "./adapters/package06.js?v=1.3.186", "./adapters/package07.js?v=1.3.186", "./adapters/package08.js?v=1.3.186", "./adapters/package09.js?v=1.3.186", "./adapters/package10.js?v=1.3.186", "./adapters/package11.js?v=1.3.186", "./pages/admin/employees.js?v=1.3.333", "./pages/admin/groups.js?v=1.3.333", "./pages/admin/index.js?v=1.3.333", "./pages/admin/item-names.js?v=1.3.333", "./pages/admin/machines.js?v=1.3.333", "./pages/attendance/index.js?v=1.3.333", "./pages/attendance/manager.js?v=1.3.186", "./pages/calendar/index.js?v=1.3.333", "./pages/delivery/index.js?v=1.3.333", "./pages/home/index.js?v=1.3.333", "./pages/leave/approved-calendar.js?v=1.3.186", "./pages/leave/index.js?v=1.3.333", "./pages/ot/index.js?v=1.3.333", "./pages/production/index.js?v=1.3.333", "./pages/production-record/index.js?v=1.3.333", "./pages/reports/index.js?v=1.3.333", "./pages/reports/local-summary.js?v=1.3.186", "./pages/work-session/index.js?v=1.3.333", "./pages/work-session/manager.js?v=1.3.186"]);
+APP_SHELL.push(...["./components/detail-dialog.js?v=1.3.349","./js/router.js?v=1.3.349","./js/app.js?v=1.3.349","./js/config.js?v=1.3.349","./css/app.css?v=1.3.349","./pages/delivery/index.js?v=1.3.349","./pages/leave/index.js?v=1.3.349","./pages/leave/employee.js?v=1.3.349","./pages/ot/index.js?v=1.3.349","./pages/production/index.js?v=1.3.349","./pages/work-session/index.js?v=1.3.349","./pages/admin/machines.js?v=1.3.349","./pages/admin/item-names.js?v=1.3.349"]);
 // Some unchanged pages still import these shared files with the original cache key.
 APP_SHELL.push(...["./js/business-rules.js?v=1.3.186","./js/config.js?v=1.3.186","./js/mock-api.js?v=1.3.186","./js/permissions.js?v=1.3.186"]);
 APP_SHELL.push(...["./pages/production/index.js?v=1.3.333", "./pages/production-record/index.js?v=1.3.333", "./pages/work-session/index.js?v=1.3.333", "./pages/home/index.js?v=1.3.333", "./js/router.js?v=1.3.333", "./js/app.js?v=1.3.187"]);
@@ -193,6 +195,11 @@ APP_SHELL.push(
 );
 APP_SHELL.push('./js/app.js?v=1.3.298','./js/config.js?v=1.3.298','./js/offline.js?v=1.3.298','./js/router.js?v=1.3.333','./js/route-policy.js?v=1.3.333','./js/permissions.js?v=1.3.298','./js/api.js?v=1.3.298','./js/supabase-app-api.js?v=1.3.333','./adapters/package04.js?v=1.3.298','./adapters/package07.js?v=1.3.298','./adapters/package09.js?v=1.3.298','./adapters/package11.js?v=1.3.298','./pages/access/index.js?v=1.3.333','./pages/admin/index.js?v=1.3.333','./sw.js?v=1.3.298');
 APP_SHELL.push('./css/app.css?v=1.3.299','./js/app.js?v=1.3.299','./js/router.js?v=1.3.333','./pages/admin/index.js?v=1.3.333','./sw.js?v=1.3.299');
+APP_SHELL.push('./js/config.js?v=1.3.360','./js/app.js?v=1.3.360','./js/api.js?v=1.3.360','./js/supabase-app-api.js?v=1.3.360',
+  './js/attendance-contract.js?v=1.3.360','./js/executive-attendance-rules.js?v=1.3.360',
+  './adapters/package03.js?v=1.3.360','./adapters/package10.js?v=1.3.360',
+  './pages/attendance/index.js?v=1.3.360','./pages/attendance/manager.js?v=1.3.360',
+  './js/report-push-worker.js?v=1.3.360');
 const shellUrls = new Set(APP_SHELL.map(asset => new URL(asset, self.location.href).href));
 
 APP_SHELL.push('./js/app.js?v=1.3.265','./js/auth.js?v=1.3.265');
@@ -243,6 +250,26 @@ APP_SHELL.push('./index.html','./js/app.js?v=1.3.330','./js/config.js?v=1.3.330'
 
 APP_SHELL.push('./css/app.css?v=1.3.330','./components/login-screen.js?v=1.3.330','./js/session-app.js?v=1.3.330');
 
-APP_SHELL.push('./index.html','./js/app.js?v=1.3.340','./js/config.js?v=1.3.340','./js/router.js?v=1.3.340','./js/session-app.js?v=1.3.333','./js/route-policy.js?v=1.3.340','./js/permissions.js?v=1.3.340','./js/access-context.js?v=1.3.333','./pages/access/index.js?v=1.3.340','./pages/calendar/index.js?v=1.3.333','./pages/home/index.js?v=1.3.340','./pages/reports/index.js?v=1.3.333','./pages/reports/menu.js?v=1.3.340','./sw.js?v=1.3.340');
+APP_SHELL.push('./index.html','./js/app.js?v=1.3.348','./js/config.js?v=1.3.348','./js/router.js?v=1.3.348','./js/session-app.js?v=1.3.333','./js/route-policy.js?v=1.3.348','./js/permissions.js?v=1.3.348','./js/access-context.js?v=1.3.333','./pages/access/index.js?v=1.3.348','./pages/calendar/index.js?v=1.3.333','./pages/home/index.js?v=1.3.348','./pages/reports/index.js?v=1.3.333','./pages/reports/menu.js?v=1.3.348','./sw.js?v=1.3.348');
 
 APP_SHELL.push('./css/app.css?v=1.3.333','./components/login-screen.js?v=1.3.333');
+
+APP_SHELL.push('./index.html','./js/app.js?v=1.3.348','./js/config.js?v=1.3.348','./js/router.js?v=1.3.348','./pages/access/index.js?v=1.3.348','./pages/admin/index.js?v=1.3.348','./css/app.css?v=1.3.348','./sw.js?v=1.3.348');
+
+
+APP_SHELL.push('./css/registration-admin.css?v=1.3.349','./js/router.js?v=1.3.349','./js/app.js?v=1.3.349','./js/config.js?v=1.3.349','./css/app.css?v=1.3.349','./pages/leave/index.js?v=1.3.349','./pages/leave/employee.js?v=1.3.349','./pages/delivery/index.js?v=1.3.349','./pages/ot/index.js?v=1.3.349','./pages/production/index.js?v=1.3.349','./pages/work-session/index.js?v=1.3.349','./pages/admin/machines.js?v=1.3.349','./pages/admin/item-names.js?v=1.3.349','./components/detail-dialog.js?v=1.3.349');
+APP_SHELL.push('./pages/admin/index.js?v=1.3.349');
+APP_SHELL.push('./js/route-policy.js?v=1.3.349','./pages/access/index.js?v=1.3.349');
+APP_SHELL.push('./index.html','./js/app.js?v=1.3.353','./js/config.js?v=1.3.353','./js/router.js?v=1.3.353','./js/api.js?v=1.3.353','./js/mock-api.js?v=1.3.353','./js/supabase-app-api.js?v=1.3.353','./js/report-summary.js?v=1.3.353','./adapters/package06.js?v=1.3.353','./pages/reports/index.js?v=1.3.353','./css/app.css?v=1.3.353','./sw.js?v=1.3.353');
+
+APP_SHELL.push('./js/route-policy.js?v=1.3.353','./js/permissions.js?v=1.3.353','./pages/home/index.js?v=1.3.353','./pages/ot/index.js?v=1.3.353','./pages/ot/report.js?v=1.3.353','./pages/reports/index.js?v=1.3.353','./js/supabase-app-api.js?v=1.3.353','./sw.js?v=1.3.353');
+APP_SHELL.push('./index.html','./css/app.css?v=1.3.359','./js/app.js?v=1.3.359','./js/router.js?v=1.3.359','./js/session-app.js?v=1.3.356','./js/route-policy.js?v=1.3.356','./js/permissions.js?v=1.3.356','./js/notifications.js?v=1.3.356','./js/api.js?v=1.3.356','./js/mock-api.js?v=1.3.354','./js/config.js?v=1.3.359','./js/supabase-app-api.js?v=1.3.356','./js/notification-client.js?v=1.3.356','./js/report-push-subscription.js?v=1.3.354','./js/report-push-worker.js','./components/app-header.js?v=1.3.356','./adapters/package08.js?v=1.3.356','./pages/calendar/index.js?v=1.3.356','./pages/notifications/index.js?v=1.3.356','./js/live-admin-context.js?v=1.3.359','./js/supabase-employee-repository.js?v=1.3.359','./pages/admin/employees.js?v=1.3.359','./sw.js?v=1.3.359');
+APP_SHELL.push('./index.html','./js/app.js?v=1.3.361','./js/config.js?v=1.3.361','./js/router.js?v=1.3.361','./js/offline.js?v=1.3.361','./pages/leave/index.js?v=1.3.361','./pages/leave/manager.js?v=1.3.361','./pages/leave/approved-calendar.js?v=1.3.361','./js/leave-rules.js?v=1.3.361','./sw.js?v=1.3.361');
+APP_SHELL.push('./index.html','./css/app.css?v=1.3.375','./js/app.js?v=1.3.375','./js/session-app.js?v=1.3.375','./js/config.js?v=1.3.375','./js/router.js?v=1.3.375','./js/route-policy.js?v=1.3.375','./js/permissions.js?v=1.3.375','./js/access-context.js?v=1.3.375','./js/offline.js?v=1.3.375','./js/notification-client.js?v=1.3.375','./components/app-header.js?v=1.3.375','./pages/access/index.js?v=1.3.375','./pages/home/index.js?v=1.3.375','./pages/notifications/index.js?v=1.3.375','./pages/work-session/index.js?v=1.3.375','./pages/work-session/screen-work.js?v=1.3.375','./pages/work-session/production-work.js?v=1.3.375','./pages/work-session/production-data.js?v=1.3.375','./sw.js?v=1.3.375');
+
+APP_SHELL.push('./adapters/package07.js?v=1.3.375','./js/api.js?v=1.3.375','./js/supabase-app-api.js?v=1.3.375');
+
+APP_SHELL.push('./pages/work-session/independent-output.js?v=1.3.375','./pages/work-session/screen-data.js?v=1.3.375','./pages/admin/index.js?v=1.3.375');
+APP_SHELL.push('./pages/production/index.js?v=1.3.375');
+APP_SHELL.push('./pages/work-session/screen-combined.js?v=1.3.375');
+APP_SHELL.push('./index.html','./css/app.css?v=1.3.376','./js/app.js?v=1.3.376','./js/config.js?v=1.3.376','./js/router.js?v=1.3.376','./pages/ot/index.js?v=1.3.376','./pages/ot/legacy.js?v=1.3.376','./pages/work-session/screen-combined.js?v=1.3.376','./sw.js?v=1.3.376');

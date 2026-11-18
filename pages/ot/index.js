@@ -1,4 +1,4 @@
-import * as workApi from "../../adapters/package07.js?v=1.3.322";
+import * as workApi from "../../adapters/package07.js?v=1.3.353";
 import { overtimeGroupsForContext } from "../../js/ot-service.js?v=1.3.322";
 import { escapeHtml as e, bangkokToday, thaiDateTime } from "../../js/utils.js?v=1.3.260";
 import { requireOnlineAction } from "../../js/offline.js?v=1.3.260";
@@ -7,6 +7,7 @@ import { showStatusModal, isStatusModalOpen } from "../../components/status-moda
 import { getAuthContext } from "../../js/access-context.js?v=1.3.260";
 import { formatReportedDuration, OT_REPORT_PAGE_SIZE, validateExecutiveOtResponse, validateOtReportRange } from "../../js/executive-ot-report-rules.js?v=1.3.322";
 import { loadingView } from "../../components/loading.js?v=1.3.186";
+import { openDetailDialog } from "../../components/detail-dialog.js?v=1.3.349";
 
 const MAX_PHOTOS=5, MAX_FILE_BYTES=512*1024, MAX_TOTAL_BYTES=2*1024*1024, MAX_SOURCE_BYTES=20*1024*1024;
 const formatDuration=row=>{
@@ -15,6 +16,10 @@ const formatDuration=row=>{
   return String(Math.floor(minutes/60)).padStart(2,"0")+":"+String(minutes%60).padStart(2,"0");
 };
 const TYPES=["image/png","image/jpeg","image/webp"];
+const OT_PERIOD_PREFIX=/^ช่วงเวลา OT: ((?:[01]\d|2[0-3]):[0-5]\d)–((?:[01]\d|2[0-3]):[0-5]\d)\r?\n/;
+function splitOtPeriod(details){const text=String(details||"");const match=OT_PERIOD_PREFIX.exec(text);return match?{start:match[1],end:match[2],details:text.slice(match[0].length).trim()}:{start:"",end:"",details:text.trim()};}
+function buildOtPeriodDetails(start,end,details){return "ช่วงเวลา OT: "+start+"–"+end+"\n"+String(details||"").trim();}
+function overtimeMinutesBetween(start,end){const parse=value=>{if(!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(String(value||"")))return null;const [hour,minute]=value.split(":").map(Number);return hour*60+minute;};const startMinute=parse(start),endMinute=parse(end);if(startMinute===null||endMinute===null||startMinute===endMinute)return 0;return (endMinute<startMinute?endMinute+1440:endMinute)-startMinute;}
 const canvasBlob=(canvas,quality)=>new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",quality));
 async function compressImage(file,targetBytes) {
   if(file.size<=targetBytes)return {file,compressed:false};
@@ -75,7 +80,7 @@ async function renderExecutiveOtDashboard(root, context) {
     '<article class="card card-pad"><span>รายงาน OT</span><strong data-manager-report-count>—</strong></article><article class="card card-pad"><span>พนักงานไม่ซ้ำ</span><strong data-manager-employee-count>—</strong></article><article class="card card-pad"><span>วันที่ทำ OT ไม่ซ้ำ</span><strong data-manager-day-count>—</strong></article><article class="card card-pad"><span>ระยะเวลาที่รายงานรวม</span><strong data-manager-total-duration>—</strong></article></div></section>'+
     '<section class="ot-manager-people"><div class="section-title"><h2>สรุปรายบุคคล</h2><span class="small-muted">เรียงตามชื่อพนักงาน</span></div><div data-manager-employees></div></section>'+
     '<section class="ot-manager-list"><div class="section-title"><h2>รายการรายงาน OT</h2><span class="small-muted" data-manager-list-count></span></div><div data-manager-list aria-live="polite"></div><div class="ot-manager-more"><button class="button" data-manager-more type="button" hidden>โหลดเพิ่ม</button></div></section>'+ 
-    '<dialog class="admin-record-detail-dialog" data-manager-detail-dialog aria-labelledby="manager-ot-detail-title"><div class="admin-record-detail-dialog__body"><header class="admin-record-detail-dialog__header"><h2 id="manager-ot-detail-title">รายละเอียดทำงานล่วงเวลา (OT)</h2><button class="button admin-record-detail-dialog__close admin-detail-close-button" type="button" data-manager-detail-close aria-label="ปิดรายละเอียด">×</button></header><div class="screen-detail-content" data-manager-detail-content aria-live="polite"></div><footer class="admin-record-detail-dialog__footer"><button class="button button-primary" type="button" data-manager-detail-close>ปิดรายละเอียด</button></footer></div></dialog>';
+    '<dialog class="admin-record-detail-dialog" data-manager-detail-dialog aria-labelledby="manager-ot-detail-title"><div class="admin-record-detail-dialog__body"><header class="admin-record-detail-dialog__header"><h2 id="manager-ot-detail-title">รายละเอียดทำงานล่วงเวลา (OT)</h2><button class="button admin-record-detail-dialog__close admin-detail-close-button" type="button" data-manager-detail-close aria-label="ปิดรายละเอียด">×</button></header><div class="screen-detail-content" data-manager-detail-content aria-live="polite"></div></div></dialog>';
   const form=root.querySelector("[data-manager-filters]"),list=root.querySelector("[data-manager-list]"),detailDialog=root.querySelector("[data-manager-detail-dialog]"),detailHost=root.querySelector("[data-manager-detail-content]");
   form.elements.query.value=initialFilters.query;
   const closeModal=key=>{const modal=state[key];if(modal){state[key]=null;modal.close();}};
@@ -215,7 +220,7 @@ export async function render(root, context) {
     const more=root.querySelector("[data-ot-more]");if(more)more.hidden=rows.length>=historyCount;
   };
   root.innerHTML='<div class="page-heading"><div><p class="eyebrow">Overtime</p><h1>'+(manager?"รายงาน OT":"กรอกข้อมูล OT")+'</h1><p>'+(manager?"ตรวจรายการ OT รายละเอียดงาน และรูปหลักฐานของพนักงาน":"บันทึกงานที่ทำล่วงเวลาเพื่อให้ผู้บริหารตรวจสอบ")+'</p></div><button class="button" data-refresh>รีเฟรช</button></div><p class="notice notice-warning">ข้อมูล OT และรูปแนบจะบันทึกใน Supabase หลังยืนยันสำเร็จ</p>'+
-  (showForm?'<section class="card form-card ot-form-card"><div class="ot-form-intro"><span class="ot-form-icon" aria-hidden="true">◷</span><div><h2>บันทึก OT</h2><p>กรอกรายละเอียดงาน พร้อมแนบรูปประกอบได้สูงสุด '+MAX_PHOTOS+' รูป</p></div></div><form data-ot-form><div class="form-grid"><label class="field"><span>วันที่ทำ OT</span><div class="ot-date-control"><span>เลือกวันที่</span><input name="date" type="date" value="'+e(bangkokToday())+'" required></div></label><label class="field"><span>ระยะเวลา OT (HH:MM)</span><div class="ot-duration-control"><div class="ot-time-control"><div class="ot-time-segment"><span>ชั่วโมง</span><select name="durationHour" required aria-label="ชั่วโมง OT"></select></div><span class="ot-time-separator" aria-hidden="true">:</span><div class="ot-time-segment"><span>นาที</span><select name="durationMinute" required aria-label="นาที OT"></select></div></div></div><span class="help-text">เลือกชั่วโมง 00–12 และนาที 00–59 ได้ทุกค่า (สูงสุด 12:59)</span></label><label class="field field-full"><span>รายละเอียดงานที่ทำ</span><textarea name="details" minlength="5" maxlength="1000" required placeholder="ระบุงานที่ทำและผลที่ได้"></textarea><span class="help-text">ช่วยให้ผู้บริหารตรวจสอบงาน OT ได้ชัดเจน</span></label><div class="field field-full"><span class="field-label">รูปหลักฐาน <span class="ot-optional">ไม่บังคับ</span></span><div class="ot-upload-box" data-dropzone><div class="ot-upload-mark" aria-hidden="true">＋</div><div class="ot-upload-copy"><strong>เพิ่มรูปภาพหลักฐาน</strong><span>เลือกได้ครั้งละหลายรูป หรือเพิ่มรูปภายหลังได้</span><small>PNG, JPG หรือ WebP • GIF แบบเคลื่อนไหวยังไม่รองรับ • ระบบบีบอัดรูปใหญ่ให้อัตโนมัติ • สูงสุด 5 รูป • รวมไม่เกิน 2 MB</small></div><label class="button button-small ot-upload-button" for="ot-photo-input">เลือกรูป<input id="ot-photo-input" name="photoInput" class="ot-file-input" type="file" accept="image/png,image/jpeg,image/webp" multiple></label></div><div class="ot-photo-status" data-photo-status aria-live="polite">ยังไม่ได้เลือกรูป</div><div class="ot-photo-grid" data-photo-grid></div></div></div><div class="ot-recorder"><span class="ot-recorder-avatar" aria-hidden="true">'+e((context.user.name||"พ").slice(0,1))+'</span><div><span class="ot-recorder-label">ผู้บันทึก</span><strong>'+e(context.user.name)+'</strong><small>ยืนยันจากบัญชีที่เข้าสู่ระบบ</small></div></div><button class="button button-primary ot-submit" type="submit">ส่งข้อมูล OT</button></form></section>':"")+
+  (showForm?'<section class="card form-card ot-form-card"><div class="ot-form-intro"><span class="ot-form-icon" aria-hidden="true">◷</span><div><h2>บันทึก OT</h2><p>กรอกรายละเอียดงาน พร้อมแนบรูปประกอบได้สูงสุด '+MAX_PHOTOS+' รูป</p></div></div><form data-ot-form><div class="form-grid"><label class="field"><span>วันที่ทำ OT</span><div class="ot-date-control"><span>เลือกวันที่</span><input name="date" type="date" value="'+e(bangkokToday())+'" required></div></label><label class="field"><span>ช่วงเวลา OT</span><div class="ot-period-control" data-ot-period-fields><div class="ot-time-control"><div class="ot-time-segment"><span>เริ่ม OT</span><input name="otStart" type="time" required aria-label="เวลาเริ่ม OT"></div><span class="ot-time-separator" aria-hidden="true">ถึง</span><div class="ot-time-segment"><span>จบ OT</span><input name="otEnd" type="time" required aria-label="เวลาจบ OT"></div></div><span class="help-text" data-ot-period-summary aria-live="polite">เลือกเวลาเริ่ม OT ก่อน</span></div><div class="ot-duration-control" data-ot-duration-fields hidden><div class="ot-time-control"><div class="ot-time-segment"><span>ชั่วโมง</span><select name="durationHour" aria-label="ชั่วโมง OT" disabled></select></div><span class="ot-time-separator" aria-hidden="true">:</span><div class="ot-time-segment"><span>นาที</span><select name="durationMinute" aria-label="นาที OT" disabled></select></div></div><span class="help-text">รายการเดิมนี้เก็บเฉพาะระยะเวลา OT</span></div></label><label class="field field-full"><span>รายละเอียดงานที่ทำ</span><textarea name="details" minlength="5" maxlength="1000" required placeholder="ระบุงานที่ทำและผลที่ได้"></textarea><span class="help-text">ช่วยให้ผู้บริหารตรวจสอบงาน OT ได้ชัดเจน</span></label><div class="field field-full"><span class="field-label">รูปหลักฐาน <span class="ot-optional">ไม่บังคับ</span></span><div class="ot-upload-box" data-dropzone><div class="ot-upload-mark" aria-hidden="true">＋</div><div class="ot-upload-copy"><strong>เพิ่มรูปภาพหลักฐาน</strong><span>เลือกได้ครั้งละหลายรูป หรือเพิ่มรูปภายหลังได้</span><small>PNG, JPG หรือ WebP • GIF แบบเคลื่อนไหวยังไม่รองรับ • ระบบบีบอัดรูปใหญ่ให้อัตโนมัติ • สูงสุด 5 รูป • รวมไม่เกิน 2 MB</small></div><label class="button button-small ot-upload-button" for="ot-photo-input">เลือกรูป<input id="ot-photo-input" name="photoInput" class="ot-file-input" type="file" accept="image/png,image/jpeg,image/webp" multiple></label></div><div class="ot-photo-status" data-photo-status aria-live="polite">ยังไม่ได้เลือกรูป</div><div class="ot-photo-grid" data-photo-grid></div></div></div><div class="ot-recorder"><span class="ot-recorder-avatar" aria-hidden="true">'+e((context.user.name||"พ").slice(0,1))+'</span><div><span class="ot-recorder-label">ผู้บันทึก</span><strong>'+e(context.user.name)+'</strong><small>ยืนยันจากบัญชีที่เข้าสู่ระบบ</small></div></div><button class="button button-primary ot-submit" type="submit">ส่งข้อมูล OT</button></form></section>':"")+
   '<div class="section-title"><h2>'+(manager?'รายการ OT ทั้งหมด':'ประวัติ OT ของฉัน')+'</h2></div><div class="ot-history-filters"><label class="field"><span>เดือนที่ทำ OT</span><input type="month" data-ot-month></label><p class="small-muted">ตัวกรองอ้างอิงวันที่ทำ OT · <span data-ot-total>กำลังโหลดผลรวม</span></p></div><div data-ot-list></div><button class="button" data-ot-more hidden>โหลดเพิ่ม</button><div data-ot-detail-host></div>';
   const form=root.querySelector("[data-ot-form]");
   const dateInput=form?.elements.date;
@@ -240,6 +245,35 @@ dateInput?.insertAdjacentHTML("afterend",'<span class="help-text">\u{e1a}\u{e31}
   const durationHour=form?.elements.durationHour, durationMinute=form?.elements.durationMinute;
   if(durationHour)for(let hour=0;hour<=12;hour++){const value=String(hour).padStart(2,"0"),option=document.createElement("option");option.value=value;option.textContent=value;durationHour.append(option);}
   if(durationMinute)for(let minute=0;minute<60;minute++){const value=String(minute).padStart(2,"0"),option=document.createElement("option");option.value=value;option.textContent=value;durationMinute.append(option);}
+  const periodStart=form?.elements.otStart,periodEnd=form?.elements.otEnd,periodSummary=form?.querySelector("[data-ot-period-summary]");
+  function updateOtPeriodSummary(){
+    if(!periodSummary)return;
+    const start=periodStart?.value||"",end=periodEnd?.value||"";if(periodEnd)periodEnd.disabled=form?.dataset.otEntryMode!=="period"||!start;
+    periodEnd?.setCustomValidity("");
+    if(!start){periodSummary.textContent="เลือกเวลาเริ่ม OT ก่อน";return;}
+    if(!end){periodSummary.textContent="เลือกเวลาจบ OT เพื่อคำนวณระยะเวลา";return;}
+    const minutes=overtimeMinutesBetween(start,end);
+    if(!minutes){periodSummary.textContent="เวลาเริ่มและจบ OT ต้องไม่ตรงกัน";periodEnd?.setCustomValidity("เวลาเริ่มและจบ OT ต้องไม่ตรงกัน");return;}
+    if(minutes>779){periodSummary.textContent="ช่วงเวลา OT สูงสุด 12 ชั่วโมง 59 นาที";periodEnd?.setCustomValidity("ช่วงเวลา OT สูงสุด 12 ชั่วโมง 59 นาที");return;}
+    periodSummary.textContent="รวม "+Math.floor(minutes/60)+" ชั่วโมง "+(minutes%60)+" นาที"+(end<start?" · จบวันถัดไป":"");
+  }
+  function setEntryMode(mode){
+    if(!form)return;
+    const usePeriod=mode==="period",periodFields=form.querySelector("[data-ot-period-fields]"),durationFields=form.querySelector("[data-ot-duration-fields]");
+    if(periodFields)periodFields.hidden=!usePeriod;
+    if(durationFields)durationFields.hidden=usePeriod;
+    if(periodStart){periodStart.disabled=!usePeriod;periodStart.required=usePeriod;}
+    if(periodEnd){periodEnd.disabled=!usePeriod||!periodStart?.value;periodEnd.required=usePeriod;}
+    if(durationHour){durationHour.disabled=usePeriod;durationHour.required=!usePeriod;}
+    if(durationMinute){durationMinute.disabled=usePeriod;durationMinute.required=!usePeriod;}
+    form.dataset.otEntryMode=usePeriod?"period":"duration";
+    updateOtPeriodSummary();
+  }
+  periodStart?.addEventListener("input",updateOtPeriodSummary);
+  periodEnd?.addEventListener("input",updateOtPeriodSummary);
+  periodStart?.addEventListener("change",updateOtPeriodSummary);
+  periodEnd?.addEventListener("change",updateOtPeriodSummary);
+  setEntryMode("period");
 
 
 
@@ -288,16 +322,16 @@ dateInput?.insertAdjacentHTML("afterend",'<span class="help-text">\u{e1a}\u{e31}
   function resetForm(){
     editing=null;pendingRecoveryDate='';existingFiles=[];selectedFiles=[];form.elements.otGroup.disabled=false;
     form.elements.otGroup.querySelector('[data-temporary-group]')?.remove();
-    form.reset();form.elements.date.value=bangkokToday();refreshDateValidity();form.querySelector('[data-cancel-edit]').hidden=true;form.querySelector('[data-abandon-ot]').hidden=true;
+    form.reset();form.elements.date.value=bangkokToday();setEntryMode('period');refreshDateValidity();form.querySelector('[data-cancel-edit]').hidden=true;form.querySelector('[data-abandon-ot]').hidden=true;
     form.querySelector('[type="submit"]').textContent="ส่งข้อมูล OT";drawFiles();
   }
   function fillEdit(report,values=report,keepPaths=null){
     editing={id:report.id,version:Number(report.version),originalDate:report.date||values.date||''};
     existingFiles=(report.attachments||[]).filter(file=>!keepPaths||keepPaths.includes(file.path));
     form.elements.date.value=values.date||'';refreshDateValidity();
-    form.elements.durationHour.value=String(Math.floor(values.duration_minutes/60)).padStart(2,'0');
-    form.elements.durationMinute.value=String(values.duration_minutes%60).padStart(2,'0');
-    form.elements.details.value=values.details||'';
+    const savedPeriod=splitOtPeriod(values.details||"");if(savedPeriod.start&&savedPeriod.end){setEntryMode("period");periodStart.value=savedPeriod.start;periodEnd.value=savedPeriod.end;updateOtPeriodSummary();}else{setEntryMode("duration");form.elements.durationHour.value=String(Math.floor(values.duration_minutes/60)).padStart(2,'0');form.elements.durationMinute.value=String(values.duration_minutes%60).padStart(2,'0');}
+
+    form.elements.details.value=savedPeriod.details;
     if(![...form.elements.otGroup.options].some(option=>option.value===report.group_name)){
       const option=document.createElement('option');option.value=report.group_name;option.textContent=report.group_name;option.dataset.temporaryGroup='true';form.elements.otGroup.append(option);
     }
@@ -331,17 +365,28 @@ dateInput?.insertAdjacentHTML("afterend",'<span class="help-text">\u{e1a}\u{e31}
     let modal=showStatusModal({title:"กำลังตรวจสอบข้อมูล",message:"กำลังเตรียมส่งรายงาน OT",tone:"working",dismissOnEscape:false});
     try{
       const values=Object.fromEntries(new FormData(form));
-      const durationText=String(values.durationHour||"").padStart(2,"0")+":"+String(values.durationMinute||"").padStart(2,"0");
-      const durationMatch=/^(\d{2}):(\d{2})$/.exec(durationText);
-      const durationMinutes=durationMatch?Number(durationMatch[1])*60+Number(durationMatch[2]):0;
-      if(!durationMatch||!(/^(?:0\d|1[0-2]):[0-5]\d$/).test(durationText)||durationMinutes<1||durationMinutes>779)throw new Error("กรุณาเลือกระยะเวลา OT ตั้งแต่ 00:01 ถึง 12:59");
+      const entryMode=form.dataset.otEntryMode||"period";
+      let durationMinutes=0,submittedDetails=String(values.details||"").trim();
+      if(entryMode==="period"){
+        durationMinutes=overtimeMinutesBetween(values.otStart,values.otEnd);
+        if(!values.otStart||!values.otEnd||!durationMinutes)throw new Error("กรุณาเลือกเวลาเริ่มและจบ OT ให้ถูกต้อง");
+        if(durationMinutes>779)throw new Error("ช่วงเวลา OT สูงสุด 12 ชั่วโมง 59 นาที");
+        submittedDetails=buildOtPeriodDetails(values.otStart,values.otEnd,submittedDetails);
+        if(submittedDetails.length>1000)throw new Error("รายละเอียดพร้อมช่วงเวลา OT ต้องไม่เกิน 1,000 ตัวอักษร");
+      }else{
+        const durationText=String(values.durationHour||"").padStart(2,"0")+":"+String(values.durationMinute||"").padStart(2,"0");
+        const durationMatch=/^(\d{2}):(\d{2})$/.exec(durationText);
+        durationMinutes=durationMatch?Number(durationMatch[1])*60+Number(durationMatch[2]):0;
+        if(!durationMatch||!(/^(?:0\d|1[0-2]):[0-5]\d$/).test(durationText)||durationMinutes<1||durationMinutes>779)throw new Error("กรุณาเลือกระยะเวลา OT ตั้งแต่ 00:01 ถึง 12:59");
+      }
+
       if(!/^\d{4}-\d{2}-\d{2}$/.test(values.date)||Number.isNaN(Date.parse(values.date+"T00:00:00Z")))throw new Error("กรุณาเลือกวันที่ทำ OT ให้ถูกต้อง"); if(!isOvertimeDateAllowed(values.date,bangkokToday())&&!(editMode&&values.date===editing.originalDate)&&values.date!==pendingRecoveryDate)throw Object.assign(new Error("OT date must be today or yesterday (Bangkok time)."),{code:"OT_DATE_OUT_OF_RANGE"});
       if(String(values.details||"").trim().length<5)throw new Error("กรุณาระบุรายละเอียดงานอย่างน้อย 5 ตัวอักษร");
       const auth=getAuthContext();
       if(!auth.authenticated||!auth.active)throw Object.assign(new Error("Session หมดอายุหรือบัญชีไม่ได้ใช้งาน"),{code:"SESSION_EXPIRED"});
       if(!editMode&&(!['สกรีน','ผลิต','ขนส่ง'].includes(values.otGroup)||(auth.role!=='admin'&&!(auth.groups||[]).includes(values.otGroup))))throw Object.assign(new Error("เลือกกลุ่มงานที่ได้รับสิทธิ์กรอก OT ก่อนส่งรายงาน"),{code:"PERMISSION_DENIED"});
       modal.update({title:editMode?"กำลังบันทึกการแก้ไข":"กำลังส่งรายงาน OT",message:selectedFiles.length?"กำลังอัปโหลดรูปและบันทึกข้อมูล":"กำลังบันทึกข้อมูล",tone:"working"});
-      const payload={date:values.date,duration_minutes:durationMinutes,details:String(values.details).trim(),files:[...selectedFiles],owner_id:auth.employee_id};
+      const payload={date:values.date,duration_minutes:durationMinutes,details:submittedDetails,files:[...selectedFiles],owner_id:auth.employee_id};
       const result=editMode?await workApi.editOvertimeReport({...payload,id:editing.id,expected_version:editing.version,keep_attachments:[...existingFiles]}):await workApi.submitOvertimeRequest({...payload,group_name:values.otGroup});
       modal.update({title:"กำลังตรวจสอบข้อมูล",message:"กำลังอ่านรายงานกลับจาก Supabase",tone:"working"});
       resetForm();
@@ -369,7 +414,7 @@ dateInput?.insertAdjacentHTML("afterend",'<span class="help-text">\u{e1a}\u{e31}
   root.querySelector("[data-ot-list]")?.addEventListener("click",async event=>{
     const editButton=event.target.closest("[data-edit-report]");
     if(editButton&&form){
-      if(editing||form.elements.details.value.trim()||selectedFiles.length){const warning=showStatusModal({title:"มีข้อมูลในฟอร์ม",message:"กรุณาส่งหรือจัดการข้อมูลที่กำลังกรอกก่อนเปิดรายการแก้ไข",tone:"error",close:()=>warning.close()});return;}
+      if(editing||form.elements.details.value.trim()||periodStart?.value||periodEnd?.value||selectedFiles.length){const warning=showStatusModal({title:"มีข้อมูลในฟอร์ม",message:"กรุณาส่งหรือจัดการข้อมูลที่กำลังกรอกก่อนเปิดรายการแก้ไข",tone:"error",close:()=>warning.close()});return;}
       const modal=showStatusModal({title:"กำลังโหลดรายงาน",message:"กำลังตรวจสิทธิ์และโหลดรูปเดิม",tone:"working"});
       const employee=getAuthContext().employee_id;
       try{
@@ -383,9 +428,8 @@ dateInput?.insertAdjacentHTML("afterend",'<span class="help-text">\u{e1a}\u{e31}
     const button=event.target.closest("[data-open-report]");if(!button)return;
     const modal=showStatusModal({title:"กำลังโหลดรายละเอียด OT",message:"กำลังตรวจสิทธิ์และโหลดรูปหลักฐาน",tone:"working"});
     const employee=getAuthContext().employee_id;
-    try{const report=await workApi.readOvertimeReport(button.dataset.openReport,manager&&context.user.role==='admin'?'admin':'self');if(getAuthContext().employee_id!==employee){modal.close();return;}const host=root.querySelector("[data-ot-detail-host]");
-      host.innerHTML='<section class="card card-pad ot-detail"><button class="button button-small" data-close-detail>ปิดรายละเอียด</button><h2>'+e(report.date)+'</h2>'+(manager?'<p><strong>พนักงาน:</strong> '+e(report.employee_name||'—')+' · '+e(report.group_name||'')+'</p>':'')+'<p><strong>ระยะเวลา:</strong> '+e(formatDuration(report))+'</p><p>'+e(report.details)+'</p><p>สร้าง '+e(thaiDateTime(report.created_at))+' · แก้ไข '+e(thaiDateTime(report.updated_at))+'</p><div class="ot-evidence-grid">'+(report.attachments||[]).map(file=>'<a class="ot-evidence-item" href="'+e(file.signed_url)+'" target="_blank" rel="noreferrer"><img src="'+e(file.signed_url)+'" alt="'+e(file.name)+'"><span>'+e(file.name)+'</span></a>').join("")+'</div></section>';
-      host.querySelector("[data-close-detail]").onclick=()=>host.replaceChildren();modal.update({title:"โหลดรายละเอียดสำเร็จ",message:"เปิดดูข้อมูลและรูปหลักฐานได้แล้ว",tone:"success",close:()=>modal.close()});
+    try{const report=await workApi.readOvertimeReport(button.dataset.openReport,manager&&context.user.role==='admin'?'admin':'self');if(getAuthContext().employee_id!==employee){modal.close();return;}
+      modal.close();openDetailDialog({title:"รายละเอียดรายงาน OT",subtitle:manager?`${report.employee_name||'ไม่ระบุชื่อ'} · ${report.group_name||'ไม่ระบุกลุ่ม'}`:`รายงาน OT ของฉัน · ${thaiDateTime(report.date)}`,returnFocus:button,content:'<dl class="work-manager-fields"><div><dt>วันที่ทำ OT</dt><dd>'+e(thaiDateTime(report.date))+'</dd></div><div><dt>ระยะเวลา</dt><dd>'+e(formatDuration(report))+'</dd></div><div><dt>ส่งเมื่อ</dt><dd>'+e(thaiDateTime(report.created_at))+'</dd></div><div><dt>แก้ไขล่าสุด</dt><dd>'+e(thaiDateTime(report.updated_at))+'</dd></div></dl><section class="detail-section"><h3>รายละเอียดงาน</h3><p>'+e(report.details)+'</p></section><section class="detail-section"><h3>รูปหลักฐาน ('+(report.attachments||[]).length+')</h3><div class="ot-evidence-grid">'+(report.attachments||[]).map(file=>'<a class="ot-evidence-item" href="'+e(file.signed_url)+'" target="_blank" rel="noreferrer"><img src="'+e(file.signed_url)+'" alt="'+e(file.name)+'"><span>'+e(file.name)+'</span></a>').join("")+'</div></section>'});
     }catch(error){modal.update({title:"เปิดรายละเอียดไม่สำเร็จ",message:error.message||"ไม่มีสิทธิ์หรือเชื่อมต่อไม่ได้",tone:"error",close:()=>modal.close()});}
   });
   async function recoverPending(){
@@ -404,7 +448,7 @@ dateInput?.insertAdjacentHTML("afterend",'<span class="help-text">\u{e1a}\u{e31}
         modal.update({title:"รายงานถูกแก้ไขแล้ว",message:"รายการแก้ไขค้างใช้ข้อมูลรุ่นเก่า กรุณาเปิดรายละเอียดล่าสุดก่อนแก้ไขใหม่",tone:"error",close:()=>modal.close()});return;
       }
       if(editResult.state==='pending'){
-        if(editing||form.elements.details.value.trim()||selectedFiles.length){modal.update({title:"มีการแก้ไขค้าง",message:"ข้อมูลที่กำลังกรอกยังอยู่ กรุณาจัดการฟอร์มก่อนกดตรวจรายการส่งค้างอีกครั้ง",tone:"error",close:()=>modal.close()});return;}
+        if(editing||form.elements.details.value.trim()||periodStart?.value||periodEnd?.value||selectedFiles.length){modal.update({title:"มีการแก้ไขค้าง",message:"ข้อมูลที่กำลังกรอกยังอยู่ กรุณาจัดการฟอร์มก่อนกดตรวจรายการส่งค้างอีกครั้ง",tone:"error",close:()=>modal.close()});return;}
         fillEdit(editResult.report,editResult,editResult.keep_paths);
         const names=editResult.file_names||[];
         if(names.length)photoStatus.textContent="กรุณาเลือกรูปใหม่ชุดเดิมอีกครั้ง: "+names.join(', ');
@@ -418,14 +462,14 @@ dateInput?.insertAdjacentHTML("afterend",'<span class="help-text">\u{e1a}\u{e31}
         const historyLoaded=await load({reset:true});
         modal.update({title:"ตรวจพบรายงานเดิมแล้ว",message:historyLoaded?"รายงานก่อนหน้าบันทึกและตรวจ Audit แล้ว สามารถเริ่มรายการใหม่ได้":"รายงานก่อนหน้าบันทึกและตรวจ Audit แล้ว แต่โหลดประวัติไม่สำเร็จ กรุณารีเฟรชประวัติ",tone:historyLoaded?"success":"error",close:()=>modal.close()});return;
       }
-      if(form.elements.details.value.trim()||selectedFiles.length){
+      if(form.elements.details.value.trim()||periodStart?.value||periodEnd?.value||selectedFiles.length){
         modal.update({title:"มีรายการส่งค้าง",message:"ยังไม่พบรายงานเดิมในระบบ ข้อมูลที่กำลังกรอกยังอยู่ กรุณาจัดการข้อมูลในฟอร์มก่อนกดตรวจรายการส่งค้างอีกครั้ง",tone:"error",close:()=>modal.close()});return;
       }
       form.querySelector('[data-abandon-ot]').hidden=false;
       pendingRecoveryDate=result.date||'';form.elements.date.value=pendingRecoveryDate;refreshDateValidity();
-      form.elements.durationHour.value=String(Math.floor(result.duration_minutes/60)).padStart(2,'0');
-      form.elements.durationMinute.value=String(result.duration_minutes%60).padStart(2,'0');
-      form.elements.details.value=result.details||'';
+      const recoveredPeriod=splitOtPeriod(result.details||"");if(recoveredPeriod.start&&recoveredPeriod.end){setEntryMode("period");periodStart.value=recoveredPeriod.start;periodEnd.value=recoveredPeriod.end;updateOtPeriodSummary();}else{setEntryMode("duration");form.elements.durationHour.value=String(Math.floor(result.duration_minutes/60)).padStart(2,'0');form.elements.durationMinute.value=String(result.duration_minutes%60).padStart(2,'0');}
+
+      form.elements.details.value=recoveredPeriod.details;
       const names=result.file_names||[];
       photoStatus.textContent=names.length?'กรุณาเลือกรูปเดิมอีกครั้ง: '+names.join(', '):'รายการเดิมไม่มีรูปแนบ';
       if([...form.elements.otGroup.options].some(option=>option.value===result.group_name))form.elements.otGroup.value=result.group_name;
@@ -458,3 +502,5 @@ dateInput?.insertAdjacentHTML("afterend",'<span class="help-text">\u{e1a}\u{e31}
 
 
 
+
+export async function renderOvertimeReport(root,context){await renderExecutiveOtDashboard(root,context);}
