@@ -1,8 +1,8 @@
-import { enumerateLeaveDates } from '../../js/leave-rules.js?v=1.3.397';
-import { escapeHtml } from '../../js/utils.js?v=1.3.397';
-import { requireOnlineAction } from '../../js/offline.js?v=1.3.397';
-import { confirmAction } from '../../components/modal.js?v=1.3.397';
-import { submitProxyLeaveRequest } from '../../adapters/package09.js?v=1.3.397';
+import { enumerateLeaveDates } from '../../js/leave-rules.js?v=1.3.398';
+import { escapeHtml } from '../../js/utils.js?v=1.3.398';
+import { requireOnlineAction } from '../../js/offline.js?v=1.3.398';
+import { confirmAction } from '../../components/modal.js?v=1.3.398';
+import { submitProxyLeaveRequest } from '../../adapters/package09.js?v=1.3.398';
 
 const LEAVE_GROUPS = new Set(['ออฟฟิศ', 'สกรีน', 'ผลิต', 'ขนส่ง']);
 const employeesForProxy = rows => (rows || [])

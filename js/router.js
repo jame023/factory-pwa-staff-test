@@ -1,42 +1,42 @@
-import { routeDecision, normalizeRoute, routeBackTarget, groupRoute } from './route-policy.js?v=1.3.397';
-import { getAuthContext as accessContext } from './access-context.js?v=1.3.397';
-import { APP_MODE, READ_ONLY_ROUTES } from "./config.js?v=1.3.397";
-import { resolveWorkspaceRoute, canAccessModule } from "./permissions.js?v=1.3.397";
-import { watchChanges, pageBusy, preservePageDraft, mockLiveEnabled } from './live-updates.js?v=1.3.397';
-import { showActionPopup } from '../components/action-popup.js?v=1.3.397';
-import { isStatusModalOpen } from '../components/status-modal.js?v=1.3.397';
-import { installDetailDisclosureDialogs } from '../components/detail-dialog.js?v=1.3.397';
+import { routeDecision, normalizeRoute, routeBackTarget, groupRoute } from './route-policy.js?v=1.3.398';
+import { getAuthContext as accessContext } from './access-context.js?v=1.3.398';
+import { APP_MODE, READ_ONLY_ROUTES } from "./config.js?v=1.3.398";
+import { resolveWorkspaceRoute, canAccessModule } from "./permissions.js?v=1.3.398";
+import { watchChanges, pageBusy, preservePageDraft, mockLiveEnabled } from './live-updates.js?v=1.3.398';
+import { showActionPopup } from '../components/action-popup.js?v=1.3.398';
+import { isStatusModalOpen } from '../components/status-modal.js?v=1.3.398';
+import { installDetailDisclosureDialogs } from '../components/detail-dialog.js?v=1.3.398';
 const routes = {
-  home: () => import("../pages/home/index.js?v=1.3.397"),
-  attendance: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/attendance/legacy.js?v=1.3.397") : import("../pages/attendance/index.js?v=1.3.397"),
-  "work-session": () => import("../pages/work-session/index.js?v=1.3.397"),
-  "production-work": () => import("../pages/work-session/production-combined.js?v=1.3.397"),
-  leave: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/leave/legacy.js?v=1.3.397") : import("../pages/leave/index.js?v=1.3.397"),
-  calendar: () => import("../pages/calendar/index.js?v=1.3.397"),
-  delivery: () => import("../pages/delivery/index.js?v=1.3.397"),
-  "delivery-combined": () => import("../pages/delivery/combined.js?v=1.3.397"),
-  "delivery-home": () => import("../pages/access/index.js?v=1.3.397"),
-  production: () => import("../pages/production/index.js?v=1.3.397"),
-  "production-record": () => import("../pages/production-record/index.js?v=1.3.397"),
-  "production-data": () => import("../pages/work-session/production-data.js?v=1.3.397"),
-  "screen-data": () => import("../pages/work-session/screen-data.js?v=1.3.397"),
-  "screen-combined": () => import("../pages/work-session/screen-combined.js?v=1.3.397"),
-  ot: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/ot/legacy.js?v=1.3.397") : import("../pages/ot/index.js?v=1.3.397"),
-  reports: () => import("../pages/reports/index.js?v=1.3.397"),
-  notifications: () => import("../pages/notifications/index.js?v=1.3.397"),
-  "ot-report": () => import("../pages/ot/report.js?v=1.3.397"),
-  "reports-menu": () => import("../pages/reports/menu.js?v=1.3.397"),
-  'admin-system-status': () => import('../pages/admin/system-status.js?v=1.3.397'),
-  admin: () => import("../pages/admin/index.js?v=1.3.397"),
-  "admin-registrations": () => import("../pages/admin/registrations.js?v=1.3.397"),
-  "admin-employees": () => import("../pages/admin/employees.js?v=1.3.397"),
-  "admin-groups": () => import("../pages/admin/groups.js?v=1.3.397"),
-  "admin-machines": () => import("../pages/admin/machines.js?v=1.3.397"),
-  "admin-item-names": () => import("../pages/admin/item-names.js?v=1.3.397")
+  home: () => import("../pages/home/index.js?v=1.3.398"),
+  attendance: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/attendance/legacy.js?v=1.3.398") : import("../pages/attendance/index.js?v=1.3.398"),
+  "work-session": () => import("../pages/work-session/index.js?v=1.3.398"),
+  "production-work": () => import("../pages/work-session/production-combined.js?v=1.3.398"),
+  leave: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/leave/legacy.js?v=1.3.398") : import("../pages/leave/index.js?v=1.3.398"),
+  calendar: () => import("../pages/calendar/index.js?v=1.3.398"),
+  delivery: () => import("../pages/delivery/index.js?v=1.3.398"),
+  "delivery-combined": () => import("../pages/delivery/combined.js?v=1.3.398"),
+  "delivery-home": () => import("../pages/access/index.js?v=1.3.398"),
+  production: () => import("../pages/production/index.js?v=1.3.398"),
+  "production-record": () => import("../pages/production-record/index.js?v=1.3.398"),
+  "production-data": () => import("../pages/work-session/production-data.js?v=1.3.398"),
+  "screen-data": () => import("../pages/work-session/screen-data.js?v=1.3.398"),
+  "screen-combined": () => import("../pages/work-session/screen-combined.js?v=1.3.398"),
+  ot: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/ot/legacy.js?v=1.3.398") : import("../pages/ot/index.js?v=1.3.398"),
+  reports: () => import("../pages/reports/index.js?v=1.3.398"),
+  notifications: () => import("../pages/notifications/index.js?v=1.3.398"),
+  "ot-report": () => import("../pages/ot/report.js?v=1.3.398"),
+  "reports-menu": () => import("../pages/reports/menu.js?v=1.3.398"),
+  'admin-system-status': () => import('../pages/admin/system-status.js?v=1.3.398'),
+  admin: () => import("../pages/admin/index.js?v=1.3.398"),
+  "admin-registrations": () => import("../pages/admin/registrations.js?v=1.3.398"),
+  "admin-employees": () => import("../pages/admin/employees.js?v=1.3.398"),
+  "admin-groups": () => import("../pages/admin/groups.js?v=1.3.398"),
+  "admin-machines": () => import("../pages/admin/machines.js?v=1.3.398"),
+  "admin-item-names": () => import("../pages/admin/item-names.js?v=1.3.398")
 };
 routes.employee = routes.home;
 routes.executive = routes.home;
-routes['access-shell']=()=>import('../pages/access/index.js?v=1.3.397');
+routes['access-shell']=()=>import('../pages/access/index.js?v=1.3.398');
 const access = {
   'access-shell':['employee','executive','admin'],
   home: ["employee", "executive", "admin"],

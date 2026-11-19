@@ -1,14 +1,14 @@
-import { createLeaveService } from './leave-service.js?v=1.3.397';
-import { createOtService } from './ot-service.js?v=1.3.397';
-import { createDeliveryService } from './delivery-service.js?v=1.3.397';
-import { validateLeaveSubmission, storedLeaveItems } from './leave-rules.js?v=1.3.397';
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js?v=1.3.397';
+import { createLeaveService } from './leave-service.js?v=1.3.398';
+import { createOtService } from './ot-service.js?v=1.3.398';
+import { createDeliveryService } from './delivery-service.js?v=1.3.398';
+import { validateLeaveSubmission, storedLeaveItems } from './leave-rules.js?v=1.3.398';
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js?v=1.3.398';
 
-import { RECORD_SCHEMAS, validateRecord } from './record-schema.js?v=1.3.397';
-import { bangkokToday } from './utils.js?v=1.3.397';
-import { getSupabaseLineAccessToken } from './auth.js?v=1.3.397';
-import { normalizeExecutiveAttendanceRows, summarizeExecutiveAttendance, validateAttendanceRange } from './executive-attendance-rules.js?v=1.3.397';
-import { ADMIN_AUDIT_PAGE_SIZE, buildAuditDetailSelect, buildAuditListParams, auditAllowsReason, resolveAuditActor, safeAuditChanges, validateAuditFilters } from './admin-audit-contract.js?v=1.3.397';
+import { RECORD_SCHEMAS, validateRecord } from './record-schema.js?v=1.3.398';
+import { bangkokToday } from './utils.js?v=1.3.398';
+import { getSupabaseLineAccessToken } from './auth.js?v=1.3.398';
+import { normalizeExecutiveAttendanceRows, summarizeExecutiveAttendance, validateAttendanceRange } from './executive-attendance-rules.js?v=1.3.398';
+import { ADMIN_AUDIT_PAGE_SIZE, buildAuditDetailSelect, buildAuditListParams, auditAllowsReason, resolveAuditActor, safeAuditChanges, validateAuditFilters } from './admin-audit-contract.js?v=1.3.398';
 
 const CATEGORIES = new Set(['attendance','workSessions','leaveRequests','calendar','deliveries','production','screenEntries','otRequests']);
 const GENERIC_ADMIN_WRITE_BLOCKED = new Set(['workSessions','leaveRequests','deliveries','production','screenEntries','otRequests']);

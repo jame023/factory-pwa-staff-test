@@ -1,5 +1,5 @@
-import { appCard } from "../../components/app-card.js?v=1.3.397";
-import { canAccessModule } from "../../js/permissions.js?v=1.3.397";
+import { appCard } from "../../components/app-card.js?v=1.3.398";
+import { canAccessModule } from "../../js/permissions.js?v=1.3.398";
 
 const executiveMenus = [
   { module:"attendance", route:"executive/attendance", icon:"🪪", title:"เวลาเข้าออก", hint:"ดูเวลาเข้าออกและสถานะพนักงาน" },

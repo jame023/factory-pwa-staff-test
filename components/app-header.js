@@ -1,6 +1,6 @@
-import { APP_MODE, APP_NAME, ROLE_LABELS } from "../js/config.js?v=1.3.397";
-import { escapeHtml } from "../js/utils.js?v=1.3.397";
-import { notificationBellMarkup } from '../js/notification-badge.js?v=1.3.397';
+import { APP_MODE, APP_NAME, ROLE_LABELS } from "../js/config.js?v=1.3.398";
+import { escapeHtml } from "../js/utils.js?v=1.3.398";
+import { notificationBellMarkup } from '../js/notification-badge.js?v=1.3.398';
 
 export function renderAppHeader(user) {
   return '<div class="app-header"><div class="header-inner">' +

@@ -1,4 +1,4 @@
-import { request } from '../js/api.js?v=1.3.397';
+import { request } from '../js/api.js?v=1.3.398';
 
 export const listLeaveRequests = (scope = 'self') => request("package09", "leave.read", {scope});
 export const readLeaveHistoryPage = filters => request("package09", "leave.history", filters);

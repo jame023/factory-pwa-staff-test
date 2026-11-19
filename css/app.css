@@ -301,6 +301,7 @@ td.attendance-tone { font-weight: 700; font-variant-numeric: tabular-nums; }
 .calendar-status-holiday { --day-ink: #b42318; --day-paper: #fff0ed; --day-border: #e6a39b; }
 .work-calendar-day { background: var(--day-paper, white); color: var(--day-ink, var(--ink)); border-color: var(--day-border, var(--line)); min-height: 96px; gap: .35rem; overflow-wrap: anywhere; text-align: start; }
 .work-calendar-day > strong { font-size: 1.05rem; }
+.calendar-day-readonly{cursor:default}
 .calendar-status-label { font-weight: 800; }
 .work-calendar-day.is-selected { background: var(--day-paper, white); outline: 3px solid var(--navy); outline-offset: -3px; }
 .work-calendar-day.is-today { border: 2px solid var(--navy); }

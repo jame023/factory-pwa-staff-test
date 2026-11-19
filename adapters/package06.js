@@ -1,4 +1,4 @@
-import { request } from "../js/api.js?v=1.3.397";
+import { request } from "../js/api.js?v=1.3.398";
 export const readReport = period => request("package06", "reports.read", { period });
 
 export const readReportInbox = (kind="all") => request("package06","reports.inbox.read",{kind});

@@ -1,14 +1,14 @@
-import { startCalendarNotifications } from "./notifications.js?v=1.3.397";
-import { authProvider, clearSupabaseSession, checkSupabaseSession } from "./auth.js?v=1.3.397";
-import { renderAppHeader } from "../components/app-header.js?v=1.3.397";
-import { renderLoginScreen } from "../components/login-screen.js?v=1.3.397";
-import { renderBottomNav } from "../components/bottom-nav.js?v=1.3.397";
-import { currentRoute, startRouter, refreshRoute } from "./router.js?v=1.3.397";
-import { subscribeStore } from './state.js?v=1.3.397';
-import { showToast } from "../components/toast.js?v=1.3.397";
-import { registerServiceWorker, setOfflineNotice, watchConnection } from "./offline.js?v=1.3.397";
-import { APP_MODE } from "./config.js?v=1.3.397";
-import { installActionFeedback, showActionPopup } from "../components/action-popup.js?v=1.3.397";
+import { startCalendarNotifications } from "./notifications.js?v=1.3.398";
+import { authProvider, clearSupabaseSession, checkSupabaseSession } from "./auth.js?v=1.3.398";
+import { renderAppHeader } from "../components/app-header.js?v=1.3.398";
+import { renderLoginScreen } from "../components/login-screen.js?v=1.3.398";
+import { renderBottomNav } from "../components/bottom-nav.js?v=1.3.398";
+import { currentRoute, startRouter, refreshRoute } from "./router.js?v=1.3.398";
+import { subscribeStore } from './state.js?v=1.3.398';
+import { showToast } from "../components/toast.js?v=1.3.398";
+import { registerServiceWorker, setOfflineNotice, watchConnection } from "./offline.js?v=1.3.398";
+import { APP_MODE } from "./config.js?v=1.3.398";
+import { installActionFeedback, showActionPopup } from "../components/action-popup.js?v=1.3.398";
 // Preserve the machine-only OAuth code before the mock app/router can replace the URL.
 const machineOAuthCode = new URLSearchParams(location.search).get('code');
 if (APP_MODE !== 'supabase-line' && machineOAuthCode && /^#\/admin\/(machines|item-names)(?:$|\?)/.test(location.hash)) {
@@ -130,7 +130,7 @@ function watchRealSession() {
 async function mountApp() {
   if (session?.applicant) {
     headerRoot.replaceChildren(); navRoot.replaceChildren(); loadingRoot.hidden=true;
-    const {mountRegistration}=await import('../pages/registration/index.js?v=1.3.397');
+    const {mountRegistration}=await import('../pages/registration/index.js?v=1.3.398');
     await mountRegistration(pageRoot,{logout:signOut});
     setTimeout(()=>void endRealSession('Session หมดอายุ กรุณายืนยัน LINE ใหม่'),Math.max(0,Date.parse(session.session_expiry)-Date.now()));
     window.addEventListener('storage',event=>{if(event.key==='factory-pwa-session-signed-out'&&event.newValue==='1')location.reload();});
@@ -175,7 +175,7 @@ async function start() {
 if(APP_MODE==='supabase-line') {
   installActionFeedback();
   setOfflineNotice(message=>showToast(message,'error'));watchConnection();
-const {startSessionApp}=await import('./session-app.js?v=1.3.397');
+const {startSessionApp}=await import('./session-app.js?v=1.3.398');
   startSessionApp();
   void registerServiceWorker();
 } else {start();}
