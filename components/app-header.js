@@ -1,5 +1,5 @@
-import { APP_MODE, APP_NAME, ROLE_LABELS } from "../js/config.js?v=1.3.250";
-import { escapeHtml } from "../js/utils.js?v=1.3.186";
+import { APP_MODE, APP_NAME, ROLE_LABELS } from "../js/config.js?v=1.3.396";
+import { escapeHtml } from "../js/utils.js?v=1.3.396";
 
 export function renderAppHeader(user) {
   return '<div class="app-header"><div class="header-inner">' +
@@ -13,6 +13,10 @@ export function renderAppHeader(user) {
     '<span class="mode-pill">' + (APP_MODE === "mock" ? "DEV MOCK" : APP_MODE === "development" ? "LOCAL API" : "LINE") + '</span>' +
     '<span class="badge badge-info" aria-label="บทบาทที่ได้รับ">' + escapeHtml(ROLE_LABELS[user.role]) + '</span>' +
     (APP_MODE === "mock" && user.groups?.length ? '<span class="badge badge-info" aria-label="กลุ่มจำลอง">' + escapeHtml(user.groups.join(" / ")) + '</span>' : '') +
+    (APP_MODE === 'supabase-line' ?
+      '<button class="button button-small notification-header-toggle" type="button" role="switch" aria-checked="false" aria-label="กำลังโหลดสถานะการแจ้งเตือน" data-device-notification-toggle data-action-feedback="false" disabled><span aria-hidden="true">🔔</span><span>แจ้งเตือน</span><span class="notification-switch-track" aria-hidden="true"><span></span></span><span data-device-notification-state>กำลังโหลด</span></button>' +
+      '<a class="button button-small notification-header-link" href="#/notifications" aria-label="เปิดกล่องข้อความแจ้งเตือน">📥 กล่องข้อความ</a>' :
+      '<a class="button button-small notification-header-link" href="#/notifications" aria-label="เปิดแจ้งเตือนระบบงาน">🔔 แจ้งเตือน</a>') +
     (APP_MODE !== "development" ? '<button class="button button-small" type="button" data-auth-logout>ออกจากระบบ</button>' : "") +
     "</div></div></div>";
 }

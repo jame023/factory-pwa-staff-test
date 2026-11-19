@@ -1,13 +1,13 @@
-import { loadSession, deleteSession, withSessionLock } from './session-vault.js?v=1.3.191';
-import { getAuthClient } from './supabase-auth-client.js?v=1.3.205';
+import { loadSession, deleteSession, withSessionLock } from './session-vault.js?v=1.3.396';
+import { getAuthClient } from './supabase-auth-client.js?v=1.3.396';
 import { APP_MODE, MOCK_USERS, ROLE_LABELS, MOCK_SESSION_ROLE, MOCK_SESSION_GROUP, LINE_LIFF_ID, API_BASE_URL,
-  SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_LINE_PROVIDER } from "./config.js?v=1.3.186";
-import { startPkceOAuth, completePkceOAuth } from "./pkce-oauth.js?v=1.3.186";
+  SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_LINE_PROVIDER } from "./config.js?v=1.3.396";
+import { startPkceOAuth, completePkceOAuth } from "./pkce-oauth.js?v=1.3.396";
 
-import { requestReadOnly } from "./read-only-api.js?v=1.3.186";
-import { normalizeRole, normalizeGroup } from "./permissions.js?v=1.3.186";
-import { ACTIVE_DIRECTORY_NAMES, DIRECTORY_SNAPSHOT_DATE } from './directory-snapshot.js?v=1.3.186';
-import { getStore } from './state.js?v=1.3.186';
+import { requestReadOnly } from "./read-only-api.js?v=1.3.396";
+import { normalizeRole, normalizeGroup } from "./permissions.js?v=1.3.396";
+import { ACTIVE_DIRECTORY_NAMES, DIRECTORY_SNAPSHOT_DATE } from './directory-snapshot.js?v=1.3.396';
+import { getStore } from './state.js?v=1.3.396';
 
 const MOCK_LOGIN_KEY = "factory-pwa-demo-login-v1";
 const LINE_SIGNED_OUT_KEY = "factory-pwa-line-signed-out-v1";

@@ -1,8 +1,8 @@
-import { APP_MODE } from "../../js/config.js?v=1.3.251";
-import * as attendanceApi from "../../adapters/package10.js?v=1.3.260";
-import { statCard } from "../../components/app-card.js?v=1.3.340";
-import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.186";
-import { renderManagerAttendance } from "./manager.js?v=1.3.316";
+import { APP_MODE } from "../../js/config.js?v=1.3.396";
+import * as attendanceApi from "../../adapters/package10.js?v=1.3.396";
+import { statCard } from "../../components/app-card.js?v=1.3.396";
+import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.396";
+import { renderManagerAttendance } from "./manager.js?v=1.3.396";
 
 export const attendancePeriodForDay = day => Number(day) <= 15 ? "first" : "second";
 export function attendancePeriodRange(month, period) {
@@ -14,6 +14,11 @@ export function attendancePeriodRange(month, period) {
 }
 const selectedPeriod = () => attendancePeriodForDay(bangkokToday().slice(8, 10));
 const safeText = value => escapeHtml(value == null || value === "" ? "—" : String(value));
+const minuteDuration = value => value == null ? "—" : `${Math.floor(value / 60)} ชม. ${value % 60} นาที`;
+const attendanceStatusLabel = row => row.statusLabel || ({
+  "present-full": "เต็มวัน", "present-half": "ครึ่งวัน", "in-progress": "ยังไม่มีเวลาออก",
+  leave: "ลา", absent: "ขาดงาน", holiday: "วันหยุด", scheduled: "วันทำงาน", unrecorded: "ยังไม่มีรายการ"
+}[row.status] || row.status);
 const periodTitle = (month, period, range) => {
   const monthName = new Date(`${month}-01T00:00:00Z`).toLocaleDateString("th-TH", { month: "long", year: "numeric", timeZone: "UTC" });
   return `${period === "first" ? "วันที่ 1–15" : `วันที่ 16–${range.lastDay}`} ${monthName}`;
@@ -31,7 +36,7 @@ function renderHistory(data, profile) {
   const rows = data.history.map(row => '<article class="list-row"><div class="list-main">' +
     '<div class="list-title">' + safeText(thaiDate(row.date)) + '</div>' +
     '<div class="list-meta">เวลาเข้า ' + safeText(row.checkIn) + ' · เวลาออก ' + safeText(row.checkOut) + '</div>' +
-    (row.status ? '<div class="list-meta">สถานะ: ' + safeText(row.status) + '</div>' : '') +
+    (row.status ? '<div class="list-meta">สถานะ: ' + safeText(attendanceStatusLabel(row)) + '</div>' : '') +
     (row.detail ? '<div class="list-meta">' + safeText(row.detail) + '</div>' : '') +
     '</div></article>').join("");
   const summary = data.summary;
@@ -40,10 +45,16 @@ function renderHistory(data, profile) {
       statCard("วันที่มีรายการ", summary.daysWithRecords, "ในช่วงที่แสดง") +
       statCard("รายการที่มีเวลาเข้า–ออกครบ", summary.completeEntries, "นับตามรายการ") +
       statCard("รายการที่ยังไม่มีเวลาออก", summary.missingCheckOut, "มีเวลาเข้าแต่ไม่มีเวลาออก") +
-    '</div></section>' +
+    '</div>' + (summary.creditedWorkDays != null || summary.lateMinutes != null || summary.earlyLeaveMinutes != null || summary.overtimeMinutes != null ?
+      '<div class="grid grid-3">' +
+        statCard("วันทำงานที่คำนวณได้", summary.creditedWorkDays == null ? "—" : summary.creditedWorkDays, "เฉพาะรายการ RFID ที่คำนวณวันได้ครบ") +
+        statCard("มาสายรวม", minuteDuration(summary.lateMinutes), "ตามรายการ RFID") +
+        statCard("ออกก่อนรวม", minuteDuration(summary.earlyLeaveMinutes), "ตามรายการ RFID") +
+        statCard("OT สุทธิรวม", minuteDuration(summary.overtimeMinutes), "หลังหักพักตามกติกา") +
+      '</div>' : '') + '</section>' +
     '<section class="card card-pad"><h2>ประวัติ ' + safeText(periodTitle(data.month, data.period, range)) + '</h2>' +
     '<div class="list">' + (rows || '<p class="empty-state">ยังไม่มีประวัติในช่วงนี้</p>') + '</div>' +
-    '<p class="small-muted">แสดงข้อมูลจาก Supabase · เขตเวลา Asia/Bangkok</p></section>';
+    '<p class="small-muted">แสดงข้อมูลตามเขตเวลา Asia/Bangkok</p></section>';
 }
 function isSessionError(error) { return ["SESSION_EXPIRED", "PERMISSION_DENIED"].includes(error?.code); }
 
@@ -83,7 +94,7 @@ export async function render(root, { user, showToast = () => {}, signal, onDataC
     try {
       const data = await attendanceApi.readMyAttendance({ month, period }, { signal: historyController.signal });
       if (version !== historyVersion || signal?.aborted || data.month !== month || data.period !== period || profile.id !== expectedEmployeeId) return;
-      if (data.source?.kind !== "real") throw new Error("หน้านี้ต้องอ่านข้อมูลจริงจาก Supabase เท่านั้น");
+      if (data.source?.kind !== "real") throw new Error("หน้านี้ต้องอ่านข้อมูลจริงจากระบบเท่านั้น");
       if (data.from !== range.from || data.to !== range.to) throw new Error("ช่วงวันที่จากระบบไม่ตรงกับช่วงที่เลือก");
       historyContent.innerHTML = renderHistory(data, profile);
       historyStatus.textContent = "";
@@ -108,7 +119,7 @@ export async function render(root, { user, showToast = () => {}, signal, onDataC
     profileStatus.innerHTML = '<p class="page-loading">กำลังโหลดข้อมูลของฉัน</p>';
     historyStatus.textContent = "";
     try {
-      if (APP_MODE !== "supabase-line" && APP_MODE !== "production") throw new Error("ต้องใช้ Session จริงเพื่ออ่านข้อมูลบัญชี");
+      if (APP_MODE !== "supabase-line" && APP_MODE !== "production") throw new Error("กรุณาเข้าสู่ระบบเพื่ออ่านข้อมูลบัญชี");
       const profile = await attendanceApi.readMyProfile({ signal: profileController.signal });
       if (requestVersion !== profileVersion || profileController.signal.aborted || signal?.aborted) return;
       if (profile.source?.kind !== "real" || profile.id !== expectedEmployeeId || !Array.isArray(profile.groups)) throw Object.assign(new Error("ยืนยันเจ้าของข้อมูลไม่สำเร็จ"), { code: "PERMISSION_DENIED" });

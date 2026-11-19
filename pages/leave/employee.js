@@ -1,10 +1,11 @@
-import * as api from '../../adapters/package09.js?v=1.3.253';
-import {enumerateLeaveDates,storedLeaveItems,isLeaveSubmissionOpen,LEAVE_WINDOW_MESSAGE} from '../../js/leave-rules.js?v=1.3.253';
-import {prepareLeavePhoto} from '../../js/leave-images.js?v=1.3.253';
-import {escapeHtml as e,thaiDate} from '../../js/utils.js?v=1.3.186';
-import {showStatusModal,isStatusModalOpen} from '../../components/status-modal.js?v=1.3.295';
-import {confirmAction} from '../../components/modal.js?v=1.3.186';
-import {mountApprovedLeaveCalendar} from './approved-calendar.js?v=1.3.253';
+import * as api from '../../adapters/package09.js?v=1.3.396';
+import {enumerateLeaveDates,storedLeaveItems,isLeaveSubmissionOpen,LEAVE_WINDOW_MESSAGE} from '../../js/leave-rules.js?v=1.3.396';
+import {prepareLeavePhoto} from '../../js/leave-images.js?v=1.3.396';
+import {escapeHtml as e,thaiDate} from '../../js/utils.js?v=1.3.396';
+import {showStatusModal,isStatusModalOpen} from '../../components/status-modal.js?v=1.3.396';
+import {confirmAction} from '../../components/modal.js?v=1.3.396';
+import {mountApprovedLeaveCalendar} from './approved-calendar.js?v=1.3.396';
+import {openDetailDialog} from '../../components/detail-dialog.js?v=1.3.396';
 const statusText=status=>({pending:'รอตรวจสอบ',approved:'อนุมัติแล้ว',rejected:'ไม่อนุมัติ',cancelled:'ยกเลิกแล้ว'}[status]||status);
 
 export async function renderEmployeeLeave(root,context) {
@@ -41,7 +42,7 @@ export async function renderEmployeeLeave(root,context) {
   const serverOffset=Date.parse(options.server_time)-Date.now();
   const holidays=new Set(options.holidays||[]);
   root.innerHTML=`<div class="page-heading"><h1>ขอลา</h1></div>
-    <p class="notice">คำขอและรูปแนบอ่านจาก Supabase • ส่ง แก้ไข และยกเลิกได้เวลา 05:00–ก่อน 21:00 น. เวลาไทย</p>
+    <p class="notice">คำขอและรูปแนบอ่านจากระบบ • ส่ง แก้ไข และยกเลิกได้เวลา 05:00–ก่อน 21:00 น. เวลาไทย</p>
     <div data-recovery role="status"></div>
     <section class="card form-card leave-form-card"><div class="ot-form-intro"><span class="ot-form-icon" aria-hidden="true">✎</span><div><h2 data-form-title>ส่งคำขอลา</h2><p>เลือกวันที่และช่วงเวลาที่ต้องการลา พร้อมระบุเหตุผล</p></div></div>
     <form id="leave-form" novalidate><div class="form-grid leave-form-grid">
@@ -56,7 +57,7 @@ export async function renderEmployeeLeave(root,context) {
         <label class="button button-small ot-upload-button" for="leave-photo-input">เลือกรูป<input id="leave-photo-input" name="photoInput" class="ot-file-input" type="file" accept="image/jpeg,image/png,image/webp" multiple></label></div>
         <div class="ot-photo-status" data-photo-status role="status" aria-live="polite"></div><div class="ot-photo-grid" data-photo-grid></div></div>
       <div class="field field-full notice" data-summary aria-live="polite">เลือกช่วงวันที่เพื่อดูสรุป</div>
-      </div><p class="help-text leave-rule-note">ลากิจไม่เกิน 2 วันต่อครั้ง / 2 ครั้งต่อเดือน • ลาป่วยไม่มีใบรับรองไม่เกิน 1 ครั้งต่อเดือน • วันที่มีคำขอ pending หรือ approved แล้วไม่สามารถขอซ้ำได้ • นับวันหยุดเฉพาะที่ระบุไว้ในปฏิทินกลุ่มงาน</p>
+      </div><p class="help-text leave-rule-note">ลากิจไม่เกิน 2 วันต่อครั้ง / 2 ครั้งต่อเดือน • ลาป่วยไม่มีใบรับรองไม่เกิน 1 ครั้งต่อเดือน • วันที่มีคำขอที่รอตรวจ หรือ approved แล้วไม่สามารถขอซ้ำได้ • นับวันหยุดเฉพาะที่ระบุไว้ในปฏิทินกลุ่มงาน</p>
       <div class="form-actions"><button class="button button-primary leave-submit" type="submit">ส่งคำขอ</button><button class="button" type="button" data-stop-edit hidden>เลิกแก้ไข</button></div><p data-unconfirmed class="notice notice-danger" hidden></p>
     </form></section><section class="card card-pad attendance-section" data-leave-calendar></section>
     <section class="card card-pad attendance-section"><div class="page-heading"><h2>ประวัติคำขอของฉัน</h2><button type="button" class="button button-small" data-refresh>รีเฟรช</button></div><p class="help-text">ตัวกรองวันที่อ้างอิงวันที่ลา</p><div class="form-grid leave-history-filters" data-history-filters><label class="field">สถานะ<select data-history-status><option value="all">ทุกสถานะ</option><option value="pending">รอตรวจสอบ</option><option value="approved">อนุมัติแล้ว</option><option value="rejected">ไม่อนุมัติ</option><option value="cancelled">ยกเลิกแล้ว</option></select></label><label class="field">อ้างอิงวันที่<select data-history-date-basis><option value="leave">วันที่ลา</option><option value="submitted">วันที่ส่งคำขอ</option></select></label><label class="field">ตั้งแต่<input type="date" data-history-from></label><label class="field">ถึง<input type="date" data-history-to></label></div><div data-history></div><button class="button button-small" type="button" data-history-more hidden>โหลดเพิ่ม</button></section>
@@ -149,7 +150,7 @@ async function loadHistory(resetPage=true) {
     await loadHistory(true);
     if(operation!=='cancel')reset();else unresolvedCancel=false;
     const detailBox=root.querySelector('[data-detail]');detailBox.hidden=true;detailBox.replaceChildren();clearTimeout(imageExpiry);
-    status(result.cleanup?.length?'คำขอบันทึกและตรวจ Audit แล้ว แต่ยังล้างไฟล์ที่ไม่ใช้บางไฟล์ไม่ได้':result.saved.changedSinceCommit?'บันทึกคำขอแล้วและมีข้อมูลใหม่ภายหลัง กรุณาตรวจสถานะล่าสุดในประวัติ':operation==='cancel'?'ยกเลิกคำขอแล้ว':operation==='edit'?'บันทึกการแก้ไขและตรวจข้อมูลกลับสำเร็จ':result.recovered?'พบคำขอที่บันทึกไว้แล้ว ตรวจข้อมูลและ Audit สำเร็จ':'ส่งคำขอและตรวจข้อมูลกลับสำเร็จ',result.cleanup?.length?'error':'success',result.cleanup?.length?'หมายเลขติดตามและ object path ถูกเก็บไว้สำหรับลองล้างอีกครั้งเมื่อเปิดหน้า':'' );
+    status(result.cleanup?.length?'คำขอบันทึกและตรวจสอบรายการแล้ว แต่ยังล้างไฟล์ที่ไม่ใช้บางไฟล์ไม่ได้':result.saved.changedSinceCommit?'บันทึกคำขอแล้วและมีข้อมูลใหม่ภายหลัง กรุณาตรวจสถานะล่าสุดในประวัติ':operation==='cancel'?'ยกเลิกคำขอแล้ว':operation==='edit'?'บันทึกการแก้ไขและตรวจข้อมูลกลับสำเร็จ':result.recovered?'พบคำขอที่บันทึกไว้แล้ว ตรวจข้อมูลกลับแล้ว':'ส่งคำขอและตรวจข้อมูลกลับสำเร็จ',result.cleanup?.length?'error':'success',result.cleanup?.length?'หมายเลขติดตามและ ตำแหน่งไฟล์แนบ ถูกเก็บไว้สำหรับลองล้างอีกครั้งเมื่อเปิดหน้า':'' );
   }
   form.addEventListener('change',event=>{changed();if(['startDate','endDate'].includes(event.target.name))drawDays();else summary();});
   form.elements.photoInput.addEventListener('change',()=>{void addPhotos(form.elements.photoInput.files);form.elements.photoInput.value='';});
@@ -193,16 +194,14 @@ async function loadHistory(resetPage=true) {
         drawDays(row.requestedDates||storedLeaveItems(row));drawPhotos();root.querySelector('[data-form-title]').textContent='แก้ไขคำขอลา pending';submit.textContent='บันทึกการแก้ไข';form.querySelector('[data-stop-edit]').hidden=false;modal?.close();form.scrollIntoView({block:'start'});return;
       }
       let photos=[];if(row.attachments.length&&!button.dataset.cancel){status('กำลังเปิดรูปแนบตามสิทธิ์');photos=await api.readLeaveImages(id);if(!alive())return;}
-      modal?.close();const box=root.querySelector('[data-detail]');clearTimeout(imageExpiry);
-      box.innerHTML=`<div class="page-heading"><h2>รายละเอียดคำขอ</h2><button class="button button-small" type="button" data-close-detail>ปิดรายละเอียด</button></div><p>${e(row.employee)} • ${e(row.type)} • ${e(statusText(row.status))}</p><div class="leave-dates">${storedLeaveItems(row).map(d=>`<div class="leave-date-row"><strong>${e(thaiDate(d.date))}</strong><span>${e(d.label)}</span></div>`).join('')}</div><p>รวม ${e(row.totalDays??'—')} วัน</p><div class="leave-reason"><span class="leave-detail-label">เหตุผล</span><p>${e(row.reason)}</p></div>${row.reviewedBy?`<p>ผู้ตรวจสอบ: ${e(row.reviewedBy)} • ${e(row.reviewedAt||'')}</p>`:''}${row.rejectionReason?`<p>เหตุผลไม่อนุมัติ: ${e(row.rejectionReason)}</p>`:''}${row.cancellationReason?`<p>เหตุผลยกเลิก: ${e(row.cancellationReason)}</p>`:''}<p>หมายเลขคำขอ: ${e(row.requestId||row.id)}</p><div class="ot-photo-grid" data-private-images>${photos.map(p=>`<figure class="ot-photo-card"><img src="${e(p.url)}" alt="${e(p.name)}"><figcaption>${e(p.name)}</figcaption></figure>`).join('')}</div>${button.dataset.cancel?'<label class="field">เหตุผลยกเลิก<textarea maxlength="500" data-cancel-reason></textarea></label><button type="button" class="button button-danger" data-confirm-cancel>ยืนยันยกเลิกคำขอ</button>':''}`;
-      box.hidden=false;box.focus();box.scrollIntoView({block:'start'});
-      box.querySelector('[data-close-detail]').onclick=()=>{box.hidden=true;box.replaceChildren();clearTimeout(imageExpiry);};
+      modal?.close();clearTimeout(imageExpiry);const detailModal=openDetailDialog({title:'รายละเอียดคำขอลา',subtitle:`${row.employee} • ${row.type} • ${statusText(row.status)}`,returnFocus:button,content:`<section class="detail-section"><h3>วันที่ลา</h3><div class="leave-dates">${storedLeaveItems(row).map(d=>`<div class="leave-date-row"><strong>${e(thaiDate(d.date))}</strong><span>${e(d.label)}</span></div>`).join('')}</div><p>รวม ${e(row.totalDays??'—')} วัน</p></section><section class="detail-section"><h3>เหตุผล</h3><p class="leave-reason">${e(row.reason)}</p></section>${row.reviewedBy?`<p>ผู้ตรวจสอบ: ${e(row.reviewedBy)} • ${e(row.reviewedAt||'')}</p>`:''}${row.rejectionReason?`<p>เหตุผลไม่อนุมัติ: ${e(row.rejectionReason)}</p>`:''}${row.cancellationReason?`<p>เหตุผลยกเลิก: ${e(row.cancellationReason)}</p>`:''}<p>หมายเลขคำขอ: ${e(row.requestId||row.id)}</p><section class="detail-section"><h3>รูปแนบ (${photos.length})</h3><div class="ot-photo-grid" data-private-images>${photos.map(p=>`<figure class="ot-photo-card"><img src="${e(p.url)}" alt="${e(p.name)}"><figcaption>${e(p.name)}</figcaption></figure>`).join('')||'<p class="small-muted">ไม่มีรูปแนบ</p>'}</div></section>${button.dataset.cancel?'<section class="detail-section"><h3>ยกเลิกคำขอ</h3><label class="field">เหตุผลยกเลิก<textarea maxlength="500" data-cancel-reason></textarea></label><button type="button" class="button button-danger" data-confirm-cancel>ยืนยันยกเลิกคำขอ</button></section>':''}`});
+      const box=detailModal.dialog;
       if(photos.length)imageExpiry=setTimeout(()=>{if(alive()&&box.querySelector('[data-private-images]'))box.querySelector('[data-private-images]').innerHTML='<p>ลิงก์รูปหมดอายุแล้ว กรุณาเปิดรายละเอียดอีกครั้ง</p>';},55000);
       const cancelAttempt={};box.querySelector('[data-confirm-cancel]')?.addEventListener('click',async()=>{
         if(busy||isStatusModalOpen())return;const reason=box.querySelector('[data-cancel-reason]').value.trim();if(!reason){status('กรุณาระบุเหตุผลยกเลิก','error');return;}
         busy=true;lock(true);const cancelButton=box.querySelector('[data-confirm-cancel]');cancelButton.disabled=true;
-        try{if(!await confirmAction({title:'ยืนยันยกเลิกคำขอ pending',message:'คำขอจะเปลี่ยนเป็นยกเลิกแล้วและเก็บ Audit พร้อมเหตุผล',confirmLabel:'ยกเลิกคำขอ',danger:true}))return;if(alive())await save('cancel',{id:row.id,updatedAt:row.updatedAt,reason,attempt:cancelAttempt});}
-        catch(error){if(alive()){unresolvedCancel=Boolean(cancelAttempt.unknown);if(unresolvedCancel){box.querySelector('[data-cancel-reason]').disabled=true;box.querySelector('[data-close-detail]').disabled=true;}status(error.message,'error');}}finally{busy=false;if(alive()){lock(false);cancelButton.disabled=false;}}
+        try{if(!await confirmAction({title:'ยืนยันยกเลิกคำขอที่รอตรวจ',message:'คำขอจะเปลี่ยนเป็นยกเลิกแล้วและเก็บประวัติพร้อมเหตุผล',confirmLabel:'ยกเลิกคำขอ',danger:true}))return;if(alive())await save('cancel',{id:row.id,updatedAt:row.updatedAt,reason,attempt:cancelAttempt});}
+        catch(error){if(alive()){unresolvedCancel=Boolean(cancelAttempt.unknown);if(unresolvedCancel){box.querySelector('[data-cancel-reason]').disabled=true;box.querySelector('.app-detail-dialog__close').disabled=true;}status(error.message,'error');}}finally{busy=false;if(alive()){lock(false);cancelButton.disabled=false;}}
       });
     }catch(error){if(alive())status(error.message,'error');}finally{busy=false;if(alive())lock(false);}
   });

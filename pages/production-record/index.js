@@ -1,13 +1,13 @@
-import * as api from '../../adapters/package05.js?v=1.3.264';
-import {isProductionEmployee} from '../../js/permissions.js?v=1.3.186';
-import * as workApi from '../../adapters/package07.js?v=1.3.267';
-import {bangkokToday, escapeHtml as e, thaiDate} from '../../js/utils.js?v=1.3.186';
-import {requireOnlineAction} from '../../js/offline.js?v=1.3.186';
-import {statCard} from '../../components/app-card.js?v=1.3.340';
+import * as api from '../../adapters/package05.js?v=1.3.396';
+import {isProductionEmployee} from '../../js/permissions.js?v=1.3.396';
+import * as workApi from '../../adapters/package07.js?v=1.3.396';
+import {bangkokToday, escapeHtml as e, thaiDate} from '../../js/utils.js?v=1.3.396';
+import {requireOnlineAction} from '../../js/offline.js?v=1.3.396';
+import {statCard} from '../../components/app-card.js?v=1.3.396';
 
 export async function render(root, context, {embedded=false} = {}) {
   if(!embedded && context.workspace==='employee' && ['employee','admin'].includes(context.user.role)){
-    const work=await import('../work-session/index.js?v=1.3.333');
+    const work=await import('../work-session/index.js?v=1.3.396');
     return work.render(root,{...context,workType:'ผลิต'});
   }
   root.innerHTML='<p class="page-loading">กำลังโหลดข้อมูลผลิต…</p>';
@@ -23,7 +23,7 @@ export async function render(root, context, {embedded=false} = {}) {
   const total=rows.reduce((sum,row)=>sum+Number(row.quantity||0),0);
   const defective=rows.reduce((sum,row)=>sum+Number(row.defective||0),0);
   root.innerHTML=(embedded?'<div class="section-title"><div><h2>บันทึกข้อมูลผลิต</h2><p>ใส่ยอดรายวันแยกจากจำนวนตอนจบงาน</p></div></div>':'<div class="page-heading"><h1>'+ (create?'บันทึกข้อมูลผลิต':'ข้อมูลผลิต') +'</h1></div>')+
-    '<p class="notice notice-info">บันทึกและอ่านรายการจาก Supabase</p>'+
+    '<p class="notice notice-info">รายการผลิตที่บัญชีนี้มีสิทธิ์ดู</p>'+
     '<div class="grid grid-3 attendance-section">'+statCard('จำนวนผลิต',total,'ใบ')+statCard('ของเสีย',defective,'ใบ')+statCard('จำนวนดี',total-defective,'ใบ')+'</div>'+
     (create?'<section class="card form-card attendance-section"><h2>บันทึกยอดผลิต</h2><form id="production-record-form"><div class="form-grid">'+
       '<label class="field">วันที่<input id="production-date" name="date" type="date" required value="'+bangkokToday()+'"></label>'+

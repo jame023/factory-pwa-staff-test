@@ -1,9 +1,9 @@
-import { subscribeStore } from "../../js/state.js?v=1.3.186";
-import { APP_MODE } from "../../js/config.js?v=1.3.316";
-import { readAttendanceDashboard } from "../../adapters/package03.js?v=1.3.316";
-import { showStatusModal } from "../../components/status-modal.js?v=1.3.295";
-import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.186";
-import { normalizeExecutiveAttendanceRows, summarizeExecutiveAttendance, validateAttendanceRange } from "../../js/executive-attendance-rules.js?v=1.3.316";
+import { subscribeStore } from "../../js/state.js?v=1.3.396";
+import { APP_MODE } from "../../js/config.js?v=1.3.396";
+import { readAttendanceDashboard } from "../../adapters/package03.js?v=1.3.396";
+import { showStatusModal } from "../../components/status-modal.js?v=1.3.396";
+import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.396";
+import { formatMinuteDuration, normalizeExecutiveAttendanceRows, summarizeExecutiveAttendance, validateAttendanceRange } from "../../js/executive-attendance-rules.js?v=1.3.396";
 
 const esc = value => escapeHtml(value == null ? "" : String(value));
 const groupsText = groups => Array.isArray(groups) && groups.length ? groups.join(", ") : "—";
@@ -47,12 +47,18 @@ export function localFixtureShape(data, range) {
 export function renderDaily(data, date) {
   const rows = (Array.isArray(data?.daily) ? data.daily : []).filter(row => row.date === date);
   if (!rows.length) return '<p class="empty-state">ยังไม่มีข้อมูลลงเวลาสำหรับวันที่ ' + esc(thaiDate(date)) + '</p>';
+  const detailFor = row => row.detail || [
+    row.lateMinutes > 0 ? `สาย ${row.lateMinutes} นาที` : "",
+    row.earlyLeaveMinutes > 0 ? `ออกก่อน ${row.earlyLeaveMinutes} นาที` : "",
+    row.overtimeMinutes > 0 ? `OT สุทธิ ${formatMinuteDuration(row.overtimeMinutes)}` : ""
+  ].filter(Boolean).join(" · ");
   const mobile = '<div class="attendance-mobile-list attendance-mobile-list--daily">' + rows.map(row =>
     '<article class="attendance-person-card"><div class="attendance-person-card__head"><div><h3>' + esc(row.name) + '</h3><span class="attendance-person-card__group">' + esc(row.group || "—") + '</span></div><span class="attendance-pill attendance-pill--neutral">' + esc(row.status) + '</span></div>' +
-    '<div class="attendance-person-card__times"><div><span>เวลาเข้า</span><strong>' + esc(row.checkIn || "—") + '</strong></div><div><span>เวลาออก</span><strong>' + esc(row.checkOut || "—") + '</strong></div></div></article>'
+    '<div class="attendance-person-card__times"><div><span>เวลาเข้า</span><strong>' + esc(row.checkIn || "—") + '</strong></div><div><span>เวลาออก</span><strong>' + esc(row.checkOut || "—") + '</strong></div></div>' +
+    (detailFor(row) ? '<p class="small-muted">' + esc(detailFor(row)) + '</p>' : '') + '</article>'
   ).join("") + '</div>';
   const table = '<div class="table-wrap attendance-table-wrap" tabindex="0" role="region" aria-label="รายละเอียดรายวัน เลื่อนแนวนอนเพื่อดูทุกคอลัมน์"><table class="attendance-table--daily"><thead><tr><th scope="col">ชื่อพนักงาน</th><th scope="col">กลุ่มงาน</th><th scope="col">เวลาเข้า</th><th scope="col">เวลาออก</th><th scope="col">สถานะ</th></tr></thead><tbody>' + rows.map(row =>
-    '<tr><td>' + esc(row.name) + '</td><td>' + esc(row.group || "—") + '</td><td>' + esc(row.checkIn || "—") + '</td><td>' + esc(row.checkOut || "—") + '</td><td>' + esc(row.status) + '</td></tr>'
+    '<tr><td>' + esc(row.name) + '</td><td>' + esc(row.group || "—") + '</td><td>' + esc(row.checkIn || "—") + '</td><td>' + esc(row.checkOut || "—") + '</td><td><strong>' + esc(row.status) + '</strong>' + (detailFor(row) ? '<small class="small-muted">' + esc(detailFor(row)) + '</small>' : '') + '</td></tr>'
   ).join("") + '</tbody></table></div>';
   return mobile + table;
 }
@@ -69,17 +75,19 @@ export function renderSummaries(data, filters) {
   const noAttendance = data.attendanceRowCount === 0;
   const notice = noAttendance ? '<p class="notice notice-warning">ยังไม่มีข้อมูลเพียงพอสำหรับคำนวณ attendance ในช่วงนี้</p>' : '';
   const cards = rows.map(row => {
-    const attendanceHint = row.attendanceDays == null ? "ยังไม่มีข้อมูล" : "วันที่มีเวลาเข้า";
+    const attendanceHint = row.attendanceDays == null ? "ยังไม่มีข้อมูลครบสำหรับคำนวณวัน" :
+      (row.inProgressDays ? `มีรายการยังไม่จบ ${row.inProgressDays} วัน` : "ตามรายการลงเวลาที่คำนวณได้");
     return '<article class="attendance-person-card"><div class="attendance-person-card__head"><div><h3>' + esc(row.name) + '</h3>' +
       (row.employeeCode ? '<span class="attendance-person-card__group">รหัส ' + esc(row.employeeCode) + '</span>' : '') +
       '<span class="attendance-person-card__group">' + esc(groupsText(row.groups)) + '</span></div></div><div class="attendance-summary-metrics">' +
       metric("วันทำงาน", null, "ไม่มีปฏิทิน") +
       metric("มาทำงาน", noAttendance ? null : row.attendanceDays, attendanceHint, "วัน") +
+      metric("ยังไม่จบงาน", row.inProgressDays, "มีเวลาเข้าแต่ยังไม่มีเวลาออก", "วัน") +
       metric("วันลา", null, "ไม่มีข้อมูลอนุมัติ") +
       metric("ขาดงาน", null, "ไม่มีปฏิทิน/เกณฑ์") +
-      metric("มาสาย", null, "ไม่มีเวลาเริ่ม/เกณฑ์") +
-      metric("ออกก่อนเวลา", null, "ไม่มีเวลาเลิก/เกณฑ์") +
-      metric("OT", null, "ยังไม่คำนวณ") + '</div></article>';
+      metric("มาสาย", row.lateDays, row.lateMinutes == null ? "ยังไม่มีข้อมูล RFID" : `รวม ${formatMinuteDuration(row.lateMinutes)}`, "วัน") +
+      metric("ออกก่อนเวลา", row.earlyDays, row.earlyMinutes == null ? "ยังไม่มีข้อมูล RFID" : `รวม ${formatMinuteDuration(row.earlyMinutes)}`, "วัน") +
+      metric("OT", row.overtimeDays, row.overtimeMinutes == null ? "ยังไม่มีข้อมูล RFID" : `สุทธิรวม ${formatMinuteDuration(row.overtimeMinutes)}`, "วัน") + '</div></article>';
   }).join("");
   return notice + '<div class="attendance-mobile-list attendance-mobile-list--summary">' + cards + '</div>';
 }
@@ -220,7 +228,7 @@ export async function renderManagerAttendance(root, { signal, showToast, onDataC
       const availableGroups = Array.isArray(shaped.availableGroups) ? shaped.availableGroups : [];
       updateGroupOptions(availableGroups, query.group);
       summaryResults.innerHTML = renderSummaries(shaped, filterState);
-      summaryStatus.textContent = shaped.source.kind === "real" ? "สรุปคำนวณจาก attendance ที่อ่านได้ในขอบเขตสิทธิ์ปัจจุบัน" : "ข้อมูล Fixture สำหรับตรวจหน้าจอเท่านั้น";
+      summaryStatus.textContent = shaped.source.kind === "real" ? "สรุปจากเวลาเข้าออกเดิมและ RFID ตามขอบเขตสิทธิ์ที่บัญชีนี้อ่านได้; ยังไม่คำนวณวันลา/ขาดงานจากวันที่ไม่มีการสแกน" : "ข้อมูล Fixture สำหรับตรวจหน้าจอเท่านั้น";
     } catch (error) {
       if (version !== summaryVersion || requestSignal.aborted || signal?.aborted || error?.name === "AbortError") return;
       summaryResults.replaceChildren();

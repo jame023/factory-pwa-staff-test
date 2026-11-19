@@ -4,19 +4,20 @@ const entries = [
   ['/', 'หน้าหลัก', 'public'], ['/login','เข้าสู่ระบบ','public'], ['/login/line','LINE Login','public'],
   ['/register','ลงทะเบียน','public'], ['/register/status','สถานะลงทะเบียน','public'],
   ['/not-found','ไม่พบหน้าที่ต้องการ','public'], ['/unauthorized','ไม่มีสิทธิ์เข้าหน้านี้','public'], ['/account-blocked','บัญชีถูกระงับ','public'],
+  ['/notifications','แจ้งเตือนระบบงาน','member'],
   ['/employee','พื้นที่พนักงาน','member'], ['/employee/home','หน้าหลักพนักงาน','member'],
   ['/employee/profile','ข้อมูลของฉัน','member'], ['/employee/select-group','เลือกพื้นที่ทำงาน','member'],
   ['/employee/attendance','เวลาของฉัน','member'], ['/employee/leave','การลา','member'],
-  ['/employee/calendar','ปฏิทิน','member'], ['/employee/ot','OT','ot'],
-  ['/employee/screen','งานสกรีน','สกรีน'], ['/employee/screen/work-session','เริ่มงาน–จบงานสกรีน','สกรีน'],
-  ['/employee/production','งานผลิต','ผลิต'], ['/employee/production/work-session','เริ่มงาน–จบงานผลิต','ผลิต'],
+  ['/employee/calendar','ปฏิทิน','member'], ['/employee/ot','OT','ot'], ['/employee/reports','รายงานสรุป','member'], ['/employee/ot-report','รายงาน OT','member'],
+  ['/employee/screen','งานสกรีน','สกรีน'], ['/employee/screen/work-menu','งานสกรีน','สกรีน'], ['/employee/screen/work-session','เริ่มงาน–จบงานสกรีน','สกรีน'], ['/employee/screen/data','บันทึกงานสกรีน','สกรีน'],
+  ['/employee/production','งานผลิต','ผลิต'], ['/employee/production/work-session','งานผลิต','ผลิต'], ['/employee/production-data','กรอกข้อมูลผลิต','ผลิต'],
   ['/employee/delivery','งานขนส่ง','ขนส่ง'], ['/employee/delivery/record','บันทึกการขนส่ง','ขนส่ง'], ['/employee/office','งานออฟฟิศ','ออฟฟิศ'],
   ['/executive','พื้นที่ผู้บริหาร','executive'], ['/executive/attendance','เวลาพนักงาน','executive'],
   ['/executive/work-session','ข้อมูลการทำงาน','executive'], ['/executive/leave','คำขอลา','executive'],
   ['/executive/calendar','ปฏิทินการทำงาน','executive'], ['/executive/production','ข้อมูลสกรีน','executive'],
   ['/executive/delivery','ข้อมูลการขนส่ง','executive'], ['/executive/production-record','ข้อมูลผลิต','executive'],
   ['/executive/reports','รายงาน','executive'], ['/executive/ot','รายงาน OT','executive'], ['/executive/reports-menu','เมนูรายงาน','executive'],
-  ['/admin','พื้นที่ Admin','admin'], ['/admin/manage','เมนูจัดการของ Admin','admin'], ['/admin/employees','พนักงาน','admin'], ['/admin/groups','กลุ่มงาน','admin'],
+  ['/admin/system-status','สถานะระบบ','admin'], ['/admin','พื้นที่ Admin','admin'], ['/admin/manage','เมนูจัดการของ Admin','admin'], ['/admin/employees','พนักงาน','admin'], ['/admin/groups','กลุ่มงาน','admin'],
   ['/admin/machines','เครื่องจักร','admin'], ['/admin/items','รายชื่อสินค้า','admin'],
   ['/admin/registration-requests','คำขอลงทะเบียน','admin'], ['/admin/records','รายการจากแบบฟอร์ม','admin'], ['/admin/audit-logs','ประวัติระบบ','admin']
 ];
@@ -41,20 +42,33 @@ export function normalizeRoute(value) {
   path=path.replace(/\/+$/,'')||'/';
   return aliases[path]||path;
 }
-export function routeBackTarget(currentPath, trail=[]) {
+export function routeBackTarget(currentPath, trail=[], role=null) {
   if(Array.isArray(trail)&&trail.length) {
     const previous=normalizeRoute(trail[trail.length-1]);
     if(previous!==normalizeRoute(currentPath))return previous;
   }
   if(!currentPath)return null;
   const path=normalizeRoute(currentPath);
+  if(path==='/employee'||path==='/employee/select-group')return role==='admin'?'/admin':role==='executive'?'/executive':'/employee/profile';
+  if(path==='/employee/home')return '/employee/select-group';
+  if(path==='/notifications')return role==='admin'?'/admin':role==='executive'?'/executive':'/employee/select-group';
+  if(path==='/executive'||path==='/admin')return '/employee/select-group';
+  if(['/unauthorized','/not-found','/account-blocked'].includes(path))return '/employee/select-group';
   if(path.startsWith('/admin/records/'))return '/admin/manage';
-  if(path==='/admin/manage'||path.startsWith('/admin/'))return '/admin';
-  if(path==='/employee/screen/work-session')return '/employee/screen';
+  if(path==='/admin/manage')return '/admin';
+  if(path.startsWith('/admin/'))return '/admin/manage';
+  if(path==='/employee/screen/work-session'||path==='/employee/screen/data')return '/employee/screen/work-menu';
+  if(path==='/employee/screen/work-menu')return '/employee/screen';
+  if(path==='/employee/production-data')return '/employee/production';
   if(path==='/employee/production/work-session'||path==='/employee/production-record')return '/employee/production';
   if(path==='/employee/delivery/record')return '/employee/delivery';
   if(path.startsWith('/employee/'))return '/employee';
-  if(path.startsWith('/executive/'))return '/executive';
+  if(path==='/executive/manage'||path==='/executive/reports-menu')return '/executive';
+  if(['/executive/employees','/executive/groups','/executive/machines','/executive/items','/executive/registration-requests','/executive/audit-logs'].includes(path))return '/executive/manage';
+  if(path.startsWith('/executive/'))return '/executive/reports-menu';
+  if(role==='admin')return '/admin';
+  if(role==='executive')return '/executive';
+  if(role==='employee')return '/employee/select-group';
   return null;
 }
 export const workspaceGroups = context => (context?.groups||[]).map(canonicalGroup).filter(g=>['สกรีน','ผลิต','ขนส่ง','ออฟฟิศ'].includes(g));
@@ -74,7 +88,7 @@ export function routeDecision(context,value) {
     groups.includes(rule)));
   if(!entry)return {allowed:false,path,redirect:'/not-found',reason:'ไม่พบหน้าที่ต้องการ'};
   if(!allowed)return {allowed:false,path,redirect:'/unauthorized',reason:'ไม่มีสิทธิ์เข้าหน้านี้'};
-  const selfServiceRoute=['/employee/profile','/employee/attendance','/employee/leave','/executive/attendance'].includes(path);
+  const selfServiceRoute=['/notifications','/employee/profile','/employee/attendance','/employee/leave','/employee/reports','/employee/ot-report','/executive/attendance'].includes(path);
   if(context.role==='employee'&&groups.length>1&&!groups.includes(context.selected_group)&&!groups.includes(rule)&&path!=='/employee/select-group'&&!selfServiceRoute)return {allowed:false,path,redirect:'/employee/select-group',reason:'กรุณาเลือกพื้นที่ทำงาน'};
   return {allowed:true,path};
 }

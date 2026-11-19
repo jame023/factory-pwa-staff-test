@@ -1,39 +1,42 @@
-import { routeDecision, normalizeRoute, routeBackTarget, groupRoute } from './route-policy.js?v=1.3.375';
-import { getAuthContext as accessContext } from './access-context.js?v=1.3.375';
-import { APP_MODE, READ_ONLY_ROUTES } from "./config.js?v=1.3.375";
-import { resolveWorkspaceRoute, canAccessModule } from "./permissions.js?v=1.3.375";
-import { watchChanges, pageBusy, preservePageDraft, mockLiveEnabled } from './live-updates.js?v=1.3.186';
-import { showActionPopup } from '../components/action-popup.js?v=1.3.186';
-import { isStatusModalOpen } from '../components/status-modal.js?v=1.3.295';
-import { installDetailDisclosureDialogs } from '../components/detail-dialog.js?v=1.3.349';
+import { routeDecision, normalizeRoute, routeBackTarget, groupRoute } from './route-policy.js?v=1.3.396';
+import { getAuthContext as accessContext } from './access-context.js?v=1.3.396';
+import { APP_MODE, READ_ONLY_ROUTES } from "./config.js?v=1.3.396";
+import { resolveWorkspaceRoute, canAccessModule } from "./permissions.js?v=1.3.396";
+import { watchChanges, pageBusy, preservePageDraft, mockLiveEnabled } from './live-updates.js?v=1.3.396';
+import { showActionPopup } from '../components/action-popup.js?v=1.3.396';
+import { isStatusModalOpen } from '../components/status-modal.js?v=1.3.396';
+import { installDetailDisclosureDialogs } from '../components/detail-dialog.js?v=1.3.396';
 const routes = {
-  home: () => import("../pages/home/index.js?v=1.3.375"),
-  attendance: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/attendance/legacy.js?v=1.3.316") : import("../pages/attendance/index.js?v=1.3.333"),
-  "work-session": () => import("../pages/work-session/index.js?v=1.3.375"),
-  leave: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/leave/legacy.js?v=1.3.260") : import("../pages/leave/index.js?v=1.3.361"),
-  calendar: () => import("../pages/calendar/index.js?v=1.3.356"),
-  delivery: () => import("../pages/delivery/index.js?v=1.3.349"),
-  "delivery-home": () => import("../pages/access/index.js?v=1.3.333"),
-  production: () => import("../pages/production/index.js?v=1.3.375"),
-  "production-record": () => import("../pages/production-record/index.js?v=1.3.333"),
-  "production-data": () => import("../pages/work-session/production-data.js?v=1.3.375"),
-  "screen-data": () => import("../pages/work-session/screen-data.js?v=1.3.375"),
-  "screen-combined": () => import("../pages/work-session/screen-combined.js?v=1.3.376"),
-  ot: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/ot/legacy.js?v=1.3.376") : import("../pages/ot/index.js?v=1.3.376"),
-  reports: () => import("../pages/reports/index.js?v=1.3.353"),
-  notifications: () => import("../pages/notifications/index.js?v=1.3.375"),
-  "ot-report": () => import("../pages/ot/report.js?v=1.3.353"),
-  "reports-menu": () => import("../pages/reports/menu.js?v=1.3.340"),
-  admin: () => import("../pages/admin/index.js?v=1.3.375"),
-  "admin-registrations": () => import("../pages/admin/registrations.js?v=1.3.313"),
-  "admin-employees": () => import("../pages/admin/employees.js?v=1.3.359"),
-  "admin-groups": () => import("../pages/admin/groups.js?v=1.3.333"),
-  "admin-machines": () => import("../pages/admin/machines.js?v=1.3.349"),
-  "admin-item-names": () => import("../pages/admin/item-names.js?v=1.3.349")
+  home: () => import("../pages/home/index.js?v=1.3.396"),
+  attendance: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/attendance/legacy.js?v=1.3.396") : import("../pages/attendance/index.js?v=1.3.396"),
+  "work-session": () => import("../pages/work-session/index.js?v=1.3.396"),
+  "production-work": () => import("../pages/work-session/production-combined.js?v=1.3.396"),
+  leave: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/leave/legacy.js?v=1.3.396") : import("../pages/leave/index.js?v=1.3.396"),
+  calendar: () => import("../pages/calendar/index.js?v=1.3.396"),
+  delivery: () => import("../pages/delivery/index.js?v=1.3.396"),
+  "delivery-combined": () => import("../pages/delivery/combined.js?v=1.3.396"),
+  "delivery-home": () => import("../pages/access/index.js?v=1.3.396"),
+  production: () => import("../pages/production/index.js?v=1.3.396"),
+  "production-record": () => import("../pages/production-record/index.js?v=1.3.396"),
+  "production-data": () => import("../pages/work-session/production-data.js?v=1.3.396"),
+  "screen-data": () => import("../pages/work-session/screen-data.js?v=1.3.396"),
+  "screen-combined": () => import("../pages/work-session/screen-combined.js?v=1.3.396"),
+  ot: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/ot/legacy.js?v=1.3.396") : import("../pages/ot/index.js?v=1.3.396"),
+  reports: () => import("../pages/reports/index.js?v=1.3.396"),
+  notifications: () => import("../pages/notifications/index.js?v=1.3.396"),
+  "ot-report": () => import("../pages/ot/report.js?v=1.3.396"),
+  "reports-menu": () => import("../pages/reports/menu.js?v=1.3.396"),
+  'admin-system-status': () => import('../pages/admin/system-status.js?v=1.3.396'),
+  admin: () => import("../pages/admin/index.js?v=1.3.396"),
+  "admin-registrations": () => import("../pages/admin/registrations.js?v=1.3.396"),
+  "admin-employees": () => import("../pages/admin/employees.js?v=1.3.396"),
+  "admin-groups": () => import("../pages/admin/groups.js?v=1.3.396"),
+  "admin-machines": () => import("../pages/admin/machines.js?v=1.3.396"),
+  "admin-item-names": () => import("../pages/admin/item-names.js?v=1.3.396")
 };
 routes.employee = routes.home;
 routes.executive = routes.home;
-routes['access-shell']=()=>import('../pages/access/index.js?v=1.3.375');
+routes['access-shell']=()=>import('../pages/access/index.js?v=1.3.396');
 const access = {
   'access-shell':['employee','executive','admin'],
   home: ["employee", "executive", "admin"],
@@ -44,10 +47,12 @@ const access = {
   leave: ["employee", "executive", "admin"],
   calendar: ["employee", "executive", "admin"],
   delivery: ["employee", "executive", "admin"],
+  "delivery-combined": ["employee", "executive", "admin"],
   "delivery-home": ["employee", "executive", "admin"],
   production: ["employee", "executive", "admin"],
   "production-record": ["employee", "executive", "admin"],
   "production-data": ["employee", "admin"],
+  "production-work": ["employee", "admin"],
   "screen-data": ["employee", "admin"],
   "screen-combined": ["employee", "executive", "admin"],
   ot: ["employee", "executive", "admin"],
@@ -55,6 +60,7 @@ const access = {
   notifications: ["employee", "executive", "admin"],
   "ot-report": ["employee", "executive", "admin"],
   "reports-menu": ["executive", "admin"],
+  'admin-system-status': ['admin'],
   admin: ["executive", "admin"],
   "admin-registrations": ["executive", "admin"],
   "admin-employees": ["employee", "executive", "admin"],
@@ -156,6 +162,7 @@ async function renderRoute() {
   const live=APP_MODE==='supabase-line';
   const livePath=normalizeRoute(readRoute());
   const adminModules={
+    '/admin/system-status':'admin-system-status',
     '/executive/employees':'admin-employees','/executive/groups':'admin-groups',
     '/executive/machines':'admin-machines','/executive/items':'admin-item-names',
     '/executive/registration-requests':'admin-registrations','/executive/audit-logs':'admin',
@@ -165,9 +172,9 @@ async function renderRoute() {
   const selfModules={'/notifications':'notifications','/employee/profile':'attendance','/employee/attendance':'attendance','/employee/calendar':'calendar','/employee/reports':'reports','/employee/ot-report':'ot-report',
     '/executive/attendance':'attendance','/executive/work-session':'work-session','/executive/leave':'leave','/executive/calendar':'calendar',
     '/executive/production':'production','/executive/delivery':'delivery','/executive/production-record':'production-record','/executive/reports':'reports','/executive/ot':'ot','/executive/reports-menu':'reports-menu',
-    '/employee/leave':'leave','/employee/ot':'ot','/employee/delivery':'delivery-home','/employee/delivery/record':'delivery',
+    '/employee/leave':'leave','/employee/ot':'ot','/employee/delivery':'delivery-home','/employee/delivery/record':'delivery-combined',
     '/employee/screen':'access-shell','/employee/screen/work-menu':'screen-combined','/employee/screen/work-session':'work-session','/employee/screen/data':'screen-data',
-    '/employee/production':'access-shell','/employee/production/work-session':'work-session','/employee/production-data':'production-data'};
+    '/employee/production':'access-shell','/employee/production/work-session':'production-work','/employee/production-data':'production-data'};
   const checked=live?routeDecision(accessContext(),livePath):null;
   const destination = live ? {allowed:checked.allowed,module:adminModules[livePath]||selfModules[livePath]||'access-shell',workspace:livePath.split('/')[1],canonical:livePath.slice(1)} : resolveWorkspaceRoute(readRoute(), user?.role);
   const route = destination.module;
@@ -185,7 +192,7 @@ async function renderRoute() {
   onRoute(route);
   if ((APP_MODE === "development" && !READ_ONLY_ROUTES.includes(route)) ||
       (APP_MODE !== "mock" && APP_MODE !== "development" &&
-        !(APP_MODE === "supabase-line" && ["access-shell","attendance","calendar","delivery","delivery-home","leave","notifications","ot","ot-report","production","production-record","production-data","screen-data","screen-combined","reports","reports-menu","work-session","admin","admin-employees","admin-groups","admin-machines","admin-item-names","admin-registrations"].includes(route)))) {
+        !(APP_MODE === "supabase-line" && ["access-shell","attendance","calendar","delivery","delivery-combined","delivery-home","leave","notifications","ot","ot-report","production","production-record","production-work","production-data","screen-data","screen-combined","reports","reports-menu","work-session","admin","admin-system-status","admin-employees","admin-groups","admin-machines","admin-item-names","admin-registrations"].includes(route)))) {
     showActionPopup("หมวดนี้ยังไม่เปิดเชื่อมต่อข้อมูล", { tone: "info", timeout: 2600 });
     pageRoot.innerHTML = '<section class="notice notice-warning"><h1>โมดูลนี้ยังไม่เปิด API</h1><p>โหมดอ่านข้อมูลทดสอบเปิดเฉพาะเวลาของฉัน</p><a class="button" href="#/attendance">เปิดเวลาของฉัน</a></section>';
     ensureRouteContextActions(pageRoot,destination.canonical,user);

@@ -1,15 +1,17 @@
-import { notificationReadKey, readAcknowledgedIds, acknowledgeNotifications } from "./notification-read-state.js?v=1.3.186";
-import { readAttendanceNotifications } from "../adapters/package10.js?v=1.3.186";
-import { renderLeaveMedia } from "./leave-media.js?v=1.3.186";
-import { readReportNotifications } from "../adapters/package06.js?v=1.3.186";
-import { APP_MODE } from "./config.js?v=1.3.186";
-import { readCalendarNotifications } from "../adapters/package08.js?v=1.3.186";
-import { readLeaveNotifications } from "../adapters/package09.js?v=1.3.186";
-import { subscribeStore } from "./state.js?v=1.3.186";
-import { escapeHtml, thaiDate } from "./utils.js?v=1.3.186";
-import { iconMarkup } from "./ui-icons.js?v=1.3.340";
+import { notificationReadKey, readAcknowledgedIds, acknowledgeNotifications } from "./notification-read-state.js?v=1.3.396";
+import { readAttendanceNotifications } from "../adapters/package10.js?v=1.3.396";
+import { renderLeaveMedia } from "./leave-media.js?v=1.3.396";
+import { readReportNotifications } from "../adapters/package06.js?v=1.3.396";
+import { APP_MODE } from "./config.js?v=1.3.396";
+import { readCalendarNotifications } from "../adapters/package08.js?v=1.3.396";
+import { readLeaveNotifications } from "../adapters/package09.js?v=1.3.396";
+import { subscribeStore } from "./state.js?v=1.3.396";
+import { escapeHtml, thaiDate } from "./utils.js?v=1.3.396";
+import { iconMarkup } from "./ui-icons.js?v=1.3.396";
+import { readNotificationInbox } from "./notification-client.js?v=1.3.396";
 
 export function startCalendarNotifications(user,showToast) {
+  if(APP_MODE==="supabase-line")return startLiveNotificationInbox(user,showToast);
   if(APP_MODE!=="mock")return;
   const panel=document.createElement("section");
   panel.className="card card-pad calendar-notification-panel";
@@ -37,4 +39,41 @@ export function startCalendarNotifications(user,showToast) {
   globalThis.addEventListener?.("storage",onStorage);
   const unsubscribe=subscribeStore(refresh);refresh();
   return ()=>{disposed=true;version++;unsubscribe();globalThis.removeEventListener?.('storage',onStorage);panel.remove();};
+}
+
+function startLiveNotificationInbox(user,showToast) {
+  const host=document.getElementById("main-content");
+  if(!host)return;
+  const panel=document.createElement("section");
+  panel.className="card card-pad calendar-notification-panel live-notification-panel";
+  panel.setAttribute("aria-label","แจ้งเตือนใหม่");
+  panel.setAttribute("aria-live","polite");
+  panel.hidden=true;
+  host.prepend(panel);
+  let disposed=false,loading=false,knownIds=new Set(),timer;
+  async function refresh(initial=false) {
+    if(disposed||loading)return;
+    loading=true;
+    try {
+      const rows=await readNotificationInbox(10);
+      if(disposed)return;
+      const unread=rows.filter(row=>!row.read_at);
+      const newest=unread.filter(row=>!knownIds.has(row.id));
+      if(!initial&&newest.length)showToast("มีแจ้งเตือนใหม่ในระบบงาน","success");
+      for(const row of rows)knownIds.add(row.id);
+      panel.hidden=!unread.length;
+      if(!unread.length)return;
+      panel.innerHTML='<div class="notification-panel-heading"><h2>'+iconMarkup("bell")+' แจ้งเตือนใหม่</h2><span>'+unread.length+' รายการ</span></div>'+
+        '<div class="notification-panel-items">'+unread.slice(0,4).map(row=>'<article><strong>'+escapeHtml(row.title)+'</strong><p>'+escapeHtml(row.body)+'</p></article>').join('')+'</div>'+
+        '<a class="button button-small" href="#/notifications">ดูการแจ้งเตือนทั้งหมด</a>';
+    }catch{
+      panel.hidden=true;
+    }finally{loading=false;}
+  }
+  const onVisible=()=>{if(!document.hidden)void refresh();};
+  globalThis.addEventListener?.("focus",onVisible);
+  globalThis.addEventListener?.("visibilitychange",onVisible);
+  void refresh(true);
+  timer=globalThis.setInterval?.(()=>void refresh(),60000);
+  return ()=>{disposed=true;globalThis.clearInterval?.(timer);globalThis.removeEventListener?.("focus",onVisible);globalThis.removeEventListener?.("visibilitychange",onVisible);panel.remove();};
 }

@@ -1,5 +1,5 @@
-import { request } from "../js/api.js?v=1.3.298";
-import { withRequestId } from "../js/business-request.js?v=1.3.186";
+import { request } from "../js/api.js?v=1.3.396";
+import { withRequestId } from "../js/business-request.js?v=1.3.396";
 export const listWorkSessions = (options = {}) => request("package07", "work.read", {}, options);
 export const listAdminWorkSessions = filters => request("package07", "work.admin.history", filters || {});
 export const readAdminWorkSessionDetail = (id, sourceCategory = "workSessions") =>
@@ -7,12 +7,15 @@ export const readAdminWorkSessionDetail = (id, sourceCategory = "workSessions") 
 export const listActiveWorkSessions = () => request("package07", "work.active.read");
 export const startWorkSession = payload => request("package07", "work.start", payload);
 export const endWorkSession = (id, quantity, requestId) => request("package07", "work.end", { id, quantity, requestId });
+export const endWorkSessionTimeOnly = (id, requestId) => request("package07", "work.end.time-only", { id, requestId });
+export const saveIndependentOutput = payload => request("package07", "independent.output.save", payload);
+export const readIndependentOutput = (group, date) => request("package07", "independent.output.read", { group, date: date || "" });
 export const endScreenWorkSession = (id, quantity, expectedScreenVersion, requestId) => request("package07", "work.end.screen", { id, quantity, expectedScreenVersion, requestId });
 export const readProductionWork = options => request("package07", "production.work.read", options || {});
 export const saveProductionWork = payload => request("package07", "production.work.save", withRequestId(payload));
 export const endProductionWorkSession = (id, expectedProductionVersion, requestId) => request("package07", "production.work.end", { id, expectedProductionVersion, requestId });
 
-export const readWorkOptions = workType => request("package07","work.options",{workType});
+export const readWorkOptions = (workType, { includeOrders = true } = {}) => request("package07","work.options",{workType,includeOrders});
 export const readScreenWork = (sessionIds = []) => request("package07","screen.work.read",{sessionIds});
 export const saveScreenWork = payload => request("package07","screen.work.save",withRequestId(payload));
 export const listOvertimeRequests = options => request("package07", "ot.read", options || {});

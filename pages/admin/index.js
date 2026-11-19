@@ -1,17 +1,18 @@
-import { pageBusy } from '../../js/live-updates.js?v=1.3.186';
-import { attendanceCalculation } from '../../js/business-rules.js?v=1.3.186';
-import { render as renderWorkCalendar } from "../calendar/index.js?v=1.3.333";
-import * as adminApi from "../../adapters/package11.js?v=1.3.327";
-import * as workApi from "../../adapters/package07.js?v=1.3.298";
-import * as deliveryApi from "../../adapters/package04.js?v=1.3.298";
-import * as leaveApi from "../../adapters/package09.js?v=1.3.298";
-import { escapeHtml, thaiDateTime } from "../../js/utils.js?v=1.3.186";
-import { RECORD_SCHEMAS, blankRecord, validateRecord } from "../../js/record-schema.js?v=1.3.186";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.186";
-import { confirmAction } from "../../components/modal.js?v=1.3.186";
-import { normalizeRoute } from "../../js/route-policy.js?v=1.3.333";
-import { adminLeaveProxyMarkup, bindAdminLeaveProxy } from "./leave-proxy.js?v=1.3.313";
-import { ADMIN_AUDIT_PAGE_SIZE, AUDIT_TABLE_OPTIONS, auditTableLabel, validateAuditFilters } from "../../js/admin-audit-contract.js?v=1.3.330";
+import { openOperationalEditor } from './operational-editor.js?v=1.3.396';
+import { pageBusy } from '../../js/live-updates.js?v=1.3.396';
+import { attendanceCalculation } from '../../js/business-rules.js?v=1.3.396';
+import { render as renderWorkCalendar } from "../calendar/index.js?v=1.3.396";
+import * as adminApi from "../../adapters/package11.js?v=1.3.396";
+import * as workApi from "../../adapters/package07.js?v=1.3.396";
+import * as deliveryApi from "../../adapters/package04.js?v=1.3.396";
+import * as leaveApi from "../../adapters/package09.js?v=1.3.396";
+import { escapeHtml, thaiDateTime } from "../../js/utils.js?v=1.3.396";
+import { RECORD_SCHEMAS, blankRecord, validateRecord } from "../../js/record-schema.js?v=1.3.396";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.396";
+import { confirmAction } from "../../components/modal.js?v=1.3.396";
+import { normalizeRoute } from "../../js/route-policy.js?v=1.3.396";
+import { adminLeaveProxyMarkup, bindAdminLeaveProxy } from "./leave-proxy.js?v=1.3.396";
+import { ADMIN_AUDIT_PAGE_SIZE, AUDIT_TABLE_OPTIONS, auditTableLabel, validateAuditFilters } from "../../js/admin-audit-contract.js?v=1.3.396";
 
 const modules = [
   ["employees","พนักงานและสิทธิ์","ชื่อ กลุ่มงาน บทบาท และสถานะบัญชี"],
@@ -118,7 +119,7 @@ function workSessionListLabel(row) {
       ? [['แพ็ค',payload.enteredPack],['เสียสกรีน (ขวด)',payload.missingBottles],['เสียผลิต (ขวด)',payload.productionDamagedBottles]]
       : [['ผลิต (ใบ)',payload.quantity],['ของเสีย (ใบ)',payload.defective]];
     return [date,row.group_name|| (row.legacy_category==='screenEntries'?'สกรีน':'ผลิต'),machine,
-      ...quantities.filter(([,value])=>value!=null).map(([label,value])=>label+' '+value),'รายการเดิม'].join(' · ');
+      ...quantities.filter(([,value])=>value!=null).map(([label,value])=>label+' '+value),payload.entrySource==='independent'?'บันทึกยอดแยก':'รายการเดิม'].join(' · ');
   }
   return [thaiDateTime(row.started_at||payload.startedAt||row.created_at),row.group_name||'—',payload.machine||'—',payload.endedAt?'จบงาน':'กำลังทำงาน'].join(' · ');
 }
@@ -164,7 +165,7 @@ function screenRecordDetailMarkup(detail) {
   const payload=detail.payload||{};
   const legacy=Boolean(detail.legacy_category);
   const screen=detail.screen_work||null;
-  const items=Array.isArray(screen?.items)?screen.items:[];
+  const items=Array.isArray(screen?.items)?screen.items:Array.isArray(payload.items)?payload.items:[];
   const countedItems=items.filter(item=>item.pack_count!==null&&item.pack_count!==undefined&&item.pack_count!==''&&Number.isFinite(Number(item.pack_count)));
   const packTotal=countedItems.reduce((sum,item)=>sum+Number(item.pack_count),0);
   const packValue=legacy?payload.enteredPack:(countedItems.length?packTotal:null);
@@ -197,21 +198,20 @@ function screenRecordDetailMarkup(detail) {
   const notes=(hasValue(note)?'<section class="screen-detail-note"><h3>หมายเหตุงานสกรีน</h3><p>'+escapeHtml(note)+'</p></section>':'')+
     (hasValue(sessionNote)?'<section class="screen-detail-note screen-detail-note-secondary"><h3>หมายเหตุช่วงทำงาน</h3><p>'+escapeHtml(sessionNote)+'</p></section>':'');
   return '<div class="screen-detail-content">'+
-    '<p class="screen-detail-source">'+(legacy?'รายการจากแบบฟอร์มเดิม':'รายการงานสกรีนที่เชื่อมกับช่วงเริ่มงาน–จบงาน')+'</p>'+
+    '<p class="screen-detail-source">'+(legacy?(payload.entrySource==='independent'?'รายการบันทึกยอดแยก':'รายการจากแบบฟอร์มเดิม'):'รายการงานสกรีนที่เชื่อมกับช่วงเริ่มงาน–จบงาน')+'</p>'+
     '<dl class="screen-detail-meta">'+meta.map(([label,value])=>field(label,value)).join('')+'</dl>'+
     '<section class="screen-detail-section"><h3>สรุปจำนวน</h3><div class="screen-detail-stats">'+
     stat(legacy?'จำนวนแพ็คที่บันทึก':'รวมจำนวนแพ็ค',packValue,'แพ็ค')+
     stat('เสียจากสกรีน',screenDefects,'ขวด')+
     stat('เสียจากผลิต',productionDefects,'ขวด')+
     '</div></section>'+
-    (!legacy?'<section class="screen-detail-section"><h3>รายการและจำนวนแพ็ค</h3>'+itemMarkup+'</section>':'')+
+    (!legacy||items.length?'<section class="screen-detail-section"><h3>รายการและจำนวนแพ็ค</h3>'+itemMarkup+'</section>':'')+
     notes+'</div>';
 }
 
 function adminRecordDetailDialogMarkup(title,body) {
   return '<dialog class="admin-record-detail-dialog" data-admin-record-detail-dialog aria-labelledby="admin-record-detail-title">'+
-    '<div class="admin-record-detail-dialog__body"><header class="admin-record-detail-dialog__header"><h2 id="admin-record-detail-title">'+escapeHtml(title)+'</h2><button class="button admin-record-detail-dialog__close admin-detail-close-button" type="button" data-admin-record-detail-close aria-label="ปิดรายละเอียด">×</button></header>'+body+
-    '<footer class="admin-record-detail-dialog__footer"><button class="button button-primary" type="button" data-admin-record-detail-close>ปิดรายละเอียด</button></footer></div></dialog>';
+    '<div class="admin-record-detail-dialog__body"><header class="admin-record-detail-dialog__header"><h2 id="admin-record-detail-title">'+escapeHtml(title)+'</h2><button class="button admin-record-detail-dialog__close admin-detail-close-button" type="button" data-admin-record-detail-close aria-label="ปิดรายละเอียด">×</button></header>'+body+'</div></dialog>';
 }
 
 function editorField(spec, record) {
@@ -492,6 +492,14 @@ export async function render(root, context) {
       }).join('') +
       '</div><div class="field"><label for="admin-reason">เหตุผลการแก้ไข</label><textarea id="admin-reason" name="changeReason" required minlength="3" maxlength="300"></textarea></div><div class="form-actions"><button class="button button-primary" type="submit">ตรวจสอบและบันทึก</button></div></form></section>' : '') +
       '';
+    if(isOperational&&['admin','executive'].includes(context.user.role)){
+      const host=document.createElement('section');host.className='card card-pad attendance-section';
+      host.innerHTML='<h2>เพิ่มหรือแก้ไขข้อมูลพนักงาน</h2><p>คงเจ้าของรายการและเก็บเหตุผลในประวัติการแก้ไข</p><div class="form-actions"><button class="button" type="button" data-proxy-create>เพิ่มรายการ</button><button class="button" type="button" data-proxy-edit '+(!selected?'disabled':'')+'>แก้ไขรายการที่เลือก</button></div>';
+      root.querySelector('[data-record-browser]')?.before(host);
+      const open=id=>void openOperationalEditor({category,id,context,onSaved:()=>render(root,context)});
+      host.querySelector('[data-proxy-create]').onclick=()=>open(null);
+      host.querySelector('[data-proxy-edit]').onclick=()=>open(selected.id);
+    }
     if(category==='leaveRequests' && context.user?.role==='admin') bindAdminLeaveProxy(root,context,{
       onToggle:()=>{leaveProxyOpen=!leaveProxyOpen;draw();},
       onSaved:async()=>{leaveProxyOpen=false;draw();await loadLeavePage(0,leaveFilters);}

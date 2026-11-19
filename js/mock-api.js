@@ -1,16 +1,17 @@
-import { requireActiveItemName } from './active-item-names.js?v=1.3.186';
-import { attendanceRecords, personalAttendanceRows, attendanceDashboard, normalizeAttendanceRecord } from "./attendance-data.js?v=1.3.186";
-import { canReadLeaveNotice, leaveMediaPreview } from "./leave-media.js?v=1.3.186";
-import { createMockReport, acceptMockReport, reportNotice, REPORT_KINDS } from "./report-inbox.js?v=1.3.186";
-import { assertActive, assertWorkStart, assertWorkEnd, normalizeCalendar, deliveryValues, productionTotals, requestId, assertUndo, validDay } from "./business-rules.js?v=1.3.186";
-import { validateLeaveSubmission, storedLeaveItems, assertLeaveCancellation } from "./leave-rules.js?v=1.3.186";
-import { createManagerAttendanceFixture } from "./manager-attendance-fixture.js?v=1.3.186";
-import { getStore, updateStore } from "./state.js?v=1.3.186";
-import { sleep, bangkokToday } from "./utils.js?v=1.3.186";
-import { authProvider } from "./auth.js?v=1.3.205";
-import { assertMockPermission, calendarGroupsForUser, canAccessModule, isProductionEmployee, isScreenEmployee, PRODUCTION_WORK_MACHINES, SCREEN_WORK_MACHINES } from "./permissions.js?v=1.3.186";
-import { validateRecord, RECORD_SCHEMAS } from "./record-schema.js?v=1.3.186";
-import { createAttendanceFixture } from "./attendance-fixture.js?v=1.3.186";
+import { requireActiveItemName } from './active-item-names.js?v=1.3.396';
+import { attendanceRecords, personalAttendanceRows, attendanceDashboard, normalizeAttendanceRecord } from "./attendance-data.js?v=1.3.396";
+import { canReadLeaveNotice, leaveMediaPreview } from "./leave-media.js?v=1.3.396";
+import { createMockReport, acceptMockReport, reportNotice, REPORT_KINDS } from "./report-inbox.js?v=1.3.396";
+import { assertActive, assertWorkStart, assertWorkEnd, normalizeCalendar, deliveryValues, productionTotals, requestId, assertUndo, validDay } from "./business-rules.js?v=1.3.396";
+import { validateLeaveSubmission, storedLeaveItems, assertLeaveCancellation } from "./leave-rules.js?v=1.3.396";
+import { createManagerAttendanceFixture } from "./manager-attendance-fixture.js?v=1.3.396";
+import { getStore, updateStore } from "./state.js?v=1.3.396";
+import { sleep, bangkokToday } from "./utils.js?v=1.3.396";
+import { authProvider } from "./auth.js?v=1.3.396";
+import { assertMockPermission, calendarGroupsForUser, canAccessModule, isProductionEmployee, isScreenEmployee, PRODUCTION_WORK_MACHINES, SCREEN_WORK_MACHINES } from "./permissions.js?v=1.3.396";
+import { validateRecord, RECORD_SCHEMAS } from "./record-schema.js?v=1.3.396";
+import { createAttendanceFixture } from "./attendance-fixture.js?v=1.3.396";
+import { summarizeReportCategories } from "./report-summary.js?v=1.3.396";
 
 const clone = value => JSON.parse(JSON.stringify(value));
 const newId = prefix => prefix + "-" + (globalThis.crypto?.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).slice(2));
@@ -63,12 +64,18 @@ function readReport(state, period) {
   const attendance = within(state.attendance.date) ? state.attendance : null;
   const totals = new Map();
   production.forEach(row => totals.set(row.operator, (totals.get(row.operator) || 0) + Number(row.quantity)));
+  const categories = summarizeReportCategories({
+    attendance: attendance ? [attendance] : [], leaveRequests: state.leaveRequests,
+    calendar: state.calendar?.entries, workSessions: state.workSessions,
+    screenEntries: state.screenEntries, production: state.production,
+    deliveries: state.deliveries, otRequests: state.otRequests
+  }, start, today);
   return {
     present: attendance?.checkIn ? 1 : 0, late: Number(attendance?.lateMinutes || 0) > 0 ? 1 : 0,
     leave: state.leaveRequests.filter(row => row.status === "approved" && row.startDate <= today && row.endDate >= start).length,
     absent: attendance?.absent ? 1 : 0, production: production.reduce((sum, row) => sum + Number(row.quantity || 0), 0),
     delivery: state.deliveries.filter(row => row.status !== "ยกเลิก" && within(row.dateTime || row.createdAt)).length,
-    outstanding: [...totals].sort((a, b) => b[1] - a[1])[0]?.[0] || "—", source:{kind:"mock",asOf:new Date().toISOString()}
+    outstanding: [...totals].sort((a, b) => b[1] - a[1])[0]?.[0] || "—", categories, source:{kind:"mock",asOf:new Date().toISOString(),timeZone:"Asia/Bangkok"}
   };
 }
 

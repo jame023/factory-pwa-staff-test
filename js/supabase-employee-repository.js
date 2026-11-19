@@ -71,10 +71,21 @@ export function createSupabaseEmployeeRepository({ supabaseUrl, publishableKey, 
   return Object.freeze({
     isLiveSupabase: true,
     user,
+    async getSystemStatus(signal) {
+      return request('/rest/v1/rpc/factory_admin_system_status', { method: 'POST', body: '{}', signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000), cache: 'no-store' });
+    },
     async listEmployees({ includeInactive = false } = {}) {
-      const params = new URLSearchParams({ select: EMPLOYEE_COLUMNS, order: 'employee_name.asc' });
+      const canReadRfid = user?.role === 'admin';
+      const select = canReadRfid ? `${EMPLOYEE_COLUMNS},employee_rfid_cards!employee_rfid_cards_employee_id_fkey(card_uid,active)` : EMPLOYEE_COLUMNS;
+      const params = new URLSearchParams({ select, order: 'employee_name.asc' });
       if (!includeInactive) params.set('active', 'eq.true');
-      return list(`/rest/v1/employees?${params.toString()}`);
+      const rows = await list(`/rest/v1/employees?${params.toString()}`);
+      return rows.map(row => {
+        const cards = canReadRfid && Array.isArray(row.employee_rfid_cards) ? row.employee_rfid_cards : [];
+        const rfid_uids = [...new Set(cards.filter(card => card.active).map(card => text(card.card_uid)).filter(Boolean))];
+        const { employee_rfid_cards: _cards, ...employee } = row;
+        return { ...employee, rfid_uids };
+      });
     },
     async getEmployeeById(id) {
       if (!id) throw fail('กรุณาระบุพนักงาน', 'VALIDATION_ERROR');

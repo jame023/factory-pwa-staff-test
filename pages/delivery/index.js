@@ -1,10 +1,11 @@
-import { APP_MODE } from "../../js/config.js?v=1.3.269";
-import * as deliveryApi from "../../adapters/package04.js?v=1.3.275";
-import { escapeHtml, thaiDateTime } from "../../js/utils.js?v=1.3.186";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.186";
-import { canEnterData } from "../../js/permissions.js?v=1.3.186";
-import { showStatusModal } from "../../components/status-modal.js?v=1.3.295";
-import { deriveDeliveryRequestId, normalizeDeliveryBillNumber, normalizeDeliveryEventAt } from "../../js/delivery-service.js?v=1.3.275";
+import { APP_MODE } from "../../js/config.js?v=1.3.396";
+import * as deliveryApi from "../../adapters/package04.js?v=1.3.396";
+import { escapeHtml, thaiDateTime } from "../../js/utils.js?v=1.3.396";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.396";
+import { canEnterData } from "../../js/permissions.js?v=1.3.396";
+import { showStatusModal } from "../../components/status-modal.js?v=1.3.396";
+import { openDetailDialog } from "../../components/detail-dialog.js?v=1.3.396";
+import { deriveDeliveryRequestId, normalizeDeliveryBillNumber, normalizeDeliveryEventAt } from "../../js/delivery-service.js?v=1.3.396";
 
 const PAGE_SIZE = 25;
 const MAX_DELIVERY_PHOTOS = 10;
@@ -59,7 +60,6 @@ function renderRecords(rows, ownerId, canCancel) {
         <span class="badge ${statusClass(item.status)}">${escapeHtml(item.status||"—")}</span></div>
       <div class="delivery-record-actions"><button class="button button-small" type="button" data-delivery-detail="${id}">ดูรายละเอียด</button>
         ${canCancel&&owner===ownerId&&item.status==="ส่งสำเร็จ"?`<button class="button button-small" type="button" data-delivery-cancel="${id}" data-version="${version}">ยกเลิกรายการ</button>`:""}</div>
-      <div class="delivery-detail-slot" data-detail-slot="${id}" hidden></div>
     </article>`;
   }).join("");
 }
@@ -86,10 +86,10 @@ export async function render(root, context) {
   let products=orderedProducts(options?.products||[]);
   const productsMarkup=products.map(item=>typeof item==="string"?`<option value="${escapeHtml(item)}">`: `<option value="${escapeHtml(item.id)}">${escapeHtml(item.displayLabel)}</option>`).join("");
   root.innerHTML=`<div class="page-heading"><div><h1>บันทึกการขนส่ง</h1><p>บันทึกข้อมูลและเปิดดูประวัติการขนส่ง</p></div></div>
-    ${APP_MODE==="mock"?'<p class="notice notice-warning">DEV MOCK • ข้อมูลตัวอย่างเท่านั้น ไม่ได้บันทึกลง Supabase</p>':""}
+    ${APP_MODE==="mock"?'<p class="notice notice-warning">DEV MOCK • ข้อมูลตัวอย่างเท่านั้น ไม่ได้บันทึกลงระบบ</p>':""}
     ${canCreate?`<section class="card form-card"><h2>บันทึกการขนส่ง</h2>
       <form id="delivery-form" style="margin-top:.8rem"><div class="form-grid">
-        ${APP_MODE==="mock"?`<div class="field"><label for="product">รายการสินค้า</label><input id="product" name="product" list="delivery-products" autocomplete="off" required ${products.length?"":"disabled"} placeholder="ค้นหาและเลือกรายการ"><datalist id="delivery-products">${productsMarkup}</datalist><input id="itemNameId" name="itemNameId" type="hidden"></div>`:`<div class="field"><label for="product-search">ค้นหารายการสินค้า</label><input id="product-search" type="search" autocomplete="off" placeholder="พิมพ์ชื่อสินค้า"><label class="field-label" for="itemNameId">รายการสินค้า</label><select id="itemNameId" name="itemNameId" required ${products.length?"":"disabled"}><option value="">${optionsError?"โหลดรายการไม่สำเร็จ":"เลือกรายการสินค้า"}</option>${productsMarkup}</select><input id="product" name="product" type="hidden" value="">${optionsError?`<p class="help-text" data-product-options-message role="alert">${escapeHtml(optionsError)}</p>`:products.length?'<p class="help-text" data-product-options-message>เลือกด้วยรหัส id จาก Supabase</p>':'<p class="help-text" data-product-options-message>ไม่มีรายการสินค้าที่ active และเลือกได้</p>'}<button class="button button-small" type="button" data-refresh-products>โหลดรายการใหม่</button></div>`}
+        ${APP_MODE==="mock"?`<div class="field"><label for="product">รายการสินค้า</label><input id="product" name="product" list="delivery-products" autocomplete="off" required ${products.length?"":"disabled"} placeholder="ค้นหาและเลือกรายการ"><datalist id="delivery-products">${productsMarkup}</datalist><input id="itemNameId" name="itemNameId" type="hidden"></div>`:`<div class="field"><label for="product-search">ค้นหารายการสินค้า</label><input id="product-search" type="search" autocomplete="off" placeholder="พิมพ์ชื่อสินค้า"><label class="field-label" for="itemNameId">รายการสินค้า</label><select id="itemNameId" name="itemNameId" required ${products.length?"":"disabled"}><option value="">${optionsError?"โหลดรายการไม่สำเร็จ":"เลือกรายการสินค้า"}</option>${productsMarkup}</select><input id="product" name="product" type="hidden" value="">${optionsError?`<p class="help-text" data-product-options-message role="alert">${escapeHtml(optionsError)}</p>`:products.length?'<p class="help-text" data-product-options-message>เลือกสินค้าจากรายการที่เปิดใช้งาน</p>':'<p class="help-text" data-product-options-message>ไม่มีสินค้าที่เปิดใช้งาน</p>'}<button class="button button-small" type="button" data-refresh-products>โหลดรายการใหม่</button></div>`}
         <div class="field"><label for="billNumber">เลขบิล</label><div class="delivery-bill-control"><span aria-hidden="true">SD</span><input id="billNumber" name="billNumber" type="text" inputmode="numeric" autocomplete="off" pattern="[0-9]{9}" minlength="9" maxlength="9" aria-describedby="billNumberHelp" placeholder="123456789" required></div><p class="small-muted" id="billNumberHelp">กรอกตัวเลข 9 หลักต่อท้าย SD</p></div>
         <div class="field"><label for="quantity">จำนวน</label><input id="quantity" name="quantity" type="number" inputmode="decimal" min="0" step="any" required><p class="small-muted">จำนวนต้องมากกว่า 0</p></div>
         <div class="field"><label for="sender">ผู้บันทึก/ผู้ส่ง</label><input id="sender" name="sender" readonly value="${escapeHtml(options?.sender||"")}" placeholder="อ่านจากบัญชีที่เข้าสู่ระบบ"></div>
@@ -111,7 +111,7 @@ export async function render(root, context) {
       <div class="list" data-delivery-history role="status" aria-live="polite"><div class="page-loading"><span class="loading-spinner"></span><span>กำลังโหลดประวัติ…</span></div></div>
       <div class="form-actions"><button class="button" type="button" data-delivery-more hidden>โหลดเพิ่ม</button></div>
     </section>
-    <p class="small-muted" style="margin-top:.8rem">ข้อมูลประวัติอ่านจาก Supabase ตามสิทธิ์บัญชีและกลุ่มงาน</p>`;
+    <p class="small-muted" style="margin-top:.8rem">ข้อมูลประวัติแสดงตามสิทธิ์บัญชีและกลุ่มงาน</p>`;
 
   const form=root.querySelector("#delivery-form"), fileInput=form?.querySelector("#deliveryImages"), dropzone=form?.querySelector("[data-delivery-dropzone]"),
     photoGrid=form?.querySelector("[data-delivery-photo-grid]"), photoStatus=form?.querySelector("[data-delivery-photo-status]"), submitButton=form?.querySelector("[type=submit]"),
@@ -149,7 +149,7 @@ export async function render(root, context) {
       const found=products.find(item=>item.id===previous);
       select.innerHTML='<option value="">เลือกรายการสินค้า</option>'+products.map(item=>`<option value="${escapeHtml(item.id)}">${escapeHtml(item.displayLabel)}</option>`).join("")+(previous&&!found?`<option value="${escapeHtml(previous)}" selected disabled>รายการที่เลือกถูกปิดหรือไม่มีสิทธิ์ กรุณาเลือกใหม่</option>`:"");
       select.disabled=!products.length;if(found){select.value=previous;form.querySelector("#product").value=found.item_name;}
-      const message=form.querySelector("[data-product-options-message]");if(message){message.className="help-text";message.textContent=previous&&!found?"ข้อมูลมีการเปลี่ยนแปลง กรุณาเลือกรายการสินค้าใหม่":products.length?"เลือกด้วยรหัส id จาก Supabase":"ไม่มีรายการสินค้าที่ active และเลือกได้";message.setAttribute("role",previous&&!found?"alert":"status");}
+      const message=form.querySelector("[data-product-options-message]");if(message){message.className="help-text";message.textContent=previous&&!found?"ข้อมูลมีการเปลี่ยนแปลง กรุณาเลือกรายการสินค้าใหม่":products.length?"เลือกสินค้าจากรายการที่เปิดใช้งาน":"ไม่มีสินค้าที่เปิดใช้งาน";message.setAttribute("role",previous&&!found?"alert":"status");}
       const submit=form.querySelector('[type="submit"]');submit.disabled=!products.length;requestId=null;
     }catch(error){const message=form.querySelector("[data-product-options-message]");if(message){message.className="help-text";message.textContent=(error.message||"โหลดรายการสินค้าไม่สำเร็จ")+" · กดโหลดรายการใหม่เพื่อลองอีกครั้ง";message.setAttribute("role","alert");}}
     finally{button.disabled=false;}
@@ -158,7 +158,7 @@ export async function render(root, context) {
     event.preventDefault();if(!canCreate||processingPhotos||!requireOnlineAction("บันทึกการขนส่ง"))return;
     if(submitButton.disabled)return;
     const values=Object.fromEntries(new FormData(form));
-    try{values.billNumber=normalizeDeliveryBillNumber(`SD${String(values.billNumber??"").trim()}`);normalizeDeliveryEventAt(values.dateTime);if(APP_MODE!=="mock"&&!values.itemNameId)throw new Error("กรุณาเลือกสินค้าจากรายการ Supabase");if(!Number.isFinite(Number(values.quantity))||Number(values.quantity)<=0)throw new Error("จำนวนต้องเป็นตัวเลขมากกว่า 0");if(selectedPhotos.length<1||selectedPhotos.length>MAX_DELIVERY_PHOTOS)throw new Error("แนบรูปหลักฐานอย่างน้อย 1 รูป และไม่เกิน 10 รูป");}
+    try{values.billNumber=normalizeDeliveryBillNumber(`SD${String(values.billNumber??"").trim()}`);normalizeDeliveryEventAt(values.dateTime);if(APP_MODE!=="mock"&&!values.itemNameId)throw new Error("กรุณาเลือกสินค้าจากรายการ");if(!Number.isFinite(Number(values.quantity))||Number(values.quantity)<=0)throw new Error("จำนวนต้องเป็นตัวเลขมากกว่า 0");if(selectedPhotos.length<1||selectedPhotos.length>MAX_DELIVERY_PHOTOS)throw new Error("แนบรูปหลักฐานอย่างน้อย 1 รูป และไม่เกิน 10 รูป");}
     catch(error){context.showToast(error.message||"ข้อมูลไม่ครบ","error");return;}
     requestId=await deriveDeliveryRequestId(context.user.id,values,selectedPhotos);submitButton.disabled=true;submitButton.textContent="กำลังบันทึก";
     const modal=pageModal({title:"บันทึกการขนส่ง",message:"กำลังตรวจสอบข้อมูล",tone:"working",dismissOnEscape:false});
@@ -202,15 +202,14 @@ export async function render(root, context) {
   history.addEventListener("click",async event=>{
     if(event.target.closest("[data-history-retry]")){void loadHistory(false);return;}
     const detailsButton=event.target.closest("[data-delivery-detail]");
-      if(detailsButton){const id=detailsButton.dataset.deliveryDetail,slot=history.querySelector(`[data-detail-slot="${CSS.escape(id)}"]`);if(!slot)return;
-      if(!slot.hidden){slot.hidden=true;return;}slot.hidden=false;slot.innerHTML='<p class="small-muted">กำลังโหลดรายละเอียด…</p>';detailsButton.disabled=true;
+      if(detailsButton){const id=detailsButton.dataset.deliveryDetail;detailsButton.disabled=true;
       const modal=pageModal({title:"รายละเอียดการขนส่ง",message:"กำลังโหลดรายละเอียด",tone:"working"});
-      try{const detail=await deliveryApi.getDeliveryDetail(id);if(disposed){modal.close();return;}slot.innerHTML=`<dl class="work-manager-fields"><div><dt>ผู้บันทึก/ผู้ส่ง</dt><dd>${escapeHtml(detail.sender||"—")}</dd></div><div><dt>รายการสินค้า</dt><dd>${escapeHtml(detail.product||"—")}</dd></div><div><dt>เลขบิล</dt><dd>${escapeHtml(detail.bill_number||detail.billNumber||"—")}</dd></div><div><dt>จำนวน</dt><dd>${escapeHtml(detail.quantity??"—")}</dd></div><div><dt>วันที่และเวลาขนส่ง</dt><dd>${escapeHtml(thaiDateTime(detail.event_at||detail.dateTime))}</dd></div><div><dt>สถานะ</dt><dd>${escapeHtml(detail.status||"—")}</dd></div><div><dt>บันทึกเมื่อ</dt><dd>${escapeHtml(thaiDateTime(detail.created_at||detail.createdAt))}</dd></div></dl><div class="delivery-evidence"><strong>รูปหลักฐาน (${(detail.attachments||[]).length})</strong><div class="ot-photo-grid">${(detail.attachments||[]).map((file,index)=>`<a class="ot-photo-card" href="${escapeHtml(file.signed_url)}" target="_blank" rel="noreferrer"><img src="${escapeHtml(file.signed_url)}" alt="รูปหลักฐาน ${index+1}"><span>${escapeHtml(file.name||`รูปที่ ${index+1}`)}</span></a>`).join("")}</div></div>`;modal.update({title:"รายละเอียดการขนส่ง",message:"โหลดรายละเอียดสำเร็จ",tone:"success",close:()=>modal.close()});}
-      catch(error){if(disposed){modal.close();return;}slot.innerHTML=`<div class="notice notice-error">${escapeHtml(error.message||"โหลดรายละเอียดไม่สำเร็จ")}</div>`;modal.update({title:"รายละเอียดการขนส่ง",message:error.message||"โหลดรายละเอียดไม่สำเร็จ",tone:"error",close:()=>modal.close()});}
+      try{const detail=await deliveryApi.getDeliveryDetail(id);if(disposed){modal.close();return;}modal.close();openDetailDialog({title:"รายละเอียดการขนส่ง",subtitle:"รายการขนส่งที่บันทึกไว้",returnFocus:detailsButton,content:`<dl class="work-manager-fields"><div><dt>ผู้บันทึก/ผู้ส่ง</dt><dd>${escapeHtml(detail.sender||"—")}</dd></div><div><dt>รายการสินค้า</dt><dd>${escapeHtml(detail.product||"—")}</dd></div><div><dt>เลขบิล</dt><dd>${escapeHtml(detail.bill_number||detail.billNumber||"—")}</dd></div><div><dt>จำนวน</dt><dd>${escapeHtml(detail.quantity??"—")}</dd></div><div><dt>วันที่และเวลาขนส่ง</dt><dd>${escapeHtml(thaiDateTime(detail.event_at||detail.dateTime))}</dd></div><div><dt>สถานะ</dt><dd>${escapeHtml(detail.status||"—")}</dd></div><div><dt>บันทึกเมื่อ</dt><dd>${escapeHtml(thaiDateTime(detail.created_at||detail.createdAt))}</dd></div></dl><section class="detail-section"><h3>รูปหลักฐาน (${(detail.attachments||[]).length})</h3><div class="ot-photo-grid">${(detail.attachments||[]).map((file,index)=>`<a class="ot-photo-card" href="${escapeHtml(file.signed_url)}" target="_blank" rel="noreferrer"><img src="${escapeHtml(file.signed_url)}" alt="รูปหลักฐาน ${index+1}"><span>${escapeHtml(file.name||`รูปที่ ${index+1}`)}</span></a>`).join("")}</div></section>`});}
+      catch(error){if(disposed){modal.close();return;}modal.update({title:"รายละเอียดการขนส่ง",message:error.message||"โหลดรายละเอียดไม่สำเร็จ",tone:"error",close:()=>modal.close()});}
       finally{detailsButton.disabled=false;}return;
     }
     const cancelButton=event.target.closest("[data-delivery-cancel]");if(cancelButton){const id=cancelButton.dataset.deliveryCancel,version=Number(cancelButton.dataset.version);
-      const modal=pageModal({title:"ยืนยันยกเลิกรายการ",message:"ยกเลิกรายการขนส่งนี้หรือไม่? การยกเลิกจะถูกบันทึกในประวัติ Audit.",tone:"info",confirmLabel:"ยืนยันยกเลิก",close:()=>modal.close(),confirm:async()=>{modal.update({title:"ยกเลิกรายการ",message:"กำลังยกเลิกรายการ",tone:"working"});try{await deliveryApi.cancelDelivery(id,version);if(disposed){modal.close();return;}modal.update({title:"ยกเลิกรายการ",message:"ยกเลิกรายการขนส่งสำเร็จ",tone:"success",close:()=>{modal.close();void loadHistory(false);}});}catch(error){if(disposed){modal.close();return;}modal.update({title:"ยกเลิกรายการ",message:error.message||"ยกเลิกรายการไม่สำเร็จ",tone:"error",close:()=>modal.close()});}}});return;
+      const modal=pageModal({title:"ยืนยันยกเลิกรายการ",message:"ยกเลิกรายการขนส่งนี้หรือไม่? การยกเลิกจะถูกบันทึกในประวัติการตรวจสอบรายการ.",tone:"info",confirmLabel:"ยืนยันยกเลิก",close:()=>modal.close(),confirm:async()=>{modal.update({title:"ยกเลิกรายการ",message:"กำลังยกเลิกรายการ",tone:"working"});try{await deliveryApi.cancelDelivery(id,version);if(disposed){modal.close();return;}modal.update({title:"ยกเลิกรายการ",message:"ยกเลิกรายการขนส่งสำเร็จ",tone:"success",close:()=>{modal.close();void loadHistory(false);}});}catch(error){if(disposed){modal.close();return;}modal.update({title:"ยกเลิกรายการ",message:error.message||"ยกเลิกรายการไม่สำเร็จ",tone:"error",close:()=>modal.close()});}}});return;
     }
   });
   void loadHistory(false);

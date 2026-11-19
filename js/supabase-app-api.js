@@ -1,14 +1,14 @@
-import { createLeaveService } from './leave-service.js?v=1.3.324';
-import { createOtService } from './ot-service.js?v=1.3.320';
-import { createDeliveryService } from './delivery-service.js?v=1.3.269';
-import { validateLeaveSubmission, storedLeaveItems } from './leave-rules.js?v=1.3.186';
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js?v=1.3.327';
+import { createLeaveService } from './leave-service.js?v=1.3.396';
+import { createOtService } from './ot-service.js?v=1.3.396';
+import { createDeliveryService } from './delivery-service.js?v=1.3.396';
+import { validateLeaveSubmission, storedLeaveItems } from './leave-rules.js?v=1.3.396';
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js?v=1.3.396';
 
-import { RECORD_SCHEMAS, validateRecord } from './record-schema.js?v=1.3.186';
-import { bangkokToday } from './utils.js?v=1.3.186';
-import { getSupabaseLineAccessToken } from './auth.js?v=1.3.205';
-import { normalizeExecutiveAttendanceRows, summarizeExecutiveAttendance, validateAttendanceRange } from './executive-attendance-rules.js?v=1.3.316';
-import { ADMIN_AUDIT_PAGE_SIZE, buildAuditDetailSelect, buildAuditListParams, auditAllowsReason, resolveAuditActor, safeAuditChanges, validateAuditFilters } from './admin-audit-contract.js?v=1.3.327';
+import { RECORD_SCHEMAS, validateRecord } from './record-schema.js?v=1.3.396';
+import { bangkokToday } from './utils.js?v=1.3.396';
+import { getSupabaseLineAccessToken } from './auth.js?v=1.3.396';
+import { normalizeExecutiveAttendanceRows, summarizeExecutiveAttendance, validateAttendanceRange } from './executive-attendance-rules.js?v=1.3.396';
+import { ADMIN_AUDIT_PAGE_SIZE, buildAuditDetailSelect, buildAuditListParams, auditAllowsReason, resolveAuditActor, safeAuditChanges, validateAuditFilters } from './admin-audit-contract.js?v=1.3.396';
 
 const CATEGORIES = new Set(['attendance','workSessions','leaveRequests','calendar','deliveries','production','screenEntries','otRequests']);
 const GENERIC_ADMIN_WRITE_BLOCKED = new Set(['workSessions','leaveRequests','deliveries','production','screenEntries','otRequests']);
@@ -20,6 +20,9 @@ const safeJson = async response => {
   let data = null; try { data = raw ? JSON.parse(raw) : null; } catch (_) {}
   if (!response.ok) {
     if (response.status === 401) throw fail('Session หมดอายุ กรุณาเข้าสู่ระบบ LINE อีกครั้ง','SESSION_EXPIRED');
+    if(String(data?.message||'').includes('RECORD_CHANGED_RELOAD'))throw fail('รายการนี้ถูกแก้ไขแล้ว กรุณาปิดแล้วเปิดรายการล่าสุดก่อนแก้ไข','REQUEST_REJECTED');
+    if(String(data?.message||'').includes('LEAVE_SELF_REVIEW_BLOCKED'))throw fail('ไม่สามารถแก้คำขอที่ตนเองเกี่ยวข้องหลังพิจารณาแล้ว ให้ผู้ตรวจคนอื่นดำเนินการ','PERMISSION_DENIED');
+    if(String(data?.message||'').includes('LINKED_SCREEN_ITEMS_REQUIRE_ITEM_EDITOR'))throw fail('ยอดนี้ผูกกับรายการสินค้าย่อย ต้องแก้ยอดสินค้าย่อยให้ตรงกัน','REQUEST_REJECTED');
     if (response.status === 403) throw fail('ไม่มีสิทธิ์ดำเนินการ','PERMISSION_DENIED');
     if (data?.code === '42501') throw fail('ไม่มีสิทธิ์ดูรายงานผู้บริหาร','PERMISSION_DENIED');
     if (data?.code === '22023' && String(data?.message || '').includes('ATTENDANCE_RANGE_TOO_LARGE'))
@@ -48,10 +51,18 @@ const safeJson = async response => {
       throw fail('ช่วงนี้มีรายการลงเวลาเกิน 1,000 รายการ กรุณาเลือกช่วงวันที่แคบลง','TOO_MANY_ATTENDANCE_ROWS');
     if (data?.code === 'PGRST202' && String(data?.message || '').includes('factory_attendance_manager_dashboard'))
       throw fail('ยังไม่ได้ติดตั้ง RPC รายงานเวลาสำหรับผู้บริหารบน Supabase','BACKEND_NOT_READY');
+    if (data?.code === 'PGRST205' && String(data?.message || '').includes('employee_rfid_daily_attendance'))
+      throw fail('ยังไม่ได้ติดตั้งข้อมูลเวลาเข้าออกจาก RFID บน Supabase','BACKEND_NOT_READY');
     if (data?.code === 'PGRST202' && String(data?.message || '').includes('ot_report_manager_dashboard'))
       throw fail('รายงาน OT สำหรับผู้บริหารยังไม่ได้ติดตั้งบน Supabase','BACKEND_NOT_READY');
     if (data?.code === 'PGRST202' && String(data?.message || '').includes('ot_report_detail_manager'))
       throw fail('รายละเอียดรายงาน OT สำหรับผู้บริหารยังไม่ได้ติดตั้งบน Supabase','BACKEND_NOT_READY');
+    if (data?.code === 'PGRST202' && String(data?.message || '').includes('factory_work_report_summary'))
+      throw fail('รายงานสรุปยังไม่พร้อมใช้งาน กรุณาติดต่อผู้ดูแลระบบ','BACKEND_NOT_READY');
+    if (data?.code === 'PGRST202' && String(data?.message || '').includes('factory_admin_record_'))
+      throw fail('การจัดการรายการยังไม่พร้อมใช้งาน กรุณาติดต่อผู้ดูแลระบบ','BACKEND_NOT_READY');
+    if (data?.code === 'PGRST202' && String(data?.message || '').includes('factory_notification_push_status'))
+      throw fail('ยังอ่านสถานะการแจ้งเตือนของอุปกรณ์ไม่ได้ กรุณาลองอีกครั้ง','BACKEND_NOT_READY');
     if (data?.code === 'PGRST202') throw fail('ระบบเริ่ม–จบงานยังไม่ได้ติดตั้งบน Supabase','BACKEND_NOT_READY');
     if (data?.code === '40001' || String(data?.message || '').includes('SCREEN_WORK_STALE_VERSION'))
       throw fail('งานถูกเปลี่ยนแปลง กรุณาโหลดข้อมูลล่าสุดก่อนแก้ไข','CONFLICT');
@@ -64,6 +75,7 @@ const safeJson = async response => {
     if (String(data?.message || '').includes('PRODUCTION_MACHINE_UNAVAILABLE'))
       throw fail('เครื่องจักรถูกปิดหรือเปลี่ยนสิทธิ์ กรุณาโหลดตัวเลือกใหม่และเลือกเครื่องอีกครั้ง','OPTIONS_CHANGED');
     if (String(data?.message || '').includes('WORK_SESSION_NOT_FOUND')) throw fail('ไม่พบงานที่กำลังทำอยู่','NOT_FOUND');
+    if (String(data?.message || '').includes('INDEPENDENT_OUTPUT_RETRY_CONFLICT')) throw fail('คำขอนี้ไม่ตรงกับข้อมูลเดิม กรุณาติดต่อ Admin','CONFLICT');
     if (data?.code === '23505') throw fail('พบข้อมูลซ้ำ ไม่สามารถบันทึกซ้ำได้','DUPLICATE_RECORD');
     if (response.status >= 400 && response.status < 500) throw fail('ข้อมูลไม่ผ่านการตรวจสอบจากระบบ กรุณาตรวจข้อมูลก่อนส่งใหม่','REQUEST_REJECTED');
     throw fail(data?.code === '42501' ? 'ไม่มีสิทธิ์ดำเนินการ' : 'บันทึกหรืออ่านข้อมูลไม่สำเร็จ กรุณาลองใหม่','API_ERROR');
@@ -107,6 +119,71 @@ export function createSupabaseAppApi() {
       result.push(...page);
       if(page.length<1000)return result;
     }
+  }
+  const RFID_ATTENDANCE_COLUMNS = 'employee_id,employee_name,group_name,work_date,check_in_at,check_out_at,attendance_status,entry_status,approved_leave_period,work_period,late_minutes,is_late,work_status,workday_credit,early_leave_minutes,overtime_gross_minutes,overtime_break_minutes,overtime_minutes,accepted_scan_count,status_label';
+  const rfidMinute = (value, field) => {
+    if (value == null) return null;
+    const number = Number(value);
+    if (!Number.isSafeInteger(number) || number < 0) throw fail('ข้อมูล RFID มีค่านาทีไม่ถูกต้อง','INVALID_ATTENDANCE_DATA');
+    return number;
+  };
+  const rfidTime = value => {
+    if (value == null) return null;
+    const instant = new Date(value);
+    if (!Number.isFinite(instant.getTime())) throw fail('เวลาในรายการ RFID ไม่ถูกต้อง','INVALID_ATTENDANCE_DATA');
+    return new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Bangkok',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).format(instant);
+  };
+  function mapRfidAttendance(row) {
+    const allowedLeave = [null,'full','morning','afternoon'];
+    const allowedEntry = ['RECORDED','ON_TIME','LATE','MISSED_IN'];
+    const allowedWork = [null,'HALF_DAY','FULL_DAY'];
+    if (!row || typeof row.employee_id !== 'string' || !row.employee_id ||
+        typeof row.employee_name !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(row.work_date || '') ||
+        !allowedEntry.includes(row.entry_status ?? 'RECORDED') || !allowedLeave.includes(row.approved_leave_period ?? null) ||
+        !allowedWork.includes(row.work_status ?? null) || typeof row.status_label !== 'string' ||
+        !(row.is_late == null || typeof row.is_late === 'boolean') || !Number.isInteger(Number(row.accepted_scan_count)) ||
+        Number(row.accepted_scan_count) < 1) {
+      throw fail('รูปแบบเวลาเข้าออกจาก RFID ไม่ถูกต้อง','INVALID_ATTENDANCE_DATA');
+    }
+    const credit = row.workday_credit == null ? null : Number(row.workday_credit);
+    if (credit !== null && ![0,0.5,1].includes(credit)) throw fail('เครดิตวันทำงาน RFID ไม่ถูกต้อง','INVALID_ATTENDANCE_DATA');
+    const lateMinutes = rfidMinute(row.late_minutes,'late_minutes');
+    const earlyLeaveMinutes = rfidMinute(row.early_leave_minutes,'early_leave_minutes');
+    const overtimeGrossMinutes = rfidMinute(row.overtime_gross_minutes,'overtime_gross_minutes');
+    const overtimeBreakMinutes = rfidMinute(row.overtime_break_minutes,'overtime_break_minutes');
+    const overtimeMinutes = rfidMinute(row.overtime_minutes,'overtime_minutes');
+    const checkIn = rfidTime(row.check_in_at);
+    const checkOut = rfidTime(row.check_out_at);
+    const status = !checkIn ? 'unrecorded' : !checkOut ? 'in-progress' :
+      row.approved_leave_period && row.approved_leave_period !== 'full' ? 'present-half' :
+      row.work_status === 'HALF_DAY' ? 'present-half' : 'present-full';
+    const detail = [];
+    if (row.approved_leave_period === 'full') detail.push('ลาเต็มวันแต่มีการแตะบัตร นับตามการทำงานปกติ');
+    else if (row.approved_leave_period === 'morning') detail.push('ลาครึ่งวันเช้า · เข้างานบ่าย');
+    else if (row.approved_leave_period === 'afternoon') detail.push('ลาครึ่งวันบ่าย · เข้างานเช้า');
+    if (row.is_late && lateMinutes > 0) detail.push(`สาย ${lateMinutes} นาที`);
+    if (earlyLeaveMinutes > 0) detail.push(`ออกก่อน ${earlyLeaveMinutes} นาที`);
+    if (overtimeGrossMinutes > 0) detail.push(`OT สุทธิ ${String(Math.floor(overtimeMinutes/60)).padStart(2,'0')}:${String(overtimeMinutes%60).padStart(2,'0')}${overtimeBreakMinutes>0?` · หักพัก ${overtimeBreakMinutes} นาที`:''}`);
+    if (credit !== null) detail.push(`นับ ${credit} วัน`);
+    return {
+      id:`rfid:${row.employee_id}:${row.work_date}`, employeeId:row.employee_id,
+      name:row.employee_name, group:typeof row.group_name==='string'?canonical(row.group_name):null,
+      date:row.work_date, checkIn, checkOut, status, statusLabel:row.status_label,
+      attendanceStatus:allowedEntry.includes(row.attendance_status)?row.attendance_status:'RECORDED', entryStatus:row.entry_status??null,
+      approvedLeavePeriod:row.approved_leave_period??null, workPeriod:row.work_period??null,
+      workStatus:row.work_status??null, workdayCredit:credit, isLate:row.is_late,
+      lateMinutes, earlyLeaveMinutes, overtimeGrossMinutes, overtimeBreakMinutes,
+      overtimeMinutes, acceptedScanCount:Number(row.accepted_scan_count),
+      recordSource:'rfid', detail:detail.join(' · ') || null
+    };
+  }
+  async function readRfidAttendance(startDate,endDate,{employeeId=null,signal:requestSignal}={}) {
+    const params=new URLSearchParams({select:RFID_ATTENDANCE_COLUMNS,order:'work_date.asc,employee_id.asc',limit:'1001'});
+    params.append('work_date',`gte.${startDate}`); params.append('work_date',`lte.${endDate}`);
+    if(employeeId) params.set('employee_id',`eq.${employeeId}`);
+    const result=await call('/rest/v1/employee_rfid_daily_attendance?'+params,{signal:requestSignal});
+    if(!Array.isArray(result)||result.length>1000) throw fail('ช่วงเวลามีรายการ RFID มากเกินกำหนด กรุณาเลือกช่วงให้แคบลง','TOO_MANY_ATTENDANCE_ROWS');
+    return result.map(mapRfidAttendance);
   }
 function normalizeImages(images) {
     if (!Array.isArray(images) || images.length > 10) throw fail('แนบรูปได้ไม่เกิน 10 รูป','VALIDATION_ERROR');
@@ -342,7 +419,7 @@ let normalized;
     }
     if (module==='package07' && action==='ot.manager.dashboard') {
       await userId();
-      if(!['admin','executive'].includes(claims?.app_metadata?.role))throw fail('ไม่มีสิทธิ์ดูรายงาน OT ผู้บริหาร','PERMISSION_DENIED');
+      if(!['admin','executive','employee'].includes(claims?.app_metadata?.role))throw fail('ไม่มีสิทธิ์ดูรายงาน OT','PERMISSION_DENIED');
       const from=p.from||null,to=p.to||null,group=p.group||null,query=String(p.query||'').trim();
       const limit=Number(p.limit??25),offset=Number(p.offset??0);
       if(!/^\d{4}-\d{2}-\d{2}$/.test(from||'')||!/^\d{4}-\d{2}-\d{2}$/.test(to||'')||from>to
@@ -365,7 +442,7 @@ let normalized;
       if(!['สกรีน','ผลิต'].includes(group))throw fail('เลือกพื้นที่ทำงานที่ได้รับสิทธิ์','VALIDATION_ERROR');
       const machineParams=new URLSearchParams({select:'id,machine_code,machine_name,work_group,active,display_order',active:'eq.true',work_group:`eq.${group}`,order:'display_order.asc,machine_code.asc'});
       const machines=await call('/rest/v1/machines?'+machineParams);
-      const orders=group==='สกรีน'?await call('/rest/v1/item_names?'+new URLSearchParams({select:'id,item_name,active',active:'eq.true',order:'item_name.asc,id.asc'})):[];
+      const orders=group==='สกรีน'&&p.includeOrders!==false?await call('/rest/v1/item_names?'+new URLSearchParams({select:'id,item_name,active',active:'eq.true',order:'item_name.asc,id.asc'})):[];
       return {machines,orders,source:'supabase',directorySnapshotDate:null};
     }
     if (module==='package07' && action==='screen.work.read') {
@@ -384,6 +461,46 @@ let normalized;
     if (module==='package07' && action==='work.start') {
       if(!p.requestId || !p.machineId)throw fail('เลือกเครื่องจักรแล้วลองใหม่','VALIDATION_ERROR');
       const result=await call('/rest/v1/rpc/work_session_start',{method:'POST',body:JSON.stringify({p_request_id:p.requestId,p_work_group:canonical(p.workType),p_machine_id:p.machineId,p_item_name_id:p.itemNameId||null,p_note:p.note||''})});
+      return verifySaved(result);
+    }
+    if (module==='package07' && action==='independent.output.read') {
+      const group=canonical(p.group);
+      if(!['สกรีน','ผลิต'].includes(group))throw fail('เลือกกลุ่มงานให้ถูกต้อง','VALIDATION_ERROR');
+      const actor=await userId();
+      const date=String(p.date||'');
+      if(date&&(!/^\d{4}-\d{2}-\d{2}$/.test(date)||Number.isNaN(Date.parse(`${date}T00:00:00Z`))||new Date(`${date}T00:00:00Z`).toISOString().slice(0,10)!==date))
+        throw fail('วันที่ที่เลือกไม่ถูกต้อง','VALIDATION_ERROR');
+      const filters={owner_id:`eq.${actor}`};
+      if(date)filters['payload->>date']=`eq.${date}`;
+      return date?allRows(group==='สกรีน'?'screenEntries':'production',filters):rows(group==='สกรีน'?'screenEntries':'production',{...filters,limit:'100'});
+    }
+    if (module==='package07' && action==='independent.output.save') {
+      const group=canonical(p.group);
+      if(!['สกรีน','ผลิต'].includes(group)||!p.requestId||!p.date||!p.machineId)throw fail('กรุณากรอกข้อมูลให้ครบ','VALIDATION_ERROR');
+      let result;
+      try {
+        if(group==='สกรีน' && p.packCount!==undefined) {
+          const validCount=value=>Number.isSafeInteger(value)&&value>=0&&value<=1000000000;
+          if(!validCount(p.packCount)||!validCount(p.screenDefects)||!validCount(p.productionDefects))
+            throw Object.assign(fail('จำนวนต้องเป็นจำนวนเต็มตั้งแต่ 0 ถึง 1,000,000,000','VALIDATION_ERROR'),{serverRejected:true});
+          result=await call('/rest/v1/rpc/factory_screen_simple_output_save',{method:'POST',body:JSON.stringify({
+            p_request_id:p.requestId,p_work_date:p.date,p_machine_id:p.machineId,p_good_packs:p.packCount,
+            p_screen_defects:p.screenDefects,p_production_defects:p.productionDefects,p_note:p.note||''
+          })});
+        } else {
+          result=await call('/rest/v1/rpc/factory_independent_output_save',{method:'POST',body:JSON.stringify({
+            p_request_id:p.requestId,p_group:group,p_work_date:p.date,p_machine_id:p.machineId,
+            p_quantity:group==='ผลิต'?p.quantity:null,p_defective:group==='ผลิต'?p.defective:null,
+            p_screen_items:group==='สกรีน'?p.items:null,p_screen_defects:group==='สกรีน'?p.screenDefects:null,
+            p_production_defects:group==='สกรีน'?p.productionDefects:null,p_note:p.note||''
+          })});
+        }
+      } catch(error) { if(error.code==='REQUEST_REJECTED')error.serverRejected=true; throw error; }
+      return verifySaved(result);
+    }
+    if (module==='package07' && action==='work.end.time-only') {
+      if(!p.id || !p.requestId)throw fail('ข้อมูลจบงานไม่ครบ กรุณาลองใหม่','VALIDATION_ERROR');
+      const result=await call('/rest/v1/rpc/work_session_end_time_only',{method:'POST',body:JSON.stringify({p_id:p.id,p_request_id:p.requestId})});
       return verifySaved(result);
     }
     if (module==='package07' && action==='work.end') {
@@ -469,13 +586,30 @@ let normalized;
     }
     if (module==='package08' && action==='calendar.read') {
       const filters={}; if(p.group) filters.group_name=`eq.${canonical(p.group)}`;
-      const result=await rows('calendar',filters); const memberships=await call('/rest/v1/employee_groups?select=group_name,employee_id,active&active=eq.true'); const id=await userId(); const groups=[...new Set((claims.app_metadata.role==='admin' ? memberships : memberships.filter(r=>r.employee_id===id)).map(r=>canonical(r.group_name)))].filter(g=>['ผลิต','สกรีน','ขนส่ง','ออฟฟิศ'].includes(g)); const approvedLeaves=await leave().calendar(p.month); return {groups,month:p.month,entries:result.filter(r=>r.date?.startsWith(p.month)),approvedLeaves};
+      const result=await rows('calendar',filters);
+      const role=claims?.app_metadata?.role;
+      const allWorkGroups=['ออฟฟิศ','สกรีน','ผลิต','ขนส่ง'];
+      let groups;
+      if(role==='admin'||role==='executive') groups=allWorkGroups;
+      else {
+        const id=await userId();
+        const memberships=await call('/rest/v1/employee_groups?select=group_name,employee_id,active&employee_id=eq.'+encodeURIComponent(id)+'&active=eq.true');
+        groups=[...new Set(memberships.map(r=>canonical(r.group_name)))].filter(g=>allWorkGroups.includes(g));
+      }
+      const approvedLeaves=await leave().calendar(p.month);
+      return {groups,month:p.month,entries:result.filter(r=>r.date?.startsWith(p.month)),approvedLeaves};
     }
     if (module==='package08' && action==='calendar.save') {
       const [existing]=await rows('calendar',{group_name:`eq.${canonical(p.group)}`, 'payload->>date':`eq.${p.date}`});
-      return existing ? update(existing.id,'calendar',p,'แก้ไขปฏิทิน') : insert('calendar',p,canonical(p.group));
+      const values={...p,group:canonical(p.group)==='ออฟฟิศ'?'ออฟฟิต':p.group};
+      return existing ? update(existing.id,'calendar',values,'แก้ไขปฏิทิน') : insert('calendar',values,canonical(p.group));
     }
-    if (module==='package08' && action==='calendar.batch.save') return Promise.all((p.entries||[]).map(entry=>dispatch(module,'calendar.save',entry)));
+    if (module==='package08' && action==='calendar.batch.save') {
+      const entries=Array.isArray(p.entries)?p.entries:[];
+      const settled=await Promise.allSettled(entries.map(entry=>dispatch(module,'calendar.save',entry)));
+      return {saved:settled.flatMap((result,index)=>result.status==='fulfilled'?[{entry:entries[index],record:result.value}]:[]),
+        failed:settled.flatMap((result,index)=>result.status==='rejected'?[{entry:entries[index],message:String(result.reason?.message||'บันทึกไม่สำเร็จ')}]:[])};
+    }
     if (module==='package08' && action==='calendar.notifications.read') return [];
     if (module==='package09' && ['leave.notifications.read','leave.notices.read'].includes(action)) return [];
     if (module==='package10' && action==='attendance.notifications.read') return [];
@@ -499,29 +633,54 @@ let normalized;
       const to=p.month+'-'+String(last).padStart(2,'0');
       const params=new URLSearchParams({select:'id,owner_id,payload,created_at',category:'eq.attendance',owner_id:`eq.${id}`,order:'created_at.asc',limit:'1000'});
       params.append('payload->>date',`gte.${from}`);params.append('payload->>date',`lte.${to}`);
-      const data=await call('/rest/v1/factory_records?'+params);
-      const history=(data||[]).map(row=>{
+      const [data,rfidHistory]=await Promise.all([
+        call('/rest/v1/factory_records?'+params,{signal}),
+        readRfidAttendance(from,to,{employeeId:id,signal})
+      ]);
+      const historyByDate=new Map((data||[]).map(row=>{
         const payload=row?.payload;
         if(row?.owner_id!==id || !payload || typeof payload!=='object' || !/^\d{4}-\d{2}-\d{2}$/.test(payload.date||'') || payload.date<from || payload.date>to) throw fail('รูปแบบประวัติเวลาไม่ถูกต้อง','INVALID_ATTENDANCE_DATA');
         for(const field of ['checkIn','checkOut']) if(payload[field]!=null && (typeof payload[field]!=='string' || !/^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/.test(payload[field]))) throw fail('รูปแบบเวลาในประวัติไม่ถูกต้อง','INVALID_ATTENDANCE_DATA');
-        return {id:row.id,date:payload.date,checkIn:payload.checkIn||null,checkOut:payload.checkOut||null,status:typeof payload.status==='string'?payload.status:null,detail:typeof payload.detail==='string'?payload.detail:null};
-      }).sort((a,b)=>a.date.localeCompare(b.date)||String(a.id).localeCompare(String(b.id)));
+        return [payload.date,{id:row.id,date:payload.date,checkIn:payload.checkIn||null,checkOut:payload.checkOut||null,status:typeof payload.status==='string'?payload.status:null,detail:typeof payload.detail==='string'?payload.detail:null,recordSource:'legacy',lateMinutes:null,earlyLeaveMinutes:null,overtimeMinutes:null,workdayCredit:null}];
+      }));
+      for(const row of rfidHistory){
+        if(row.employeeId!==id || row.date<from || row.date>to) throw fail('ข้อมูล RFID ไม่ตรงกับบัญชีหรือช่วงวันที่','INVALID_ATTENDANCE_DATA');
+        historyByDate.set(row.date,row);
+      }
+      const history=[...historyByDate.values()].sort((a,b)=>a.date.localeCompare(b.date)||String(a.id).localeCompare(String(b.id)));
       const daysWithRecords=new Set(history.map(row=>row.date)).size;
-      return {month:p.month,period:p.period,from,to,history,summary:{daysWithRecords,completeEntries:history.filter(row=>row.checkIn&&row.checkOut).length,missingCheckOut:history.filter(row=>row.checkIn&&!row.checkOut).length},source:{kind:'real',asOf:new Date().toISOString()}};
+      const rfidRows=history.filter(row=>row.recordSource==='rfid');
+      const completedCredits=rfidRows.filter(row=>row.workdayCredit!==null&&row.workdayCredit!==undefined);
+      const rfidTotals=rfidRows.length?{
+        creditedWorkDays:completedCredits.length?completedCredits.reduce((sum,row)=>sum+row.workdayCredit,0):null,
+        lateMinutes:rfidRows.reduce((sum,row)=>sum+(row.lateMinutes||0),0),
+        earlyLeaveMinutes:rfidRows.reduce((sum,row)=>sum+(row.earlyLeaveMinutes||0),0),
+        overtimeMinutes:rfidRows.reduce((sum,row)=>sum+(row.overtimeMinutes||0),0)
+      }:{};
+      return {month:p.month,period:p.period,from,to,history,summary:{daysWithRecords,completeEntries:history.filter(row=>row.checkIn&&row.checkOut).length,missingCheckOut:history.filter(row=>row.checkIn&&!row.checkOut).length,...rfidTotals},source:{kind:'real',asOf:new Date().toISOString()}};
     }
     if (module==='package10' && action==='attendance.read') {
       const id=await userId();
-      const [attendance,calendarRows,leaves] = await Promise.all([
+      const lastDay=new Date(Date.UTC(Number(p.month.slice(0,4)),Number(p.month.slice(5,7)),0)).getUTCDate();
+      const monthStart=p.month+'-01',monthEnd=p.month+'-'+String(lastDay).padStart(2,'0');
+      const [attendance,calendarRows,leaves,rfidRows] = await Promise.all([
         rows('attendance',{owner_id:`eq.${id}`, 'payload->>date':`gte.${p.month}-01`}),
         rows('calendar',{ 'payload->>date':`gte.${p.month}-01`}),
-        rows('leaveRequests',{owner_id:`eq.${id}`})
+        rows('leaveRequests',{owner_id:`eq.${id}`}),
+        readRfidAttendance(monthStart,monthEnd,{employeeId:id,signal})
       ]);
-      const history=attendance.filter(r=>r.date?.startsWith(p.month)).map(r=>({date:r.date,checkIn:r.checkIn||null,checkOut:r.checkOut||null,status:r.status||({'present':'present-full','leave':'leave','absent':'absent','holiday':'holiday'}[r.workdayStatus]||'unrecorded'),lateMinutes:Number(r.lateMinutes)||0,earlyLeaveMinutes:Number(r.earlyLeaveMinutes)||0,overtimeMinutes:Number(r.overtimeMinutes)||0}));
+      const historyByDate=new Map(attendance.filter(r=>r.date?.startsWith(p.month)).map(r=>[r.date,{...r,date:r.date,checkIn:r.checkIn||null,checkOut:r.checkOut||null,status:r.status||({'present':'present-full','leave':'leave','absent':'absent','holiday':'holiday'}[r.workdayStatus]||'unrecorded'),lateMinutes:Number(r.lateMinutes)||0,earlyLeaveMinutes:Number(r.earlyLeaveMinutes)||0,overtimeMinutes:Number(r.overtimeMinutes)||0,workdayCredit:null,recordSource:'legacy'}]));
+      for(const row of rfidRows){if(row.employeeId!==id)throw fail('ข้อมูล RFID ไม่ตรงกับบัญชี','INVALID_ATTENDANCE_DATA');historyByDate.set(row.date,row);}
+      const history=[...historyByDate.values()].sort((a,b)=>a.date.localeCompare(b.date));
       const today=history.find(r=>r.date===bangkokToday())||{date:bangkokToday(),checkIn:null,checkOut:null,status:'unrecorded',lateMinutes:0,earlyLeaveMinutes:0,overtimeMinutes:0};
       const calendarDays=calendarRows.filter(r=>r.date?.startsWith(p.month)).map(r=>({date:r.date,status:({'เต็มวัน':'scheduled','ครึ่งวัน':'present-half','หยุด':'holiday'}[r.status]||'scheduled')}));
       const myLeaves=leaves.filter(r=>r.employeeId===id && ['approved','pending'].includes(r.status) && r.startDate<=bangkokToday() && r.endDate>=bangkokToday());
       const status=today.status==='unrecorded' && myLeaves.some(r=>r.status==='approved') ? 'leave' : today.status;
-      const summary={attendanceDays:history.filter(r=>['present-full','present-half','in-progress'].includes(r.status)).length,leaveDays:history.filter(r=>r.status==='leave').length,absentDays:history.filter(r=>r.status==='absent').length,lateMinutes:history.reduce((s,r)=>s+r.lateMinutes,0),earlyLeaveMinutes:history.reduce((s,r)=>s+r.earlyLeaveMinutes,0),overtimeMinutes:history.reduce((s,r)=>s+r.overtimeMinutes,0)};
+      const completeRfid=history.filter(r=>r.recordSource==='rfid'&&r.workdayCredit!==null&&r.workdayCredit!==undefined);
+      const legacyAttendedDates=new Set(history.filter(r=>r.recordSource==='legacy'&&r.checkIn&&!rfidRows.some(scan=>scan.date===r.date)).map(r=>r.date));
+      const attendanceDays=completeRfid.length||legacyAttendedDates.size?completeRfid.reduce((sum,r)=>sum+r.workdayCredit,0)+legacyAttendedDates.size:null;
+      const knownRfid=rfidRows.length>0;
+      const summary={attendanceDays,leaveDays:history.some(r=>r.status==='leave')?history.filter(r=>r.status==='leave').length:null,absentDays:history.some(r=>r.status==='absent')?history.filter(r=>r.status==='absent').length:null,lateMinutes:knownRfid?rfidRows.reduce((s,r)=>s+(r.lateMinutes||0),0):null,earlyLeaveMinutes:knownRfid?rfidRows.reduce((s,r)=>s+(r.earlyLeaveMinutes||0),0):null,overtimeMinutes:knownRfid?rfidRows.reduce((s,r)=>s+(r.overtimeMinutes||0),0):null};
       return {...today,workdayStatus:status,absent:status==='absent',leaveStatus:myLeaves.find(r=>r.status==='approved')?.type||null,month:p.month,period:p.period,history,calendarDays,summary,source:{kind:'real',asOf:new Date().toISOString()}};
     }
     if (module==='package03' && action==='attendance.read') {
@@ -575,14 +734,23 @@ let normalized;
       if((!todayOnly&&(effectiveRange.startDate!==range.startDate||effectiveRange.endDate!==range.endDate))||
          (todayOnly&&(effectiveRange.startDate!==serverToday||effectiveRange.endDate!==serverToday)))
         throw fail('วันที่หรือช่วงจาก Supabase ไม่ตรงกับคำขอ','INVALID_ATTENDANCE_DATA');
-      const rawAttendance=dashboard.rows.map(row=>({
+      const [rfidRows]=await Promise.all([
+        readRfidAttendance(effectiveRange.startDate,effectiveRange.endDate,{signal})
+      ]);
+      const rawByEmployeeDate=new Map(dashboard.rows.map(row=>{
+        const legacy={
         id:row.record_id,
         employeeId:row.employee_id,
         group:row.group_name,
         date:row.attendance_date,
         checkIn:row.check_in,
-        checkOut:row.check_out
+        checkOut:row.check_out,
+        recordSource:'legacy'
+        };
+        return [`${legacy.employeeId}|${legacy.date}`,legacy];
       }));
+      for(const row of rfidRows) rawByEmployeeDate.set(`${row.employeeId}|${row.date}`,row);
+      const rawAttendance=[...rawByEmployeeDate.values()];
       const allNormalized=normalizeExecutiveAttendanceRows(rawAttendance,people,effectiveRange);
       const daily=todayOnly?allNormalized:[];
       const term=String(p.search??p.name??'').trim().toLocaleLowerCase('th');
@@ -604,20 +772,12 @@ let normalized;
         endDate:effectiveRange.endDate,
         currentDate:serverToday,
         attendanceRowCount:allNormalized.length,
-        source:{kind:'real',asOf:new Date().toISOString(),timeZone:'Asia/Bangkok',recordSource:'public.factory_records:attendance'}
+        source:{kind:'real',asOf:new Date().toISOString(),timeZone:'Asia/Bangkok',recordSource:'factory_records:attendance + employee_rfid_daily_attendance'}
       };
     }
     if (module==='package06' && action==='reports.read') {
       if(!['today','week','month'].includes(p.period)) throw fail('เลือกรอบรายงานไม่ถูกต้อง','VALIDATION_ERROR');
-      const today=bangkokToday(); let start=today;
-      if(p.period==='month') start=today.slice(0,7)+'-01';
-      if(p.period==='week'){const day=new Date(today+'T00:00:00Z');day.setUTCDate(day.getUTCDate()-(day.getUTCDay()+6)%7);start=day.toISOString().slice(0,10);}
-      const [attendance,production,deliveries,leaves]=await Promise.all([rows('attendance'),rows('production'),rows('deliveries'),rows('leaveRequests')]);
-      const within=date=>typeof date==='string' && date.slice(0,10)>=start && date.slice(0,10)<=today;
-      const a=attendance.filter(r=>within(r.date)); const prod=production.filter(r=>within(r.date||r.createdAt)); const delivery=deliveries.filter(r=>r.status!=='ยกเลิก' && within(r.dateTime||r.createdAt));
-      const approvedLeaves=leaves.filter(r=>r.status==='approved' && r.startDate<=today && r.endDate>=start);
-      const totals=new Map(); prod.forEach(r=>totals.set(r.operator||r.employee||'ไม่ระบุ',(totals.get(r.operator||r.employee||'ไม่ระบุ')||0)+Number(r.quantity||0)));
-      return {period:p.period,present:a.filter(r=>r.checkIn).length,late:a.filter(r=>Number(r.lateMinutes)>0).length,leave:approvedLeaves.length,absent:a.filter(r=>r.absent===true||r.workdayStatus==='absent').length,production:prod.reduce((sum,r)=>sum+Number(r.quantity||0),0),delivery:delivery.length,outstanding:[...totals].sort((x,y)=>y[1]-x[1])[0]?.[0]||'—',source:{kind:'real',asOf:new Date().toISOString()}};
+      return call('/rest/v1/rpc/factory_work_report_summary',{method:'POST',signal,body:JSON.stringify({p_period:p.period})});
     }
     if (module==='package06' && action==='reports.inbox.read') return [];
     if (module==='package06' && action==='reports.notifications.read') return [];
@@ -628,6 +788,9 @@ let normalized;
     }
     if (module==='package11' && action==='admin.audit.list') return readAdminAuditPage(p.filters||{}, {signal});
     if (module==='package11' && action==='admin.audit.detail') return readAdminAuditDetail(p.id, {signal});
+    if(module==='package11' && action==='records.options')return call('/rest/v1/rpc/factory_admin_record_options',{method:'POST',body:'{}'});
+    if(module==='package11' && action==='records.detail')return call('/rest/v1/rpc/factory_admin_record_read',{method:'POST',body:JSON.stringify({p_id:p.id,p_category:p.category})});
+    if(module==='package11' && action==='records.correct')return call('/rest/v1/rpc/factory_admin_record_save',{method:'POST',body:JSON.stringify({p_category:p.category,p_id:p.id,p_owner:p.owner,p_group:p.group,p_expected_updated_at:p.expectedUpdatedAt,p_request_id:p.requestId,p_input:p.input,p_reason:p.reason})});
     if (module==='package11' && action==='records.list') {
       if (p.category==='employees') return call('/rest/v1/employees?select=id,employee_name,main_group,active,employee_code&order=employee_name.asc');
       return rows(p.category);

@@ -46,6 +46,10 @@ export function normalizeExecutiveAttendanceRows(rows, employees, range) {
         throw Object.assign(new Error("รูปแบบเวลาในรายการลงเวลาไม่ถูกต้อง"), { code: "INVALID_ATTENDANCE_DATA" });
       }
     }
+    const workdayCredit = row.workdayCredit == null ? null : Number(row.workdayCredit);
+    if (workdayCredit !== null && ![0, 0.5, 1].includes(workdayCredit)) {
+      throw Object.assign(new Error("เครดิตวันทำงานไม่ถูกต้อง"), { code: "INVALID_ATTENDANCE_DATA" });
+    }
     const normalized = {
       id: row.id,
       employeeId: row.employeeId,
@@ -55,7 +59,24 @@ export function normalizeExecutiveAttendanceRows(rows, employees, range) {
       date,
       checkIn: row.checkIn || null,
       checkOut: row.checkOut || null,
-      status: row.checkIn && row.checkOut ? "ลงเวลาครบรายการ" : row.checkIn ? "ยังไม่มีเวลาออก" : row.checkOut ? "รายการไม่มีเวลาเข้า" : "รายการไม่มีเวลาเข้าและออก"
+      status: typeof row.statusLabel === "string" && row.statusLabel.trim() ? row.statusLabel.trim() :
+        row.checkIn && row.checkOut ? "ลงเวลาครบรายการ" : row.checkIn ? "ยังไม่มีเวลาออก" : row.checkOut ? "รายการไม่มีเวลาเข้า" : "รายการไม่มีเวลาเข้าและออก",
+      statusLabel: typeof row.statusLabel === "string" ? row.statusLabel.trim() : null,
+      attendanceStatus: typeof row.attendanceStatus === "string" ? row.attendanceStatus : null,
+      entryStatus: typeof row.entryStatus === "string" ? row.entryStatus : null,
+      approvedLeavePeriod: row.approvedLeavePeriod ?? null,
+      workPeriod: row.workPeriod ?? null,
+      workStatus: row.workStatus ?? null,
+      workdayCredit,
+      isLate: row.isLate === true,
+      lateMinutes: Number.isSafeInteger(row.lateMinutes) && row.lateMinutes >= 0 ? row.lateMinutes : null,
+      earlyLeaveMinutes: Number.isSafeInteger(row.earlyLeaveMinutes) && row.earlyLeaveMinutes >= 0 ? row.earlyLeaveMinutes : null,
+      overtimeGrossMinutes: Number.isSafeInteger(row.overtimeGrossMinutes) && row.overtimeGrossMinutes >= 0 ? row.overtimeGrossMinutes : null,
+      overtimeBreakMinutes: Number.isSafeInteger(row.overtimeBreakMinutes) && row.overtimeBreakMinutes >= 0 ? row.overtimeBreakMinutes : null,
+      overtimeMinutes: Number.isSafeInteger(row.overtimeMinutes) && row.overtimeMinutes >= 0 ? row.overtimeMinutes : null,
+      acceptedScanCount: Number.isSafeInteger(row.acceptedScanCount) ? row.acceptedScanCount : null,
+      recordSource: row.recordSource === "rfid" ? "rfid" : "legacy",
+      detail: typeof row.detail === "string" && row.detail.trim() ? row.detail.trim() : null
     };
     const priorId = seenIds.get(row.id);
     if (priorId) {
@@ -100,18 +121,25 @@ export function summarizeExecutiveAttendance(employees, attendanceRows, sourceHa
   return [...uniqueEmployees.values()].sort((a, b) => a.name.localeCompare(b.name, "th") || a.id.localeCompare(b.id)).map(employee => {
     const rows = rowsByEmployee.get(employee.id) || [];
     const attendedDates = new Set(rows.filter(row => row.checkIn).map(row => row.date));
+    const rfidRows = rows.filter(row => row.recordSource === "rfid");
+    const creditedRows = rfidRows.filter(row => row.workdayCredit !== null);
+    const completedRfidRows = rfidRows.filter(row => row.checkIn && row.checkOut);
+    const legacyDates = new Set(rows.filter(row => row.recordSource !== "rfid" && row.checkIn && !rfidRows.some(rfid => rfid.date === row.date)).map(row => row.date));
+    const hasCompletedAttendance = creditedRows.length > 0 || legacyDates.size > 0;
     return {
       ...employee,
       workdays: null,
-      attendanceDays: sourceHasRows ? attendedDates.size : null,
+      attendanceDays: !sourceHasRows ? null : hasCompletedAttendance ?
+        creditedRows.reduce((sum, row) => sum + row.workdayCredit, 0) + legacyDates.size : null,
+      inProgressDays: rows.length ? new Set(rows.filter(row => row.checkIn && !row.checkOut).map(row => row.date)).size : null,
       leaveDays: null,
       absenceDays: null,
-      lateDays: null,
-      lateMinutes: null,
-      earlyDays: null,
-      earlyMinutes: null,
-      overtimeDays: null,
-      overtimeMinutes: null
+      lateDays: rfidRows.length ? rfidRows.filter(row => row.isLate).length : null,
+      lateMinutes: rfidRows.length ? rfidRows.reduce((sum, row) => sum + (row.lateMinutes || 0), 0) : null,
+      earlyDays: completedRfidRows.length ? completedRfidRows.filter(row => (row.earlyLeaveMinutes || 0) > 0).length : null,
+      earlyMinutes: completedRfidRows.length ? completedRfidRows.reduce((sum, row) => sum + (row.earlyLeaveMinutes || 0), 0) : null,
+      overtimeDays: completedRfidRows.length ? completedRfidRows.filter(row => (row.overtimeMinutes || 0) > 0).length : null,
+      overtimeMinutes: completedRfidRows.length ? completedRfidRows.reduce((sum, row) => sum + (row.overtimeMinutes || 0), 0) : null
     };
   });
 }

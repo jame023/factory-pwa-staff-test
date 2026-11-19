@@ -1,4 +1,4 @@
-import { bangkokToday } from "./utils.js?v=1.3.186";
+import { bangkokToday } from "./utils.js?v=1.3.396";
 
 export const ATTENDANCE_STATUSES = Object.freeze([
   "present-full", "present-half", "in-progress", "leave", "absent", "holiday", "scheduled", "unrecorded"
@@ -30,7 +30,7 @@ const dateValue = value => {
 };
 const timeValue = value => {
   if (value === null) return null;
-  if (typeof value !== "string" || !/^([01]\d|2[0-3]):[0-5]\d$/.test(value)) fail();
+  if (typeof value !== "string" || !/^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/.test(value)) fail();
   return value;
 };
 const metric = value => {
@@ -44,10 +44,37 @@ const statusValue = value => {
 };
 function rowValue(row) {
   if (!row || typeof row !== "object") fail();
+  const shortText = (value, maximum = 120) => {
+    if (value == null) return null;
+    if (typeof value !== "string" || value.length > maximum) fail();
+    return value;
+  };
+  const workdayCredit = row.workdayCredit == null ? null : row.workdayCredit;
+  if (workdayCredit !== null && ![0, 0.5, 1].includes(workdayCredit)) fail();
+  const attendanceStatus = shortText(row.attendanceStatus);
+  const entryStatus = shortText(row.entryStatus);
+  const approvedLeavePeriod = shortText(row.approvedLeavePeriod);
+  const workPeriod = shortText(row.workPeriod);
+  const workStatus = shortText(row.workStatus);
+  const recordSource = row.recordSource == null ? null : row.recordSource;
+  if (attendanceStatus !== null && !["RECORDED", "ON_TIME", "LATE", "MISSED_IN"].includes(attendanceStatus)) fail();
+  if (entryStatus !== null && !["RECORDED", "ON_TIME", "LATE", "MISSED_IN"].includes(entryStatus)) fail();
+  if (approvedLeavePeriod !== null && !["full", "morning", "afternoon"].includes(approvedLeavePeriod)) fail();
+  if (workPeriod !== null && !["FULL_DAY", "MORNING", "AFTERNOON"].includes(workPeriod)) fail();
+  if (workStatus !== null && !["FULL_DAY", "HALF_DAY"].includes(workStatus)) fail();
+  if (recordSource !== null && !["rfid", "legacy"].includes(recordSource)) fail();
+  if (row.isLate != null && typeof row.isLate !== "boolean") fail();
+  for (const key of ["overtimeGrossMinutes", "overtimeBreakMinutes", "acceptedScanCount"]) {
+    if (row[key] != null && (!Number.isSafeInteger(row[key]) || row[key] < 0)) fail();
+  }
   return {
     date: dateValue(row.date), checkIn: timeValue(row.checkIn), checkOut: timeValue(row.checkOut),
     status: statusValue(row.status), lateMinutes: metric(row.lateMinutes),
-    earlyLeaveMinutes: metric(row.earlyLeaveMinutes), overtimeMinutes: metric(row.overtimeMinutes)
+    earlyLeaveMinutes: metric(row.earlyLeaveMinutes), overtimeMinutes: metric(row.overtimeMinutes),
+    statusLabel: shortText(row.statusLabel), detail: shortText(row.detail, 500), attendanceStatus, entryStatus,
+    approvedLeavePeriod, workPeriod, workStatus, workdayCredit, isLate: row.isLate ?? false,
+    overtimeGrossMinutes: metric(row.overtimeGrossMinutes ?? null), overtimeBreakMinutes: metric(row.overtimeBreakMinutes ?? null),
+    acceptedScanCount: row.acceptedScanCount ?? null, recordSource
   };
 }
 export function validateAttendanceResponse(data, query) {
@@ -67,7 +94,7 @@ export function validateAttendanceResponse(data, query) {
         rows.some(row => !inAttendancePeriod(row.date, query))) fail();
   }
   const summary = {};
-  for (const key of ["attendanceDays", "leaveDays", "absentDays", "lateMinutes", "earlyLeaveMinutes", "overtimeMinutes"]) {
+  for (const key of ["attendanceDays", "leaveDays", "absentDays", "lateMinutes", "earlyLeaveMinutes", "overtimeMinutes", "creditedWorkDays"]) {
     summary[key] = metric(data.summary?.[key]);
   }
   if (typeof data.source.asOf !== "string" || !Number.isFinite(Date.parse(data.source.asOf))) fail();

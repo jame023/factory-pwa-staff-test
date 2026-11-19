@@ -1,4 +1,4 @@
-import { ICONS, routeIcon } from './ui-icons.js?v=1.3.340';
+import { ICONS, routeIcon } from './ui-icons.js?v=1.3.396';
 
 // Add decorative icon attributes only. Never replace controls or change names,
 // values, listeners, visibility, session state or authorization.
@@ -32,3 +32,9 @@ const observer=new MutationObserver(records=>{
 decorate(document.body);
 observer.observe(document.body,{childList:true,subtree:true});
 window.addEventListener('hashchange',()=>decorate(document.getElementById('page-root')));
+
+const headerRoot=document.getElementById('header-root');
+if(headerRoot&&'ResizeObserver' in window){
+ const syncHeaderHeight=()=>document.documentElement.style.setProperty('--sip-header-height',headerRoot.getBoundingClientRect().height+'px');
+ new ResizeObserver(syncHeaderHeight).observe(headerRoot);syncHeaderHeight();
+}

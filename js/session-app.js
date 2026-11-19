@@ -1,21 +1,82 @@
-import { normalizeRoute, safeReturnRoute } from './route-policy.js?v=1.3.333';
-import { requireAccess, getAuthContext as accessContext, resolveDefaultRoute } from './access-context.js?v=1.3.333';
-import { authProvider } from './auth.js?v=1.3.205';
-import { verifySession,refreshSession,revokeSession,listenAuthState,getAuthContext } from './session-manager.js?v=1.3.205';
-import { startRouter,stopRouter,refreshRoute,invalidateRoute,canNavigateBack,navigateBack } from './router.js?v=1.3.333';
-import { renderAppHeader } from '../components/app-header.js?v=1.3.278';
-import { renderBottomNav } from '../components/bottom-nav.js?v=1.3.340';
-import { renderLoginScreen } from '../components/login-screen.js?v=1.3.333';
-import { showStatusModal,isStatusModalOpen } from '../components/status-modal.js?v=1.3.295';
-import { showToast } from '../components/toast.js?v=1.3.186';
-import { hideActionPopup } from '../components/action-popup.js?v=1.3.186';
-import { escapeHtml } from './utils.js?v=1.3.186';
-import { startCalendarNotifications } from './notifications.js?v=1.3.340';
+import { normalizeRoute, safeReturnRoute } from './route-policy.js?v=1.3.396';
+import { requireAccess, getAuthContext as accessContext, resolveDefaultRoute } from './access-context.js?v=1.3.396';
+import { authProvider } from './auth.js?v=1.3.396';
+import { verifySession,refreshSession,revokeSession,listenAuthState,getAuthContext } from './session-manager.js?v=1.3.396';
+import { startRouter,stopRouter,refreshRoute,invalidateRoute,canNavigateBack,navigateBack } from './router.js?v=1.3.396';
+import { renderAppHeader } from '../components/app-header.js?v=1.3.396';
+import { renderBottomNav } from '../components/bottom-nav.js?v=1.3.396';
+import { renderLoginScreen } from '../components/login-screen.js?v=1.3.396';
+import { showStatusModal,isStatusModalOpen } from '../components/status-modal.js?v=1.3.396';
+import { showToast } from '../components/toast.js?v=1.3.396';
+import { hideActionPopup } from '../components/action-popup.js?v=1.3.396';
+import { escapeHtml } from './utils.js?v=1.3.396';
+import { startCalendarNotifications } from './notifications.js?v=1.3.396';
+import { disableDeviceNotifications, enableDeviceNotifications, readDeviceNotificationState } from './notification-client.js?v=1.3.396';
 
 const page=document.getElementById('page-root'),header=document.getElementById('header-root'),nav=document.getElementById('nav-root'),loading=document.getElementById('page-loading');
 let modal,session,stopNotifications,timer,working=false,started=false,applicantMounted=false;
 let booting=null,permissionsRefresh;
+let headerNotificationButton=null,headerNotificationState=null,headerNotificationBusy=false,headerNotificationRead=0;
 const RETURN_KEY='factory-pwa-return-route-v33';
+
+function paintHeaderNotificationToggle() {
+  const button=headerNotificationButton;
+  if(!button?.isConnected)return;
+  const state=headerNotificationState;
+  const label=button.querySelector('[data-device-notification-state]');
+  if(label)label.textContent=!state?'กำลังโหลด':!state.supported?'ไม่รองรับ':state.enabled?'เปิด':'ปิด';
+  const enabled=Boolean(state?.enabled);
+  button.setAttribute('aria-checked',String(enabled));
+  button.setAttribute('aria-label',enabled?'ปิดการแจ้งเตือนบนอุปกรณ์นี้':'เปิดการแจ้งเตือนบนอุปกรณ์นี้');
+  button.dataset.enabled=String(enabled);
+  button.title=state?.permission==='denied'?'การแจ้งเตือนถูกปิดในตั้งค่าเบราว์เซอร์':'เปิดหรือปิดการแจ้งเตือนบนอุปกรณ์นี้';
+  button.disabled=headerNotificationBusy||!state?.supported;
+}
+
+async function refreshHeaderNotificationState(button=headerNotificationButton) {
+  if(!button)return;
+  const read=++headerNotificationRead;
+  headerNotificationState=null;paintHeaderNotificationToggle();
+  try {
+    const state=await readDeviceNotificationState();
+    if(read!==headerNotificationRead||button!==headerNotificationButton)return;
+    headerNotificationState=state;
+  } catch {
+    if(read!==headerNotificationRead||button!==headerNotificationButton)return;
+    headerNotificationState={supported:false,enabled:false,permission:'unknown'};
+  }
+  paintHeaderNotificationToggle();
+}
+
+function bindHeaderNotificationToggle() {
+  const button=header.querySelector('[data-device-notification-toggle]');
+  headerNotificationButton=button;headerNotificationState=null;
+  if(!button)return;
+  button.addEventListener('click',async()=>{
+    if(button!==headerNotificationButton||headerNotificationBusy||!headerNotificationState?.supported)return;
+    const current=headerNotificationState;headerNotificationBusy=true;paintHeaderNotificationToggle();
+    try {
+      const result=current.enabled?await disableDeviceNotifications():await enableDeviceNotifications();
+      const updated={...current,enabled:result.status==='enabled',permission:globalThis.Notification?.permission||current.permission};
+      window.dispatchEvent(new CustomEvent('factory-device-notifications-changed',{detail:{...updated,source:'header'}}));
+      showToast(result.status==='permission_not_granted'?'ยังไม่ได้อนุญาตการแจ้งเตือนบนอุปกรณ์':updated.enabled?'เปิดการแจ้งเตือนบนอุปกรณ์แล้ว':'ปิดการแจ้งเตือนบนอุปกรณ์แล้ว',result.status==='permission_not_granted'?'info':'success');
+    } catch(error) {showToast(error.message||'ตั้งค่าการแจ้งเตือนไม่สำเร็จ','error');}
+    finally {
+      headerNotificationBusy=false;
+      if(button===headerNotificationButton)await refreshHeaderNotificationState(button);
+      paintHeaderNotificationToggle();
+    }
+  });
+  void refreshHeaderNotificationState(button);
+}
+
+window.addEventListener('factory-device-notifications-changed',event=>{
+  if(!event.detail||typeof event.detail.enabled!=='boolean')return;
+  headerNotificationState={...(headerNotificationState||{supported:true,permission:globalThis.Notification?.permission||'default'}),...event.detail};
+  paintHeaderNotificationToggle();
+});
+window.addEventListener('focus',()=>void refreshHeaderNotificationState());
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)void refreshHeaderNotificationState();});
 function rememberReturn() {
   const target=safeReturnRoute(location.hash);
   if(target)try{sessionStorage.setItem(RETURN_KEY,target);}catch{}
@@ -52,7 +113,7 @@ function chrome() {
   const workspaceLabel=path.startsWith('/admin')?'Admin':path.startsWith('/executive')?'ผู้บริหาร':(accessContext().selected_workspace||accessContext().selected_group);
   const homeRoute=accessContext()?.role==='admin'?'admin':'home';
   const currentRoute=normalizeRoute(location.hash).slice(1);
-  header.innerHTML=renderAppHeader({...session.user,workspaceLabel},{canGoBack:canNavigateBack()});nav.innerHTML=renderBottomNav(currentRoute,homeRoute);
+  header.innerHTML=renderAppHeader({...session.user,workspaceLabel},{canGoBack:canNavigateBack()});nav.innerHTML=renderBottomNav(currentRoute,homeRoute);bindHeaderNotificationToggle();
   header.querySelector('[data-auth-logout]')?.setAttribute('data-action-feedback','false');
   header.querySelector('[data-auth-logout]')?.addEventListener('click',logout);
   
@@ -148,7 +209,7 @@ async function bootOnce() {
     if(!session)return;
     if(session.applicant) {
       stopRouter();started=false;
-      applicantMounted=true;const {mountRegistration}=await import('../pages/registration/index.js?v=1.3.333');
+      applicantMounted=true;const {mountRegistration}=await import('../pages/registration/index.js?v=1.3.396');
       if(!session?.applicant||!applicantMounted)return;
       const registrationRoot=document.createElement('div');page.replaceChildren(registrationRoot);
       await mountRegistration(registrationRoot,{logout});

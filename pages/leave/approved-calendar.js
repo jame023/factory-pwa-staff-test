@@ -1,5 +1,5 @@
-import * as leaveApi from "../../adapters/package09.js?v=1.3.253";
-import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.186";
+import * as leaveApi from "../../adapters/package09.js?v=1.3.396";
+import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.396";
 
 const monthPattern = /^\d{4}-(0[1-9]|1[0-2])$/;
 const standardGroups = ["สกรีน", "ผลิต", "ขนส่ง", "ออฟฟิศ", "ผู้บริหาร", "Admin"];
@@ -37,8 +37,10 @@ function renderMonth(month, leaves, selectedDate, groupFilter) {
   }).join("");
   const selected = byDate.get(selectedDate) || [];
   const personPeriods = new Map();
-  for (const row of selected) { if (!personPeriods.has(row.employee)) personPeriods.set(row.employee, new Set()); personPeriods.get(row.employee).add(row.period); }
-  const anomalies = [...personPeriods].filter(([, periods]) => periods.size > 1).map(([name]) => name);
+  for (const row of selected) { if (!personPeriods.has(row.employee)) personPeriods.set(row.employee, []); personPeriods.get(row.employee).push(row.period); }
+  const canonicalPeriod = value => ({"เต็มวัน":"full","ครึ่งวันเช้า":"morning","ครึ่งวันบ่าย":"afternoon"}[value] || "full");
+  const periodsOverlap = (left,right) => { const a=canonicalPeriod(left),b=canonicalPeriod(right); return a==="full"||b==="full"||a===b; };
+  const anomalies = [...personPeriods].filter(([, periods]) => periods.some((period,index) => periods.slice(index+1).some(other=>periodsOverlap(period,other)))).map(([name]) => name);
   const warning = anomalies.length ? `<p class="notice notice-danger" role="alert">ตรวจสอบรายการซ้ำในวันเดียว: ${anomalies.map(escapeHtml).join(", ")} มีหลายช่วงลาที่อนุมัติ</p>` : "";  const details = selected.length ? `${warning}<ul>${selected.map(row => `<li><strong>${escapeHtml(row.employee)}</strong><span>${escapeHtml(row.group || "ไม่ระบุกลุ่ม")} • ${escapeHtml(row.period)}</span></li>`).join("")}</ul>` : '<p class="empty-state">ไม่มีผู้ได้รับอนุมัติลาในวันนี้</p>';
   return `<div class="calendar-grid leave-calendar-grid" aria-label="ปฏิทินวันลาที่อนุมัติ">${["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."].map(day => `<span class="small-muted">${day}</span>`).join("")}${padding}${cells}</div><div class="leave-calendar-details"><h3>รายชื่อผู้ลา • ${escapeHtml(thaiDate(selectedDate))}</h3>${details}</div>`;
 }

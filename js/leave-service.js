@@ -92,7 +92,7 @@ export function createLeaveService({url,key,token,getToken,fetchImpl=fetch,stora
     if(!expected || saved.category!=='leaveRequests'||saved.audit.actor_employee_id!==expected.actor||saved.updatedBy!==expected.actor)
       throw failure('READBACK_MISMATCH','ผลที่อ่านกลับไม่ตรงผู้ดำเนินการ กรุณาตรวจสอบประวัติก่อนส่งซ้ำ');
     const {operation,input,id,requestId}=expected;
-    if(id && saved.id!==id || operation!=='review' && saved.employeeId!==expected.actor || operation==='create' && (saved.requestId!==requestId||saved.createdBy!==expected.actor))
+    if(id && saved.id!==id || !['review','cancel'].includes(operation) && saved.employeeId!==expected.actor || operation==='create' && (saved.requestId!==requestId||saved.createdBy!==expected.actor))
       throw failure('READBACK_MISMATCH','ผลที่อ่านกลับไม่ตรงเจ้าของหรือหมายเลขคำขอ');
     if(['create','edit'].includes(operation)) {
       const attachments=(saved.attachments||[]).map(a=>({storage_path:a.storage_path,original_name:a.original_name,mime_type:a.mime_type,byte_size:a.byte_size,sha256:a.sha256})).sort((a,b)=>a.storage_path.localeCompare(b.storage_path));

@@ -1,13 +1,13 @@
-import * as workApi from "../../adapters/package07.js?v=1.3.353";
-import { overtimeGroupsForContext } from "../../js/ot-service.js?v=1.3.322";
-import { escapeHtml as e, bangkokToday, thaiDateTime } from "../../js/utils.js?v=1.3.260";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.260";
-import { isOvertimeDateAllowed, previousBangkokDate } from "../../js/ot-date-rules.js?v=1.3.260";
-import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.295";
-import { getAuthContext } from "../../js/access-context.js?v=1.3.260";
-import { formatReportedDuration, OT_REPORT_PAGE_SIZE, validateExecutiveOtResponse, validateOtReportRange } from "../../js/executive-ot-report-rules.js?v=1.3.322";
-import { loadingView } from "../../components/loading.js?v=1.3.186";
-import { openDetailDialog } from "../../components/detail-dialog.js?v=1.3.349";
+import * as workApi from "../../adapters/package07.js?v=1.3.396";
+import { overtimeGroupsForContext } from "../../js/ot-service.js?v=1.3.396";
+import { escapeHtml as e, bangkokToday, thaiDateTime } from "../../js/utils.js?v=1.3.396";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.396";
+import { isOvertimeDateAllowed, previousBangkokDate } from "../../js/ot-date-rules.js?v=1.3.396";
+import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.396";
+import { getAuthContext } from "../../js/access-context.js?v=1.3.396";
+import { formatReportedDuration, OT_REPORT_PAGE_SIZE, validateExecutiveOtResponse, validateOtReportRange } from "../../js/executive-ot-report-rules.js?v=1.3.396";
+import { loadingView } from "../../components/loading.js?v=1.3.396";
+import { openDetailDialog } from "../../components/detail-dialog.js?v=1.3.396";
 
 const MAX_PHOTOS=5, MAX_FILE_BYTES=512*1024, MAX_TOTAL_BYTES=2*1024*1024, MAX_SOURCE_BYTES=20*1024*1024;
 const formatDuration=row=>{
@@ -140,7 +140,7 @@ async function renderExecutiveOtDashboard(root, context) {
     state.queryController?.abort();state.queryController=controller;
     const routeAbort=()=>controller.abort();context.signal?.addEventListener("abort",routeAbort,{once:true});
     if(reset){state.filters={...filters};state.items=[];state.offset=0;state.totalCount=0;state.employeeCount=0;state.daysCount=0;state.totalMinutes=0;state.snapshot="";state.employees=[];drawList();
-      closeModal("modal");setLoadingMessage("กำลังโหลดรายงาน OT · กำลังคำนวณสรุปจาก Supabase…");
+      closeModal("modal");setLoadingMessage("กำลังโหลดรายงาน OT · กำลังคำนวณสรุปจากระบบ…");
     } else setLoadingMessage("กำลังโหลดรายการ OT เพิ่ม…");
     try{
       const result=validateExecutiveOtResponse(await workApi.readExecutiveOvertimeDashboard({...filters,limit:OT_REPORT_PAGE_SIZE,offset:reset?0:state.offset},{signal:controller.signal}));
@@ -215,13 +215,13 @@ export async function render(root, context) {
       const auth=getAuthContext(),canEdit=(!manager&&(auth.role==='admin'||overtimeGroupsForContext(auth).length>0))||(auth.role==='admin'&&(row.owner_id||row.employee_id)===auth.employee_id);
       const employeeLabel=manager&&row.employee_name?'<p class="small-muted">พนักงาน: '+e(row.employee_name)+' · '+e(row.group_name||'')+'</p>':'';
       return '<article class="card card-pad attendance-section ot-record"><div class="ot-record-heading"><h3>'+e(row.date||"")+'</h3><span class="badge badge-info">'+e(formatDuration(row))+' OT</span></div>'+employeeLabel+'<p class="small-muted">ส่งเมื่อ '+e(thaiDateTime(row.created_at||row.createdAt))+' · '+Number(row.attachment_count||0)+' รูป</p><p class="ot-record-details">'+e(row.details||"")+'</p><button class="button button-small" type="button" data-open-report="'+e(row.id)+'">ดูรายละเอียด</button>'+(canEdit?' <button class="button button-small" type="button" data-edit-report="'+e(row.id)+'">แก้ไข</button>':'')+'</article>';
-    }).join("")||'<p class="empty-state">ยังไม่มีรายการ OT</p>';
+    }).join("")||'<p class="empty-state">'+(context.combinedScreen||context.combinedProduction?'ไม่พบประวัติ OT ในวันที่เลือก':'ยังไม่มีรายการ OT')+'</p>';
     const total=root.querySelector("[data-ot-total]");if(total)total.textContent=`รวม ${Math.floor(historyTotalMinutes/60)} ชั่วโมง ${historyTotalMinutes%60} นาที`;
     const more=root.querySelector("[data-ot-more]");if(more)more.hidden=rows.length>=historyCount;
   };
-  root.innerHTML='<div class="page-heading"><div><p class="eyebrow">Overtime</p><h1>'+(manager?"รายงาน OT":"กรอกข้อมูล OT")+'</h1><p>'+(manager?"ตรวจรายการ OT รายละเอียดงาน และรูปหลักฐานของพนักงาน":"บันทึกงานที่ทำล่วงเวลาเพื่อให้ผู้บริหารตรวจสอบ")+'</p></div><button class="button" data-refresh>รีเฟรช</button></div><p class="notice notice-warning">ข้อมูล OT และรูปแนบจะบันทึกใน Supabase หลังยืนยันสำเร็จ</p>'+
+  root.innerHTML='<div class="page-heading'+(context.combinedScreen||context.combinedProduction?' combined-work-heading':'')+'"><div><p class="eyebrow">OT</p><h1>'+(manager?"รายงาน OT":"กรอกข้อมูล OT")+'</h1><p>'+(manager?"ตรวจรายการ OT รายละเอียดงาน และรูปหลักฐานของพนักงาน":"บันทึกงานที่ทำล่วงเวลาเพื่อให้ผู้บริหารตรวจสอบ")+'</p></div><button class="button" data-refresh>รีเฟรช</button></div><p class="notice notice-warning">ข้อมูล OT และรูปแนบจะบันทึกในระบบหลังยืนยันสำเร็จ</p>'+
   (showForm?'<section class="card form-card ot-form-card"><div class="ot-form-intro"><span class="ot-form-icon" aria-hidden="true">◷</span><div><h2>บันทึก OT</h2><p>กรอกรายละเอียดงาน พร้อมแนบรูปประกอบได้สูงสุด '+MAX_PHOTOS+' รูป</p></div></div><form data-ot-form><div class="form-grid"><label class="field"><span>วันที่ทำ OT</span><div class="ot-date-control"><span>เลือกวันที่</span><input name="date" type="date" value="'+e(bangkokToday())+'" required></div></label><label class="field"><span>ช่วงเวลา OT</span><div class="ot-period-control" data-ot-period-fields><div class="ot-time-control"><div class="ot-time-segment"><span>เริ่ม OT</span><input name="otStart" type="time" required aria-label="เวลาเริ่ม OT"></div><span class="ot-time-separator" aria-hidden="true">ถึง</span><div class="ot-time-segment"><span>จบ OT</span><input name="otEnd" type="time" required aria-label="เวลาจบ OT"></div></div><span class="help-text" data-ot-period-summary aria-live="polite">เลือกเวลาเริ่ม OT ก่อน</span></div><div class="ot-duration-control" data-ot-duration-fields hidden><div class="ot-time-control"><div class="ot-time-segment"><span>ชั่วโมง</span><select name="durationHour" aria-label="ชั่วโมง OT" disabled></select></div><span class="ot-time-separator" aria-hidden="true">:</span><div class="ot-time-segment"><span>นาที</span><select name="durationMinute" aria-label="นาที OT" disabled></select></div></div><span class="help-text">รายการเดิมนี้เก็บเฉพาะระยะเวลา OT</span></div></label><label class="field field-full"><span>รายละเอียดงานที่ทำ</span><textarea name="details" minlength="5" maxlength="1000" required placeholder="ระบุงานที่ทำและผลที่ได้"></textarea><span class="help-text">ช่วยให้ผู้บริหารตรวจสอบงาน OT ได้ชัดเจน</span></label><div class="field field-full"><span class="field-label">รูปหลักฐาน <span class="ot-optional">ไม่บังคับ</span></span><div class="ot-upload-box" data-dropzone><div class="ot-upload-mark" aria-hidden="true">＋</div><div class="ot-upload-copy"><strong>เพิ่มรูปภาพหลักฐาน</strong><span>เลือกได้ครั้งละหลายรูป หรือเพิ่มรูปภายหลังได้</span><small>PNG, JPG หรือ WebP • GIF แบบเคลื่อนไหวยังไม่รองรับ • ระบบบีบอัดรูปใหญ่ให้อัตโนมัติ • สูงสุด 5 รูป • รวมไม่เกิน 2 MB</small></div><label class="button button-small ot-upload-button" for="ot-photo-input">เลือกรูป<input id="ot-photo-input" name="photoInput" class="ot-file-input" type="file" accept="image/png,image/jpeg,image/webp" multiple></label></div><div class="ot-photo-status" data-photo-status aria-live="polite">ยังไม่ได้เลือกรูป</div><div class="ot-photo-grid" data-photo-grid></div></div></div><div class="ot-recorder"><span class="ot-recorder-avatar" aria-hidden="true">'+e((context.user.name||"พ").slice(0,1))+'</span><div><span class="ot-recorder-label">ผู้บันทึก</span><strong>'+e(context.user.name)+'</strong><small>ยืนยันจากบัญชีที่เข้าสู่ระบบ</small></div></div><button class="button button-primary ot-submit" type="submit">ส่งข้อมูล OT</button></form></section>':"")+
-  '<div class="section-title"><h2>'+(manager?'รายการ OT ทั้งหมด':'ประวัติ OT ของฉัน')+'</h2></div><div class="ot-history-filters"><label class="field"><span>เดือนที่ทำ OT</span><input type="month" data-ot-month></label><p class="small-muted">ตัวกรองอ้างอิงวันที่ทำ OT · <span data-ot-total>กำลังโหลดผลรวม</span></p></div><div data-ot-list></div><button class="button" data-ot-more hidden>โหลดเพิ่ม</button><div data-ot-detail-host></div>';
+  '<div class="section-title"><h2>'+(manager?'รายการ OT ทั้งหมด':'ประวัติ OT ของฉัน')+'</h2></div>'+(context.combinedScreen||context.combinedProduction?'<div class="ot-history-filters"><p class="small-muted">รายการ OT ของวันที่ <strong data-ot-day-label>'+e(context.combinedProduction?context.productionHistoryDate:context.screenHistoryDate||bangkokToday())+'</strong> · <span data-ot-total>กำลังโหลดผลรวม</span></p></div>':'<div class="ot-history-filters"><label class="field"><span>เดือนที่ทำ OT</span><input type="month" data-ot-month></label><p class="small-muted">ตัวกรองอ้างอิงวันที่ทำ OT · <span data-ot-total>กำลังโหลดผลรวม</span></p></div>')+'<div data-ot-list></div><button class="button" data-ot-more hidden>โหลดเพิ่ม</button><div data-ot-detail-host></div>';
   const form=root.querySelector("[data-ot-form]");
   const dateInput=form?.elements.date;
   const refreshDateValidity=()=>{
@@ -343,18 +343,18 @@ dateInput?.insertAdjacentHTML("afterend",'<span class="help-text">\u{e1a}\u{e31}
     if(!editing){resetForm();return;}
     const button=event.currentTarget,auth=getAuthContext();if(button.disabled)return;
     button.disabled=true;form.inert=true;
-    const modal=showStatusModal({title:"กำลังตรวจรายการแก้ไขค้าง",message:"กำลังตรวจ Supabase ก่อนปิดแบบฟอร์มแก้ไข",tone:"working",dismissOnEscape:false});
+    const modal=showStatusModal({title:"กำลังตรวจรายการแก้ไขค้าง",message:"กำลังตรวจข้อมูล ก่อนปิดแบบฟอร์มแก้ไข",tone:"working",dismissOnEscape:false});
     try{
       const result=await workApi.abandonOvertimeEdit(auth.employee_id);
       if(context.signal?.aborted||getAuthContext().employee_id!==auth.employee_id){modal.close();return;}
       if(result.state==='none'){resetForm();modal.close();return;}
       if(result.state==='saved'){
         resetForm();const historyLoaded=await load({reset:true});
-        modal.update({title:"พบการแก้ไขที่บันทึกแล้ว",message:historyLoaded?result.superseded?"ระบบตรวจพบการแก้ไขเดิมและมีการแก้ไขภายหลัง กรุณาตรวจข้อมูลล่าสุด":result.cleanupPending?"ระบบตรวจ Audit แล้วและเก็บไฟล์ที่ต้องล้างไว้ตรวจต่อ":"ระบบบันทึกและตรวจ Audit แล้ว":"ยืนยันการแก้ไขเดิมแล้ว แต่โหลดประวัติไม่สำเร็จ กรุณารีเฟรช",tone:historyLoaded?"success":"error",close:()=>modal.close()});return;
+        modal.update({title:"พบการแก้ไขที่บันทึกแล้ว",message:historyLoaded?result.superseded?"ระบบตรวจพบการแก้ไขเดิมและมีการแก้ไขภายหลัง กรุณาตรวจข้อมูลล่าสุด":result.cleanupPending?"ระบบตรวจสอบประวัติ แล้วและเก็บไฟล์ที่ต้องล้างไว้ตรวจต่อ":"ระบบบันทึกและตรวจสอบประวัติ แล้ว":"ยืนยันการแก้ไขเดิมแล้ว แต่โหลดประวัติไม่สำเร็จ กรุณารีเฟรช",tone:historyLoaded?"success":"error",close:()=>modal.close()});return;
       }
       if(!result.cleanupPending)resetForm();const historyLoaded=await load({reset:true});
       modal.update({title:result.cleanupPending?"ยกเลิก request แล้ว แต่ไฟล์ยังต้องจัดการ":"ยกเลิกรายการแก้ไขค้างแล้ว",message:result.cleanupPending?"ระบบเข้าคิวไฟล์ชั่วคราวแล้ว ปุ่มยกเลิกการแก้ไขยังอยู่สำหรับลองล้างอีกครั้ง":historyLoaded?"ยืนยันว่าไม่มีการแก้ไขถูกบันทึกแล้ว สามารถปิดแบบฟอร์มได้":"ยกเลิก request เดิมแล้ว แต่โหลดประวัติไม่สำเร็จ กรุณารีเฟรช",tone:result.cleanupPending||!historyLoaded?"error":"success",close:()=>modal.close()});
-    }catch(error){modal.update({title:"ปิดแบบฟอร์มแก้ไขไม่ได้",message:error.message||"ยังยืนยันกับ Supabase ไม่ได้",tone:"error",close:()=>modal.close(),retry:()=>{modal.close();button.click();}});}
+    }catch(error){modal.update({title:"ปิดแบบฟอร์มแก้ไขไม่ได้",message:error.message||"ยังยืนยันกับระบบ ไม่ได้",tone:"error",close:()=>modal.close(),retry:()=>{modal.close();button.click();}});}
     finally{button.disabled=false;form.inert=false;}
   });
   form?.addEventListener("submit",async event=>{
@@ -388,20 +388,21 @@ dateInput?.insertAdjacentHTML("afterend",'<span class="help-text">\u{e1a}\u{e31}
       modal.update({title:editMode?"กำลังบันทึกการแก้ไข":"กำลังส่งรายงาน OT",message:selectedFiles.length?"กำลังอัปโหลดรูปและบันทึกข้อมูล":"กำลังบันทึกข้อมูล",tone:"working"});
       const payload={date:values.date,duration_minutes:durationMinutes,details:submittedDetails,files:[...selectedFiles],owner_id:auth.employee_id};
       const result=editMode?await workApi.editOvertimeReport({...payload,id:editing.id,expected_version:editing.version,keep_attachments:[...existingFiles]}):await workApi.submitOvertimeRequest({...payload,group_name:values.otGroup});
-      modal.update({title:"กำลังตรวจสอบข้อมูล",message:"กำลังอ่านรายงานกลับจาก Supabase",tone:"working"});
+      modal.update({title:"กำลังตรวจสอบข้อมูล",message:"กำลังอ่านรายงานกลับจากระบบ",tone:"working"});
       resetForm();
       const historyLoaded=await load({reset:true});
-      if(historyLoaded)modal.update({title:editMode?"บันทึกการแก้ไขสำเร็จ":"ส่งรายงาน OT สำเร็จ",message:result?.superseded?"การแก้ไขนี้บันทึกแล้ว และมีการแก้ไขภายหลัง กรุณาตรวจข้อมูลล่าสุด":result?.cleanupPending?"บันทึกและตรวจ Audit แล้ว ไฟล์เดิมที่ถอดออกถูกบันทึกไว้เพื่อจัดการต่อ":"บันทึกและอ่านข้อมูลกลับจาก Supabase แล้ว",tone:"success",close:()=>modal.close()});
+      if(historyLoaded)modal.update({title:editMode?"บันทึกการแก้ไขสำเร็จ":"ส่งรายงาน OT สำเร็จ",message:result?.superseded?"การแก้ไขนี้บันทึกแล้ว และมีการแก้ไขภายหลัง กรุณาตรวจข้อมูลล่าสุด":result?.cleanupPending?"บันทึกและตรวจสอบประวัติ แล้ว ไฟล์เดิมที่ถอดออกถูกบันทึกไว้เพื่อจัดการต่อ":"บันทึกและอ่านข้อมูลกลับจากระบบ แล้ว",tone:"success",close:()=>modal.close()});
       else modal.update({title:"บันทึกรายงานแล้ว",message:"ตรวจรายงานที่บันทึกกลับแล้ว แต่โหลดประวัติไม่สำเร็จ กรุณารีเฟรชประวัติ",tone:"error",close:()=>modal.close()});
     }catch(error){modal.update({title:error.code==="PERMISSION_DENIED"?"ไม่มีสิทธิ์":error.code==="SESSION_EXPIRED"?"Session หมดอายุ":editMode?"บันทึกการแก้ไขไม่สำเร็จ":"ส่งรายงาน OT ไม่สำเร็จ",message:error.message||"ไม่สามารถเชื่อมต่อได้",tone:"error",close:()=>modal.close(),retry:error.code==="EDIT_CONFLICT"?null:()=>{modal.close();form.requestSubmit();}});}
     finally{button.disabled=false;form.inert=false;button.textContent=editing?"บันทึกการแก้ไข":"ส่งข้อมูล OT";}
   });
-  async function load({reset=true}={}){
-    const seq=++loadSequence,employee=getAuthContext().employee_id,refresh=root.querySelector("[data-refresh]"),month=root.querySelector("[data-ot-month]")?.value;
+  async function load({reset=true,quiet=false}={}){
+    const seq=++loadSequence,employee=getAuthContext().employee_id,refresh=root.querySelector("[data-refresh]"),combinedWorkPage=context.combinedScreen||context.combinedProduction,selectedDay=combinedWorkPage?String(context.combinedProduction?context.productionHistoryDate:context.screenHistoryDate||bangkokToday()):"",month=combinedWorkPage?"":root.querySelector("[data-ot-month]")?.value;
     if(refresh)refresh.disabled=true;
-    let modal=null;if(reset&&!isStatusModalOpen())modal=showStatusModal({title:"กำลังโหลดประวัติ OT",message:"กำลังอ่านข้อมูลจาก Supabase",tone:"working"});
+    let modal=null;if(reset&&!quiet&&!isStatusModalOpen())modal=showStatusModal({title:"กำลังโหลดประวัติ OT",message:"กำลังอ่านข้อมูลจากระบบ",tone:"working"});
+    if(reset&&quiet){root.querySelector("[data-ot-list]").innerHTML='<p class="page-loading">กำลังโหลดประวัติ OT…</p>';root.querySelector("[data-ot-total]").textContent="กำลังโหลดผลรวม";}
     try{
-      const from=month?`${month}-01`:"1900-01-01",to=month?new Date(Date.UTC(Number(month.slice(0,4)),Number(month.slice(5,7)),0)).toISOString().slice(0,10):"2999-12-31";
+      const from=selectedDay||(month?month+"-01":"1900-01-01"),to=selectedDay||(month?new Date(Date.UTC(Number(month.slice(0,4)),Number(month.slice(5,7)),0)).toISOString().slice(0,10):"2999-12-31");
       const page=await workApi.listOvertimeRequests({from,to,limit:25,offset:reset?0:historyOffset,scope:manager&&context.user.role==='admin'?'admin':'self'});if(seq!==loadSequence||getAuthContext().employee_id!==employee)return false;
       if(!Array.isArray(page?.items)||page.total_count==null||page.total_duration_minutes==null||!Number.isSafeInteger(Number(page.total_count))||Number(page.total_count)<0||!Number.isSafeInteger(Number(page.total_duration_minutes))||Number(page.total_duration_minutes)<0)throw new Error("ข้อมูลประวัติ OT ที่ได้รับไม่สมบูรณ์");
       const items=page.items;
@@ -410,6 +411,12 @@ dateInput?.insertAdjacentHTML("afterend",'<span class="help-text">\u{e1a}\u{e31}
     finally{if(refresh)refresh.disabled=false;}
   }
   root.querySelector("[data-ot-month]")?.addEventListener("change",()=>{historyOffset=0;void load({reset:true});});
+  const historyEventName=context.combinedScreen?"screen-history-date-change":context.combinedProduction?"production-history-date-change":null;
+  if(historyEventName)root.addEventListener(historyEventName,event=>{
+    const date=String(event.detail?.date||"");if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return;
+    if(context.combinedProduction)context.productionHistoryDate=date;else context.screenHistoryDate=date;const label=root.querySelector("[data-ot-day-label]");if(label)label.textContent=date;
+    historyOffset=0;void load({reset:true,quiet:true});
+  });
   root.querySelector("[data-ot-more]")?.addEventListener("click",()=>void load({reset:false}));
   root.querySelector("[data-ot-list]")?.addEventListener("click",async event=>{
     const editButton=event.target.closest("[data-edit-report]");
@@ -435,14 +442,14 @@ dateInput?.insertAdjacentHTML("afterend",'<span class="help-text">\u{e1a}\u{e31}
   async function recoverPending(){
     if(!form||isStatusModalOpen())return;
     const auth=getAuthContext();if(!auth.authenticated||!auth.active)return;
-    const modal=showStatusModal({title:"กำลังตรวจรายการส่งค้าง",message:"กำลังตรวจรายงานเดิมจาก Supabase",tone:"working",dismissOnEscape:false});
+    const modal=showStatusModal({title:"กำลังตรวจรายการส่งค้าง",message:"กำลังตรวจรายงานเดิมจากระบบ",tone:"working",dismissOnEscape:false});
     form.inert=true;
     try{
       const editResult=await workApi.recoverOvertimeEdit(auth.employee_id);
       if(context.signal?.aborted||getAuthContext().employee_id!==auth.employee_id){modal.close();return;}
       if(editResult.state==='saved'){
         const historyLoaded=await load({reset:true});
-        modal.update({title:"ตรวจพบการแก้ไขเดิมแล้ว",message:!historyLoaded?"ตรวจ Audit แล้ว แต่โหลดประวัติไม่สำเร็จ กรุณารีเฟรช":editResult.superseded?"การแก้ไขเดิมบันทึกแล้ว และมีการแก้ไขภายหลัง กรุณาตรวจข้อมูลล่าสุด":editResult.cleanupPending?"ตรวจ Audit แล้ว ไฟล์เดิมที่ถอดออกถูกบันทึกไว้เพื่อจัดการต่อ":"บันทึกการแก้ไขและตรวจ Audit แล้ว",tone:historyLoaded?"success":"error",close:()=>modal.close()});return;
+        modal.update({title:"ตรวจพบการแก้ไขเดิมแล้ว",message:!historyLoaded?"ตรวจสอบประวัติ แล้ว แต่โหลดประวัติไม่สำเร็จ กรุณารีเฟรช":editResult.superseded?"การแก้ไขเดิมบันทึกแล้ว และมีการแก้ไขภายหลัง กรุณาตรวจข้อมูลล่าสุด":editResult.cleanupPending?"ตรวจสอบประวัติ แล้ว ไฟล์เดิมที่ถอดออกถูกบันทึกไว้เพื่อจัดการต่อ":"บันทึกการแก้ไขและตรวจสอบประวัติ แล้ว",tone:historyLoaded?"success":"error",close:()=>modal.close()});return;
       }
       if(editResult.state==='conflict'){
         modal.update({title:"รายงานถูกแก้ไขแล้ว",message:"รายการแก้ไขค้างใช้ข้อมูลรุ่นเก่า กรุณาเปิดรายละเอียดล่าสุดก่อนแก้ไขใหม่",tone:"error",close:()=>modal.close()});return;
@@ -460,7 +467,7 @@ dateInput?.insertAdjacentHTML("afterend",'<span class="help-text">\u{e1a}\u{e31}
       if(result.state==='saved'){
         form.querySelector('[data-abandon-ot]').hidden=true;
         const historyLoaded=await load({reset:true});
-        modal.update({title:"ตรวจพบรายงานเดิมแล้ว",message:historyLoaded?"รายงานก่อนหน้าบันทึกและตรวจ Audit แล้ว สามารถเริ่มรายการใหม่ได้":"รายงานก่อนหน้าบันทึกและตรวจ Audit แล้ว แต่โหลดประวัติไม่สำเร็จ กรุณารีเฟรชประวัติ",tone:historyLoaded?"success":"error",close:()=>modal.close()});return;
+        modal.update({title:"ตรวจพบรายงานเดิมแล้ว",message:historyLoaded?"รายงานก่อนหน้าบันทึกและตรวจสอบประวัติ แล้ว สามารถเริ่มรายการใหม่ได้":"รายงานก่อนหน้าบันทึกและตรวจสอบประวัติ แล้ว แต่โหลดประวัติไม่สำเร็จ กรุณารีเฟรชประวัติ",tone:historyLoaded?"success":"error",close:()=>modal.close()});return;
       }
       if(form.elements.details.value.trim()||periodStart?.value||periodEnd?.value||selectedFiles.length){
         modal.update({title:"มีรายการส่งค้าง",message:"ยังไม่พบรายงานเดิมในระบบ ข้อมูลที่กำลังกรอกยังอยู่ กรุณาจัดการข้อมูลในฟอร์มก่อนกดตรวจรายการส่งค้างอีกครั้ง",tone:"error",close:()=>modal.close()});return;
@@ -488,11 +495,11 @@ dateInput?.insertAdjacentHTML("afterend",'<span class="help-text">\u{e1a}\u{e31}
       if(context.signal?.aborted||getAuthContext().employee_id!==auth.employee_id){modal.close();return;}
       if(result.state==='saved'){
         resetForm();const historyLoaded=await load({reset:true});
-        modal.update({title:"พบรายงานที่บันทึกแล้ว",message:historyLoaded?"ระบบยืนยันว่า Supabase บันทึกรายงานเดิมแล้ว จึงไม่ได้ยกเลิก":"ยืนยันรายงานเดิมแล้ว แต่โหลดประวัติไม่สำเร็จ กรุณารีเฟรช",tone:historyLoaded?"success":"error",close:()=>modal.close()});return;
+        modal.update({title:"พบรายงานที่บันทึกแล้ว",message:historyLoaded?"ระบบยืนยันว่าบันทึกรายงานเดิมแล้ว จึงไม่ได้ยกเลิก":"ยืนยันรายงานเดิมแล้ว แต่โหลดประวัติไม่สำเร็จ กรุณารีเฟรช",tone:historyLoaded?"success":"error",close:()=>modal.close()});return;
       }
       if(!result.cleanupPending)resetForm();const historyLoaded=await load({reset:true});
       modal.update({title:result.cleanupPending?"ยกเลิก request แล้ว แต่ไฟล์ยังต้องจัดการ":"ยกเลิกรายการส่งค้างแล้ว",message:result.cleanupPending?"ระบบเข้าคิวไฟล์ชั่วคราวแล้ว ปุ่มยกเลิกรายการส่งค้างยังอยู่สำหรับลองล้างอีกครั้ง":historyLoaded?"ยืนยันว่าไม่มีรายงานเดิมและจัดการไฟล์ชั่วคราวแล้ว สามารถเริ่มรายการใหม่ได้":"ยกเลิก request เดิมแล้ว แต่โหลดประวัติไม่สำเร็จ กรุณารีเฟรช",tone:result.cleanupPending||!historyLoaded?"error":"success",close:()=>modal.close()});
-    }catch(error){modal.update({title:"ยกเลิกรายการส่งค้างไม่สำเร็จ",message:error.message||"ยังยืนยันกับ Supabase ไม่ได้",tone:"error",close:()=>modal.close(),retry:()=>{modal.close();button.click();}});}
+    }catch(error){modal.update({title:"ยกเลิกรายการส่งค้างไม่สำเร็จ",message:error.message||"ยังยืนยันกับระบบ ไม่ได้",tone:"error",close:()=>modal.close(),retry:()=>{modal.close();button.click();}});}
     finally{button.disabled=false;form.inert=false;}
   });
   root.querySelector("[data-refresh]").addEventListener("click",load);

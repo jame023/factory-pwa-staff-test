@@ -1,13 +1,13 @@
-import * as api from '../../adapters/package09.js?v=1.3.324';
-import { escapeHtml as e, bangkokToday, thaiDate, thaiDateTime, statusText } from '../../js/utils.js?v=1.3.186';
-import { storedLeaveItems } from '../../js/leave-rules.js?v=1.3.186';
-import { mountApprovedLeaveCalendar } from './approved-calendar.js?v=1.3.186';
-import { canManage } from '../../js/permissions.js?v=1.3.186';
-import { getAuthContext } from '../../js/access-context.js?v=1.3.260';
-import { showStatusModal } from '../../components/status-modal.js?v=1.3.295';
-import { loadingView } from '../../components/loading.js?v=1.3.186';
+import * as api from '../../adapters/package09.js?v=1.3.396';
+import { escapeHtml as e, bangkokToday, thaiDate, thaiDateTime, statusText } from '../../js/utils.js?v=1.3.396';
+import { storedLeaveItems } from '../../js/leave-rules.js?v=1.3.396';
+import { mountApprovedLeaveCalendar } from './approved-calendar.js?v=1.3.396';
+import { canManage } from '../../js/permissions.js?v=1.3.396';
+import { getAuthContext } from '../../js/access-context.js?v=1.3.396';
+import { showStatusModal } from '../../components/status-modal.js?v=1.3.396';
+import { loadingView } from '../../components/loading.js?v=1.3.396';
 import { defaultLeaveReportRange, formatLeaveDays, validateLeaveManagerQueueResponse,
-  validateLeaveManagerReportResponse, validateLeaveReportRange } from '../../js/leave-manager-rules.js?v=1.3.324';
+  validateLeaveManagerReportResponse, validateLeaveReportRange } from '../../js/leave-manager-rules.js?v=1.3.396';
 
 const LEAVE_GROUPS=['ออฟฟิศ','สกรีน','ผลิต','ขนส่ง'];
 const QUEUE_SIZE=25,REPORT_SIZE=25;
@@ -96,7 +96,7 @@ export async function renderLeaveManager(root,context){
         <div data-report-result>${loadingView('เลือกช่วงวันที่แล้วกดแสดงผล')}</div>
       </section>
     </section>
-    <dialog class="admin-record-detail-dialog leave-manager-detail-dialog" data-leave-detail-dialog aria-labelledby="leave-detail-title"><div class="admin-record-detail-header"><h2 id="leave-detail-title">รายละเอียดคำขอลา</h2><button type="button" class="button button-small" data-close-leave-detail>ปิด</button></div><div class="admin-record-detail-content" data-leave-detail-content></div></dialog>`;
+    <dialog class="admin-record-detail-dialog leave-manager-detail-dialog" data-leave-detail-dialog aria-labelledby="leave-detail-title"><div class="admin-record-detail-dialog__body"><header class="admin-record-detail-dialog__header"><h2 id="leave-detail-title">รายละเอียดคำขอลา</h2><button type="button" class="button admin-detail-close-button admin-record-detail-dialog__close" data-close-leave-detail aria-label="ปิดรายละเอียด">×</button></header><p class="screen-detail-source">ข้อมูลคำขอและผลการพิจารณา</p><div class="admin-record-detail-content screen-detail-content" data-leave-detail-content></div></div></dialog>`;
 
   const queueForm=root.querySelector('[data-leave-queue-form]'),reportForm=root.querySelector('[data-leave-report-form]');
   const queueHost=root.querySelector('[data-queue-content]'),queueMeta=root.querySelector('[data-queue-meta]');
@@ -243,6 +243,7 @@ export async function renderLeaveManager(root,context){
     const own=item.employeeId===getAuthContext().employee_id||item.createdBy===getAuthContext().employee_id;
     const reviewScope=auth.role==='admin'||(auth.role==='executive'&&item.group===getAuthContext().main_group);
     const canReview=item.status==='pending'&&!own&&reviewScope;
+    const canCancel=['pending','approved'].includes(item.status)&&!own&&reviewScope;
     const audit=item.audit||null;
     detailHost.innerHTML=`<div class="leave-manager-detail">
       <div class="leave-manager-detail-person"><h3>${e(item.employee||'ไม่ระบุชื่อ')}</h3><p>${employeeCode?`รหัสพนักงาน ${e(employeeCode)} · `:''}${item.employeeId?`รหัสบัญชี ${e(item.employeeId)}`:''}${item.group?` · ${e(item.group)}`:''}</p></div>
@@ -259,9 +260,11 @@ export async function renderLeaveManager(root,context){
       ${audit?`<section class="leave-manager-detail-section"><h4>Audit ล่าสุด</h4><p>${e(audit.action||'มีบันทึกการเปลี่ยนแปลง')} · ผู้ดำเนินการ ${e(audit.actor_employee_id||'—')} · ${e(thaiDateTime(audit.created_at))}</p></section>`:'<p class="small-muted">ไม่พบ Audit ล่าสุดในรายละเอียดที่อ่านได้</p>'}
       ${item.status==='pending'&&own?'<p class="notice notice-warning">ผู้ตรวจเป็นเจ้าของหรือเป็นผู้ยื่นแทนคำขอนี้ จึงยังไม่เปิดให้พิจารณาจนกว่าจะยืนยันนโยบาย</p>':''}
       ${canReview?`<section class="leave-manager-review"><h4>ผลพิจารณา</h4><label class="field"><span>เหตุผลเมื่อไม่อนุมัติ (จำเป็น)</span><textarea data-rejection-reason maxlength="500" placeholder="ระบุเหตุผลให้ผู้ขอลาทราบ"></textarea></label><p class="small-muted">ผลอนุมัติหรือไม่อนุมัติใช้วันและช่วงตามคำขอเดิม ไม่แก้ไขเนื้อหาคำขอ</p><div class="form-actions"><button class="button button-primary" type="button" data-decision="approved">อนุมัติ</button><button class="button button-danger" type="button" data-decision="rejected">ไม่อนุมัติ</button></div></section>`:''}
+      ${canCancel?`<section class="leave-manager-review leave-manager-cancel"><h4>ยกเลิกคำขอลา</h4><label class="field"><span>เหตุผลการยกเลิก (จำเป็น)</span><textarea data-cancellation-reason maxlength="500" placeholder="แจ้งเหตุผลให้พนักงานทราบ"></textarea></label><p class="small-muted">ยกเลิกได้เฉพาะคำขอที่รอตรวจหรืออนุมัติแล้ว การยกเลิกจะบันทึกชื่อผู้ดำเนินการและ Audit</p><div class="form-actions"><button class="button button-danger" type="button" data-cancel-leave>ยกเลิกคำขอ</button></div></section>`:''}
       </div>`;
     detailHost.querySelector('[data-load-leave-proof]')?.addEventListener('click',()=>void loadProof(item.id));
     detailHost.querySelectorAll('[data-decision]').forEach(button=>button.addEventListener('click',()=>void prepareReview(item,button.dataset.decision)));
+    detailHost.querySelector('[data-cancel-leave]')?.addEventListener('click',()=>void prepareCancel(item));
     detailHost.querySelectorAll('[data-proof-retry]').forEach(button=>button.addEventListener('click',()=>void loadProof(item.id)));
     detailHost.querySelectorAll('img[data-leave-image]').forEach(image=>image.addEventListener('error',()=>{
       image.hidden=true;const proof=image.closest('[data-leave-proof]');if(!proof)return;
@@ -370,6 +373,64 @@ export async function renderLeaveManager(root,context){
       detailHost.querySelectorAll('[data-decision]').forEach(button=>button.disabled=false);
       const retry=()=>openDetail(latest.id,{preserveReason:true});
       statusError(error,retry);
+    }
+  }
+  async function prepareCancel(item){
+    if(!alive()||state.statusModal)return;
+    const reasonField=detailHost.querySelector('[data-cancellation-reason]');
+    const reason=String(reasonField?.value||'').trim();
+    if(!reason||reason.length>500){
+      reasonField?.setCustomValidity(reason?'ระบุเหตุผลไม่เกิน 500 ตัวอักษร':'กรุณาระบุเหตุผลการยกเลิก');
+      reasonField?.reportValidity();reasonField?.focus();return;
+    }
+    reasonField?.setCustomValidity('');
+    const current=getAuthContext(),actorId=current.employee_id;
+    if(item.employeeId===actorId||item.createdBy===actorId){statusError(Object.assign(new Error('ยังไม่มีนโยบายอนุญาตให้ผู้ตรวจยกเลิกคำขอของตนเองหรือคำขอที่ยื่นแทน'),{code:'PERMISSION_DENIED'}));return;}
+    if(!(current.role==='admin'||(current.role==='executive'&&item.group===current.main_group))){statusError(Object.assign(new Error('ไม่มีสิทธิ์ยกเลิกคำขอในกลุ่มงานนี้'),{code:'PERMISSION_DENIED'}));return;}
+    if(!['pending','approved'].includes(item.status)){statusError(Object.assign(new Error('ยกเลิกได้เฉพาะคำขอที่รอตรวจหรืออนุมัติแล้ว'),{code:'STATUS_CONFLICT'}));return;}
+    closeStatus();state.statusModal=showStatusModal({title:'กำลังตรวจสอบสถานะล่าสุด',message:'โหลดคำขอและสิทธิ์ปัจจุบันก่อนยืนยัน',tone:'working'});
+    const linked=linkedController(),controller=linked.controller;
+    try{
+      const latest=await api.readLeaveDetail(item.id,{signal:controller.signal});
+      if(controller.signal.aborted||!alive()||state.activeDetail!==item.id)return;
+      if(!['pending','approved'].includes(latest.status))throw Object.assign(new Error('คำขอนี้ดำเนินการแล้วหรือเปลี่ยนสถานะ กรุณาโหลดรายการใหม่'),{code:'STATUS_CONFLICT'});
+      if(latest.employeeId===actorId||latest.createdBy===actorId||!(current.role==='admin'||(current.role==='executive'&&latest.group===current.main_group)))
+        throw Object.assign(new Error('ไม่มีสิทธิ์ยกเลิกคำขอลานี้'),{code:'PERMISSION_DENIED'});
+      const dayList=storedLeaveItems(latest).map(day=>`${dateLabel(day.date)} ${periodLabel(day.period||day.label)}`).join(', ');
+      state.statusModal.update({title:'ยืนยันยกเลิกคำขอลา',message:`ยกเลิกคำขอของ ${latest.employee||'ไม่ระบุชื่อ'}?`,
+        detail:`${latest.type||'ลา'} • ${dateLabel(latest.startDate)} ถึง ${dateLabel(latest.endDate)} • ${formatLeaveDays(latest.totalDays)} วัน • ${dayList}\nเหตุผล: ${reason}`,
+        tone:'info',confirmLabel:'ยืนยันยกเลิกคำขอ',confirm:()=>{void commitCancel(latest,reason);},close:closeStatus});
+    }catch(error){
+      if(!controller.signal.aborted&&alive())statusError(error,()=>openDetail(item.id));
+    }finally{linked.cleanup();}
+  }
+  async function commitCancel(latest,reason){
+    if(!alive()||state.statusModal===null)return;
+    const current=getAuthContext(),attemptKey=latest.id+':cancel',attempt=state.reviewAttempts.get(attemptKey)||{};
+    const recoveryKey=`factory-pwa-leave-cancel-v1:${encodeURIComponent(current.employee_id)}:${latest.id}`;
+    if(!attempt.id){try{const saved=JSON.parse(sessionStorage.getItem(recoveryKey)||'null');if(saved?.id)attempt.id=saved.id;}catch{}}
+    attempt.id||=crypto.randomUUID();
+    try{sessionStorage.setItem(recoveryKey,JSON.stringify({id:attempt.id}));}catch{}
+    state.reviewAttempts.set(attemptKey,attempt);
+    const modal=state.statusModal;modal.update({title:'กำลังยกเลิกคำขอลา',message:'บันทึกสถานะและตรวจสอบ Audit',tone:'working'});
+    detailHost.querySelectorAll('[data-decision],[data-cancel-leave]').forEach(button=>button.disabled=true);
+    try{
+      const result=await api.mutateLeaveRequest('cancel',{id:latest.id,reason,updatedAt:latest.updatedAt,attempt,
+        onProgress:message=>{if(alive()&&state.statusModal===modal)modal.update({title:'กำลังยกเลิกคำขอลา',message,tone:'working'});}});
+      if(!alive()||state.statusModal!==modal)return;
+      const saved=result?.saved;
+      if(!saved||saved.status!=='cancelled'||saved.cancellationReason!==reason||!saved.updatedAt||
+          saved.audit?.actor_employee_id!==current.employee_id||!saved.audit?.id)
+        throw Object.assign(new Error('อ่านสถานะ ผู้ดำเนินการ หรือ Audit กลับมาไม่ครบ กรุณาตรวจสอบคำขอก่อนทำซ้ำ'),{code:'INCOMPLETE_WRITE'});
+      try{sessionStorage.removeItem(recoveryKey);}catch{}
+      state.statusModal.update({title:'ยกเลิกคำขอสำเร็จ',message:`${latest.employee||'พนักงาน'} • ${dateLabel(latest.startDate)} – ${dateLabel(latest.endDate)} • ${formatLeaveDays(latest.totalDays)} วัน`,
+        detail:`ผู้ดำเนินการ ${current.employee_id} • ${thaiDateTime(saved.updatedAt)} • Audit ${saved.audit.id}`,tone:'success',close:closeStatus});
+      drawDetail(saved,state.detailEmployeeCode);void loadQueue({reset:true});if(state.reportLoaded)void loadReport({reset:true});root._refreshLeaveCalendar?.();
+    }catch(error){
+      if(!alive()||state.statusModal!==modal)return;
+      if(attempt.id===null||error?.code==='OPERATION_ABORTED')try{sessionStorage.removeItem(recoveryKey);}catch{}
+      detailHost.querySelectorAll('[data-decision],[data-cancel-leave]').forEach(button=>button.disabled=false);
+      statusError(error,()=>openDetail(latest.id));
     }
   }
 

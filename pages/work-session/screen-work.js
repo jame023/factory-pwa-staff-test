@@ -1,7 +1,7 @@
-import * as screenApi from "../../adapters/package07.js?v=1.3.264";
-import { bangkokToday, escapeHtml, thaiDate, thaiDateTime } from "../../js/utils.js?v=1.3.264";
-import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.295";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.186";
+import * as screenApi from "../../adapters/package07.js?v=1.3.396";
+import { bangkokToday, escapeHtml, thaiDate, thaiDateTime } from "../../js/utils.js?v=1.3.396";
+import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.396";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.396";
 
 const intValue = value => Number.isInteger(Number(value)) && Number(value) >= 0 ? Number(value) : 0;
 const businessDateOf = value => {
@@ -78,7 +78,7 @@ export async function renderScreenWorkPanel(root, context, { active, sessions, c
       <div class="field"><label>เครื่องจักร</label><input value="${escapeHtml(active?.machine || 'เลือกเมื่อเริ่มงาน')}" readonly></div>
       <div class="field"><label>สถานะและเวลาเริ่ม</label><input value="${escapeHtml(active ? `กำลังทำงาน · ${thaiDateTime(active.startedAt)}` : 'ยังไม่ได้เริ่มงาน')}" readonly></div>
     </div></section>
-    <section class="card card-pad" style="margin-top:.8rem"><div class="section-title"><div><h2>รายละเอียดรายการ</h2><p>จำนวนแพ็คหมายถึงแพ็คดีที่ได้ · ของเสียเป็นจำนวนขวดต่อทั้งงาน</p></div></div>
+    <section id="screen-work-details" class="card card-pad screen-work-details" style="margin-top:.8rem"><div class="section-title"><div><h2>บันทึกงานสกรีน</h2><p>กรอกจำนวนแพ็คดีแยกตามรายการ และของเสียแยกตามประเภท</p></div></div>
       ${active?.itemNameId ? `<form id="screen-work-form" data-version="${escapeHtml(activeData?.version || 0)}" data-dirty="false" data-zero-output="${activeData && !activeData.items.length ? 'true' : 'false'}"><div id="screen-work-items">${itemsHTML(items, options)}</div>
         <p data-zero-output-note class="notice notice-info" ${items.length ? 'hidden' : ''}>ไม่มีแพ็คดีในงานนี้ คุณยังระบุของเสียและหมายเหตุแล้วบันทึกเพื่อจบงานได้</p>
         <div class="form-actions"><button class="button" type="button" id="add-screen-item">เพิ่มรายการ</button><button class="button" type="button" id="screen-no-good-packs">${activeData?.items?.length ? 'แทนที่รายการเป็นงานไม่มีแพ็คดี' : 'งานนี้ไม่มีแพ็คดี'}</button></div>
@@ -90,7 +90,7 @@ export async function renderScreenWorkPanel(root, context, { active, sessions, c
         <div class="form-grid"><div class="field"><label>ยอดร่างที่ยังไม่บันทึก</label><input data-draft-total readonly value="${items.reduce((n, item) => n + intValue(item.packCount), 0)} แพ็คดี"></div>
           <div class="field"><label>ของเสียในร่าง</label><input data-draft-defects readonly value="${activeData?.screen_defect_bottles || 0} + ${activeData?.production_defect_bottles || 0} ขวด (แยกประเภท)"></div></div>
         <div class="form-actions"><button class="button button-primary" type="submit">บันทึกรายละเอียด</button></div>
-      </form>` : active ? '<p class="empty-state">session สกรีนเดิมนี้ไม่มีรหัสรายการที่จำเป็นสำหรับรายละเอียดหลายรายการ จึงเพิ่มรายละเอียดไม่ได้ แต่ยังจบงานด้วยแบบฟอร์มเดิมได้</p>' : '<p class="empty-state">เริ่มงานสกรีนก่อน แล้วจึงเพิ่มและบันทึกรายละเอียดใน session เดิม</p>'}
+      </form>` : active ? '<p class="empty-state">งานสกรีนนี้ไม่มีรายการชื่อผูกไว้ตอนเริ่มงาน จึงยังกรอกรายละเอียดไม่ได้ ให้จบงานนี้ก่อน แล้วเริ่มงานใหม่โดยเลือกรายการชื่อก่อนกดเริ่มงาน</p>' : '<p class="empty-state">ยังไม่มีงานที่เริ่มอยู่ เลือกเครื่องจักรและรายการชื่อในแบบฟอร์มเริ่มงานด้านบน แล้วกด “เริ่มงาน” ช่องกรอกจะปรากฏในการ์ดนี้</p>'}
     </section>
     <section class="card card-pad" style="margin-top:.8rem"><h2>สรุปรายวันจากข้อมูลที่บันทึกแล้ว</h2>
       <div class="field"><label for="screen-report-date">วันที่ไทยเริ่มงาน</label><input id="screen-report-date" type="date" value="${escapeHtml(reportDate)}"></div>
@@ -142,7 +142,7 @@ export async function renderScreenWorkPanel(root, context, { active, sessions, c
     form.querySelector('[data-draft-defects]').value = `${intValue(form.elements.screenDefectBottles.value)} + ${intValue(form.elements.productionDefectBottles.value)} ขวด (แยกประเภท)`;
   };
   if(recoverDraft){
-    form.insertAdjacentHTML('beforebegin','<p class="notice notice-danger">ข้อมูลที่บันทึกใน Supabase เปลี่ยนจากอีกหน้าต่างแล้ว ระบบโหลด version ล่าสุดและเก็บข้อมูลเดิมที่กำลังกรอกเป็นร่างแยก กรุณาเทียบกับรายการที่บันทึกก่อนส่งใหม่</p>');
+    form.insertAdjacentHTML('beforebegin','<p class="notice notice-danger">ข้อมูลที่บันทึกในระบบ เปลี่ยนจากอีกหน้าต่างแล้ว ระบบโหลด ข้อมูลล่าสุดและเก็บข้อมูลเดิมที่กำลังกรอกเป็นร่างแยก กรุณาเทียบกับรายการที่บันทึกก่อนส่งใหม่</p>');
     form.dataset.version=String(activeData?.version||0);
     form.dataset.dirty='true';
     form.dataset.zeroOutput=recoverDraft.zeroOutput?'true':'false';

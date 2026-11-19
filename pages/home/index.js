@@ -1,19 +1,21 @@
-import * as attendanceApi from "../../adapters/package10.js?v=1.3.250";
-import * as workApi from "../../adapters/package07.js?v=1.3.186";
-import * as leaveApi from "../../adapters/package09.js?v=1.3.186";
-import { appCard, statCard } from "../../components/app-card.js?v=1.3.340";
-import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.186";
-import { APP_MODE } from "../../js/config.js?v=1.3.186";
-import { canAccessModule, isProductionEmployee, isScreenEmployee } from "../../js/permissions.js?v=1.3.186";
+import * as attendanceApi from "../../adapters/package10.js?v=1.3.396";
+import * as workApi from "../../adapters/package07.js?v=1.3.396";
+import * as leaveApi from "../../adapters/package09.js?v=1.3.396";
+import { appCard, statCard } from "../../components/app-card.js?v=1.3.396";
+import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.396";
+import { APP_MODE } from "../../js/config.js?v=1.3.396";
+import { canAccessModule } from "../../js/permissions.js?v=1.3.396";
 
 const employeeModules = [
   { route:"attendance", icon:"🪪", title:"ข้อมูลของฉัน", hint:"ดูเวลาเข้าออกและสถานะ" },
   { route:"leave", icon:"📝", title:"ขอลา", hint:"ส่งคำขอและติดตามสถานะ" },
   { route:"calendar", icon:"📅", title:"ปฏิทินงาน", hint:"ดูวันที่ทำงานตามกลุ่ม" },
   { route:"delivery", icon:"🚚", title:"บันทึกการขนส่ง", hint:"เลือกสินค้าและบันทึกจำนวน" },
-  { route:"production", icon:"🖨️", title:"งานสกรีน", hint:"เริ่มงาน–จบงาน และบันทึกยอดสกรีนในหน้าเดียว" },
-  { route:"production-record", icon:"🏭", title:"งานผลิต", hint:"เริ่มงาน–จบงาน และบันทึกยอดผลิตในหน้าเดียว" }
-  ,{ route:"ot", icon:"⏱️", title:"กรอกข้อมูล OT", hint:"บันทึกงานล่วงเวลา พร้อมรายละเอียดและรูปหลักฐาน" }
+  { route:"screen/work-menu", module:"production", icon:"🖨️", title:"งานสกรีน", hint:"เริ่ม–จบงาน บันทึกยอดสกรีน และ OT" },
+  { route:"production/work-session", module:"production-work", icon:"🏭", title:"งานผลิต", hint:"เริ่ม–จบงาน กรอกยอดผลิต และบันทึก OT" },
+  { route:"ot", icon:"⏱️", title:"กรอกข้อมูล OT", hint:"บันทึกงานล่วงเวลา พร้อมรายละเอียดและรูปหลักฐาน" },
+  { route:"reports", icon:"📊", title:"รายงานสรุป", hint:"ดูสรุปการทำงานทุกหมวดของพนักงาน" },
+  { route:"ot-report", icon:"⏱️", title:"รายงาน OT", hint:"ดูรายงาน OT ของพนักงานทุกคน" }
 ];
 const executiveModules = [
   { route:"reports-menu", icon:"📊", title:"เมนูรายงาน", hint:"รวมข้อมูลแยกตามหมวดและรายงานทั้งหมด" },
@@ -50,7 +52,7 @@ export async function render(root, { user, signal, workspace }) {
     executive:"ดูข้อมูลที่พนักงานบันทึก แยกตามหมวด พร้อมจัดการลาและปฏิทิน",
     admin:"ใช้งานได้ทั้งหน้าพนักงานและผู้บริหาร พร้อมแก้ไขข้อมูลทุกหมวด" }[role];
   const modules = role === "employee" ? employeeModules : role === "executive" ? executiveModules : adminModules;
-  const visible = modules.filter(item => canAccessModule(user, item.route)).map(item => ({
+  const visible = modules.filter(item => canAccessModule(user, item.module || item.route)).map(item => ({
     ...item, route:role === "admin" ? item.route : role + "/" + item.route
   }));
   root.innerHTML =
@@ -60,10 +62,10 @@ export async function render(root, { user, signal, workspace }) {
       statCard("เวลาเข้าของฉัน", attendance.checkIn || "—", attendance.checkOut ? "ออก " + attendance.checkOut : "วันนี้") +
       (canAccessModule(user, "work-session") ? statCard("งานที่กำลังทำ", String(work.filter(item => !item.endedAt).length), active ? active.machine : "ยังไม่มีงาน") : "") +
       statCard("คำขอลารออนุมัติ", String(pending), "รายการตามสิทธิ์บัญชี") +
-    '</div>' : '') + (user.role === "admin" && role !== "admin" ? '<p><a class="button" href="#/home">กลับหน้า Admin</a></p>' : '') +
+    '</div>' : '') +
     '<div class="section-title"><div><h2>' + (role === "employee" ? "กรอกข้อมูล" : role === "executive" ? "ข้อมูลแยกตามหมวด" : "เลือกหน้าที่ต้องการใช้งาน") + '</h2></div></div>' +
     '<div class="module-grid">' + visible.map(appCard).join("") + "</div>" +
-    '<p class="small-muted" style="margin-top:1rem">ข้อมูลหน้าหลักอ่านจาก Supabase ตามสิทธิ์ของบัญชี</p>';
+    '<p class="small-muted" style="margin-top:1rem">ข้อมูลหน้าหลักแสดงตามสิทธิ์ของบัญชี</p>';
 }
 
 

@@ -1,7 +1,11 @@
-# Factory SIP PWA — Staff Test Staging
+# Factory SIP PWA
 
-A separate staging copy of the Factory SIP PWA for staff testing. This repository and site are not Production and are separate from the existing GitHub Pages preview.
+แอปโรงงานที่ใช้งานผ่าน https://jame023.github.io/factory-pwa-staff-test/ เชื่อม Factory SIP Main และเข้าสู่ระบบผ่าน LINE
 
-Access is controlled by the existing LINE authentication flow and current Supabase employee state/RLS. Do not put credentials or Service Role keys in this repository.
+ซอร์สที่ราก repository ต้องตรงกับไฟล์ใน `factory-pwa-staff-test-bundle.zip` ซึ่ง workflow ใช้เผยแพร่ GitHub Pages ทุกครั้ง เลขรุ่นแอปอยู่ใน `js/config.js` และต้องตรงกับ import URLs กับ cache ใน `sw.js`
 
-This candidate adds the Pass 6.1 Admin operational-records page at `/admin/records`. Other business modules remain intentionally unavailable under the current scope. Do not treat this staging site as a completed business-data integration.
+ครอบคลุมพื้นที่สกรีน ผลิต ขนส่ง ออฟฟิศ ผู้บริหาร และ Admin ระบบตรวจสิทธิ์จากบัญชีและฐานข้อมูล การแสดงพื้นที่ในหน้าเว็บไม่เพิ่มสิทธิ์ให้บัญชี
+
+Admin เปิดสถานะเครื่องอ่านบัตร รายงานอัตโนมัติ และคิวแจ้งเตือนได้ที่ `#/admin/system-status` ข้อมูลสถานะไม่มีรหัสลับของเครื่องอ่านหรือข้อมูลสมัครแจ้งเตือน
+
+เก็บ credentials และ service-role keys ไว้นอกซอร์สโค้ด รายงานผลการตรวจและข้อจำกัดของแต่ละรุ่นอยู่ในบันทึกการเผยแพร่ ต้องแยกผลทดสอบจำลองออกจากบัญชีจริงและการรับแจ้งเตือนบนอุปกรณ์

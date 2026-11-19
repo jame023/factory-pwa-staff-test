@@ -1,14 +1,14 @@
-import { startCalendarNotifications } from "./notifications.js?v=1.3.340";
-import { authProvider, clearSupabaseSession, checkSupabaseSession } from "./auth.js?v=1.3.265";
-import { renderAppHeader } from "../components/app-header.js?v=1.3.287";
-import { renderLoginScreen } from "../components/login-screen.js?v=1.3.333";
-import { renderBottomNav } from "../components/bottom-nav.js?v=1.3.340";
-import { currentRoute, startRouter, refreshRoute } from "./router.js?v=1.3.340";
-import { subscribeStore } from './state.js?v=1.3.186';
-import { showToast } from "../components/toast.js?v=1.3.186";
-import { registerServiceWorker, setOfflineNotice, watchConnection } from "./offline.js?v=1.3.330";
-import { APP_MODE } from "./config.js?v=1.3.340";
-import { installActionFeedback, showActionPopup } from "../components/action-popup.js?v=1.3.186";
+import { startCalendarNotifications } from "./notifications.js?v=1.3.396";
+import { authProvider, clearSupabaseSession, checkSupabaseSession } from "./auth.js?v=1.3.396";
+import { renderAppHeader } from "../components/app-header.js?v=1.3.396";
+import { renderLoginScreen } from "../components/login-screen.js?v=1.3.396";
+import { renderBottomNav } from "../components/bottom-nav.js?v=1.3.396";
+import { currentRoute, startRouter, refreshRoute } from "./router.js?v=1.3.396";
+import { subscribeStore } from './state.js?v=1.3.396';
+import { showToast } from "../components/toast.js?v=1.3.396";
+import { registerServiceWorker, setOfflineNotice, watchConnection } from "./offline.js?v=1.3.396";
+import { APP_MODE } from "./config.js?v=1.3.396";
+import { installActionFeedback, showActionPopup } from "../components/action-popup.js?v=1.3.396";
 // Preserve the machine-only OAuth code before the mock app/router can replace the URL.
 const machineOAuthCode = new URLSearchParams(location.search).get('code');
 if (APP_MODE !== 'supabase-line' && machineOAuthCode && /^#\/admin\/(machines|item-names)(?:$|\?)/.test(location.hash)) {
@@ -23,7 +23,6 @@ const headerRoot = document.getElementById("header-root");
 const navRoot = document.getElementById("nav-root");
 const pageRoot = document.getElementById("page-root");
 const loadingRoot = document.getElementById("page-loading");
-
 function renderChrome(route = currentRoute()) {
   headerRoot.innerHTML = renderAppHeader(session.user);
   navRoot.innerHTML = renderBottomNav(route);
@@ -131,7 +130,7 @@ function watchRealSession() {
 async function mountApp() {
   if (session?.applicant) {
     headerRoot.replaceChildren(); navRoot.replaceChildren(); loadingRoot.hidden=true;
-    const {mountRegistration}=await import('../pages/registration/index.js?v=1.3.333');
+    const {mountRegistration}=await import('../pages/registration/index.js?v=1.3.396');
     await mountRegistration(pageRoot,{logout:signOut});
     setTimeout(()=>void endRealSession('Session หมดอายุ กรุณายืนยัน LINE ใหม่'),Math.max(0,Date.parse(session.session_expiry)-Date.now()));
     window.addEventListener('storage',event=>{if(event.key==='factory-pwa-session-signed-out'&&event.newValue==='1')location.reload();});
@@ -176,10 +175,12 @@ async function start() {
 if(APP_MODE==='supabase-line') {
   installActionFeedback();
   setOfflineNotice(message=>showToast(message,'error'));watchConnection();
-  const {startSessionApp}=await import('./session-app.js?v=1.3.333');
+const {startSessionApp}=await import('./session-app.js?v=1.3.396');
   startSessionApp();
   void registerServiceWorker();
 } else {start();}
+
+
 
 
 

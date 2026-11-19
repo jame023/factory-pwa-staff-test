@@ -1,9 +1,11 @@
-import { watchChanges, mockLiveEnabled } from '../../js/live-updates.js?v=1.3.186';
-import * as calendarApi from "../../adapters/package08.js?v=1.3.186";
-import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.186";
-import { canManage } from "../../js/permissions.js?v=1.3.186";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.186";
-import { confirmAction } from "../../components/modal.js?v=1.3.186";
+import { watchChanges, mockLiveEnabled } from '../../js/live-updates.js?v=1.3.396';
+import * as calendarApi from "../../adapters/package08.js?v=1.3.396";
+import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.396";
+import { canManage } from "../../js/permissions.js?v=1.3.396";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.396";
+import { confirmAction } from "../../components/modal.js?v=1.3.396";
+import { APP_MODE } from "../../js/config.js?v=1.3.396";
+import { summarizeCalendarChanges } from "../../js/notification-client.js?v=1.3.396";
 
 const statuses = ["เต็มวัน","ครึ่งวัน","หยุด"];
 const dayTone = status => ({"เต็มวัน":"full","ครึ่งวัน":"half","หยุด":"holiday"})[status] || "";
@@ -23,15 +25,26 @@ export async function render(root,context) {
     const first = new Date(month + "-01T00:00:00Z");
     const end = new Date(first); end.setUTCMonth(end.getUTCMonth()+1,0);
     const count = end.getUTCDate();
+    const approvedByDate = new Map();
+    for (const leave of data.approvedLeaves || []) {
+      if (!leave?.date || !leave?.employee) continue;
+      const rows = approvedByDate.get(leave.date) || [];
+      rows.push(leave);
+      approvedByDate.set(leave.date, rows);
+    }
     const cells = Array.from({length:first.getUTCDay()},()=>'<div aria-hidden="true"></div>').join("") + Array.from({length:count},(_,i)=>{
       const date = dateFor(i+1);
       const draft = drafts.get(key({group,date}));
       const status = draft?.status || data.entries.find(row=>row.date===date && row.group===group)?.status || "เต็มวัน";
+      const leaves = approvedByDate.get(date) || [];
       const chosen = selected.has(date);
-      return '<button type="button" class="calendar-cell work-calendar-day calendar-status-' + dayTone(status) + (chosen ? ' is-selected' : '') + (date === bangkokToday() ? ' is-today' : '') + '" data-date="' + date + '" aria-pressed="' + chosen + '" aria-label="' + escapeHtml(thaiDate(date)+" "+status+(chosen ? " เลือกแล้ว" : "")+(draft ? " รอบันทึก" : "")) + '"><strong>' + (i+1) + '</strong><span class="calendar-status-label">' + status + '</span>' + (chosen ? '<span class="calendar-selection-label">✓ เลือกแล้ว</span>' : '') + (draft ? '<span class="small-muted">รอบันทึก</span>' : '') + '</button>';
+      return '<button type="button" class="calendar-cell work-calendar-day calendar-status-' + dayTone(status) + (chosen ? ' is-selected' : '') + (date === bangkokToday() ? ' is-today' : '') + '" data-date="' + date + '" aria-pressed="' + chosen + '" aria-label="' + escapeHtml(thaiDate(date)+" "+status+(leaves.length ? ` มีผู้ลาอนุมัติ ${leaves.length} คน` : "")+(chosen ? " เลือกแล้ว" : "")+(draft ? " รอบันทึก" : "")) + '"><strong>' + (i+1) + '</strong><span class="calendar-status-label">' + status + '</span>' + (leaves.length ? '<span class="calendar-leave-count">ลาอนุมัติ '+leaves.length+'</span>' : '') + (chosen ? '<span class="calendar-selection-label">✓ เลือกแล้ว</span>' : '') + (draft ? '<span class="small-muted">รอบันทึก</span>' : '') + '</button>';
     }).join("");
-    root.innerHTML = '<div class="page-heading"><div><p class="eyebrow">Work Calendar</p><h1>' + (manage ? 'ตั้งปฏิทินการทำงาน' : 'ปฏิทินงาน') + '</h1><p>' + escapeHtml(group) + (manage ? ' • เลือกหลายวันและบันทึกแยกตามกลุ่มงาน' : ' • วันทำงานตามกลุ่มสิทธิ์ของคุณ') + '</p></div></div><section class="card card-pad"><div class="field"><label for="calendarMonth">เลือกเดือน</label><input id="calendarMonth" type="month" value="' + month + '"></div><div class="chip-row attendance-section">' + data.groups.map(value=>'<button type="button" class="chip" data-group="'+escapeHtml(value)+'" aria-pressed="'+(group===value)+'">'+escapeHtml(value)+'</button>').join("") + '</div><div class="calendar-legend attendance-section" aria-label="คำอธิบายสีปฏิทิน"><span class="calendar-legend-item calendar-status-full">เต็มวัน</span><span class="calendar-legend-item calendar-status-half">ครึ่งวัน</span><span class="calendar-legend-item calendar-status-holiday">หยุด</span></div><div class="calendar-grid attendance-section work-calendar-grid">' + ["อา","จ","อ","พ","พฤ","ศ","ส"].map(day=>'<span class="small-muted">'+day+'</span>').join("") + cells + '</div>' +
+    const leaveList = (data.approvedLeaves || []).filter(row=>row?.date?.startsWith(month) && row?.employee)
+      .slice().sort((a,b)=>a.date.localeCompare(b.date)||String(a.employee).localeCompare(String(b.employee),"th"));
+    root.innerHTML = '<div class="page-heading"><div><p class="eyebrow">ปฏิทินงาน</p><h1>' + (manage ? 'ตั้งปฏิทินการทำงาน' : 'ปฏิทินงาน') + '</h1><p>' + escapeHtml(group) + (manage ? ' • เลือกหลายวันและบันทึกแยกตามกลุ่มงาน' : ' • วันทำงานตามกลุ่มสิทธิ์ของคุณ') + '</p></div></div><section class="card card-pad"><div class="field"><label for="calendarMonth">เลือกเดือน</label><input id="calendarMonth" type="month" value="' + month + '"></div><div class="chip-row attendance-section">' + data.groups.map(value=>'<button type="button" class="chip" data-group="'+escapeHtml(value)+'" aria-pressed="'+(group===value)+'">'+escapeHtml(value)+'</button>').join("") + '</div><div class="calendar-legend attendance-section" aria-label="คำอธิบายสีปฏิทิน"><span class="calendar-legend-item calendar-status-full">เต็มวัน</span><span class="calendar-legend-item calendar-status-half">ครึ่งวัน</span><span class="calendar-legend-item calendar-status-holiday">หยุด</span></div><div class="calendar-grid attendance-section work-calendar-grid">' + ["อา","จ","อ","พ","พฤ","ศ","ส"].map(day=>'<span class="small-muted">'+day+'</span>').join("") + cells + '</div>' +
       (manage ? '<div class="form-actions"><button class="button" data-select-all>เลือกทั้งเดือน</button><button class="button" data-clear-selection>ล้างวันที่เลือก</button></div><p role="status">เลือก ' + selected.size + ' วัน • ' + escapeHtml(group) + '</p><form data-stage><div class="field"><label for="dayStatus">ประเภทวัน (เริ่มต้นเต็มวัน)</label><select id="dayStatus">' + statuses.map(value=>'<option'+(type===value ? ' selected' : '')+'>'+value+'</option>').join("") + '</select></div><div class="form-actions"><button type="submit" data-live-disabled class="button button-primary"'+(!selected.size ? ' disabled' : '')+'>เพิ่มวันที่เลือกในรายการรอบันทึก</button></div><p class="help-text">การเพิ่มรายการยังไม่บันทึกข้อมูล เลือกชุดวันอื่นเพิ่มได้ก่อนบันทึกกลุ่มนี้ รายการของแต่ละกลุ่มเก็บแยกกัน</p></form>' : '<p class="help-text">วันที่ยังไม่ได้กำหนดใช้ค่าเริ่มต้นเต็มวัน</p>') + '</section>' +
+      '<section class="card card-pad attendance-section approved-leave-calendar"><h2>วันลาที่อนุมัติแล้ว • ทุกกลุ่ม ('+leaveList.length+' รายการ)</h2>' + (leaveList.length ? '<div class="list">'+leaveList.map(row=>'<div class="list-row"><div class="list-main"><strong>'+escapeHtml(thaiDate(row.date))+' • '+escapeHtml(row.employee)+'</strong><div class="list-meta">'+escapeHtml(row.group||'')+' • '+escapeHtml(row.period||'เต็มวัน')+'</div></div></div>').join('')+'</div>' : '<p class="empty-state">ไม่มีรายการลาที่ได้รับอนุมัติในเดือนนี้</p>') + '<p class="help-text">แสดงเฉพาะชื่อพนักงาน กลุ่มงาน วันที่ และช่วงเวลาที่อนุมัติ</p></section>' +
       (manage ? '<section class="card card-pad attendance-section"><h2>รายการรอบันทึก • '+escapeHtml(group)+' ('+groupDrafts.length+' วัน)</h2>' + (groupDrafts.length ? '<div class="list">' + groupDrafts.sort((a,b)=>a.date.localeCompare(b.date)||a.group.localeCompare(b.group,"th")).map(row=>'<div class="list-row"><div class="list-main"><strong>'+escapeHtml(thaiDate(row.date))+'</strong><div class="list-meta">'+escapeHtml(row.group)+' • <span class="calendar-legend-item calendar-status-'+dayTone(row.status)+'">'+row.status+'</span>'+'</div></div><button class="button button-small" data-remove="'+escapeHtml(key(row))+'" aria-label="นำ '+escapeHtml(thaiDate(row.date)+" "+row.group)+' ออกจากรายการ">นำออก</button></div>').join("")+'</div>' : '<p class="empty-state">เลือกวันและเพิ่มรายการด้านบนก่อนบันทึก</p>') + '<div class="form-actions"><button class="button button-primary" data-save'+(!groupDrafts.length ? ' disabled' : '')+'>บันทึกกลุ่มนี้ครั้งเดียว</button><button class="button" data-clear-drafts'+(!groupDrafts.length ? ' disabled' : '')+'>ล้างรายการกลุ่มนี้</button></div><p class="help-text">รายการรอบันทึกเก็บไว้ในหน้านี้จนกว่าจะกดบันทึก • บันทึกเฉพาะกลุ่มที่เลือก กลุ่มอื่นยังไม่ถูกบันทึก • รายการรอบันทึกยังไม่ถูกส่ง และจะหายเมื่อออกจากหน้านี้หรือรีเฟรช • ออฟไลน์ไม่บันทึกและไม่ส่งอัตโนมัติ</p></section>' : '');
     root.querySelectorAll("button,input,select").forEach(el=>{if(busy) el.disabled=true;});
     root.querySelectorAll("[data-date]").forEach(button=>button.addEventListener("click",()=>{
@@ -63,9 +76,21 @@ export async function render(root,context) {
       try {
         const confirmed=await confirmAction({title:"ยืนยันบันทึกปฏิทินกลุ่มนี้",message:group+" • "+entries.length+" วัน",confirmLabel:"บันทึกกลุ่มนี้"});
         if(!confirmed || context.signal?.aborted)return;
-        await calendarApi.saveCalendarDays(entries);
-        entries.forEach(row=>drafts.delete(key(row)));selected.clear();type="เต็มวัน";
-        context.showToast("บันทึกปฏิทินของกลุ่ม "+group+" ลง Supabase แล้ว","success");
+        const result=await calendarApi.saveCalendarDays(entries);
+        const saved=Array.isArray(result)?result.map((record,index)=>({entry:entries[index],record})):result?.saved||[];
+        const failed=Array.isArray(result)?[]:(result?.failed||[]);
+        saved.forEach(item=>drafts.delete(key(item.entry)));
+        selected.clear();type="เต็มวัน";
+        let summaryFailed=false;
+        if(APP_MODE==="supabase-line"&&saved.length){
+          try {
+            const ids=saved.map(item=>item.record?.id).filter(Boolean);
+            if(ids.length!==saved.length)throw new Error("ตรวจรหัสรายการปฏิทินไม่ครบ");
+            await summarizeCalendarChanges(ids);
+          } catch {summaryFailed=true;context.showToast("บันทึกปฏิทินแล้ว แต่ส่งสรุปให้ผู้บริหาร/Admin ไม่สำเร็จ","error");}
+        }
+        if(failed.length)context.showToast("บันทึกสำเร็จ "+saved.length+" วัน • ยังไม่สำเร็จ "+failed.length+" วัน รายการที่เหลือยังอยู่ในรอบันทึก","error");
+        else if(!summaryFailed)context.showToast("บันทึกปฏิทินของกลุ่ม "+group+" แล้ว และส่งสรุปให้ผู้บริหาร/Admin","success");
         try { await read(); } catch { context.showToast("บันทึกแล้ว แต่โหลดปฏิทินล่าสุดไม่สำเร็จ กรุณาเปิดหน้าใหม่","error"); }
       } catch(error){context.showToast(error.message||"บันทึกไม่สำเร็จ รายการยังอยู่ในรอบันทึก","error");}
       finally{busy=false;draw();}

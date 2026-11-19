@@ -1,6 +1,6 @@
-import * as workApi from "../../adapters/package07.js?v=1.3.267";
-import { bangkokToday, escapeHtml, thaiDate, thaiDateTime } from "../../js/utils.js?v=1.3.186";
-import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.295";
+import * as workApi from "../../adapters/package07.js?v=1.3.396";
+import { bangkokToday, escapeHtml, thaiDate, thaiDateTime } from "../../js/utils.js?v=1.3.396";
+import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.396";
 
 const moneyless = value => new Intl.NumberFormat("th-TH").format(Number(value || 0));
 const versionOf = row => Number(row?.version || 0);
@@ -27,7 +27,7 @@ export async function renderProductionWorkPanel(root, context, { active = null, 
   const saved = activeRows.items?.find(row => row.work_session_id === active?.id) || null;
   const readError = loadError ? '<div class="notice notice-error" role="alert">' + escapeHtml(loadError) + ' <button type="button" class="button" data-production-retry>ลองใหม่</button></div>' : '';
   root.innerHTML =
-    '<section class="card card-pad production-work-panel"><div class="section-title"><div><p class="eyebrow">PASS 5.3</p><h2>ข้อมูลการผลิต</h2><p>บันทึกจำนวนครั้งเดียว ระบบใช้ยอดเดียวกันตอนจบงาน</p></div></div>' +
+    '<section class="card card-pad production-work-panel"><div class="section-title"><div><p class="eyebrow">ข้อมูลการผลิต</p><h2>ข้อมูลการผลิต</h2><p>บันทึกยอดผลิตและของเสียแยกจากหน้าเริ่มและจบงาน</p></div></div>' +
     readError +
     (active ? '<div class="form-grid"><label class="field">วันที่ของงาน<input type="date" readonly value="' + escapeHtml(saved?.work_date || today) + '"></label>' +
       '<label class="field">ผู้บันทึก<input readonly value="' + escapeHtml(context.user.name) + '"></label>' +
@@ -42,7 +42,7 @@ export async function renderProductionWorkPanel(root, context, { active = null, 
         '<p class="help-text">จำนวนดีคำนวณอัตโนมัติ = จำนวนผลิต − ของเสีย · หน่วย “ใบ” · ของเสียต้องไม่เกินจำนวนผลิต</p>' +
         '<div class="form-actions"><button class="button button-primary" type="submit" ' + (loadError ? 'disabled' : '') + '>' + (saved ? 'บันทึกการแก้ไข' : 'บันทึกข้อมูลผลิต') + '</button></div></form>' +
       (!saved ? '<p class="notice notice-warning">บันทึกข้อมูลผลิตก่อนจบงาน จำนวนตอนจบจะใช้ยอดผลิตชุดนี้โดยอัตโนมัติ</p>' : '')
-      : '<p class="notice notice-info">เริ่มงานผลิตเพื่อบันทึกรายละเอียดใน session เดิม</p>') +
+      : '<p class="notice notice-info">เริ่มงานผลิตจากเมนู “เริ่มงาน–จบงานผลิต” ก่อน แล้วกลับมาบันทึกข้อมูลของ session เดิม</p><a class="button button-secondary" href="#/employee/production/work-session">ไปหน้าเริ่มงาน–จบงานผลิต</a>') +
     '<div class="section-title"><div><h3>สรุปวันนี้ · ' + escapeHtml(thaiDate(today)) + '</h3><p>เฉพาะรายละเอียดที่บันทึกแล้ว ทั้งงานกำลังทำและงานจบแล้ว; ไม่นับร่างหรือฟอร์มผลิตครั้งเดียวเก่า</p></div></div>' +
     '<div class="grid grid-3 attendance-section"><div class="card card-pad"><span>ยอดผลิต</span><strong>' + moneyless(daily?.total_quantity) + ' ใบ</strong></div><div class="card card-pad"><span>ของเสีย</span><strong>' + moneyless(daily?.total_defective) + ' ใบ</strong></div><div class="card card-pad"><span>จำนวนดี</span><strong>' + moneyless(daily?.total_good) + ' ใบ</strong></div></div>' +
     '<div class="section-title"><div><h3>ประวัติงานผลิต</h3><p>เรียงวันที่และเวลาเริ่มงานล่าสุดก่อน · หน้า ' + (Math.floor(offset/pageSize)+1) + ' / ' + Math.max(1, Math.ceil(Number(history?.total_count || 0) / pageSize)) + '</p></div></div>' +
@@ -55,7 +55,7 @@ export async function renderProductionWorkPanel(root, context, { active = null, 
       '<details><summary>ดูรายละเอียดงาน</summary><dl class="work-manager-fields"><div><dt>ผู้บันทึก</dt><dd>' + escapeHtml(row.employee || "—") + '</dd></div><div><dt>วันที่ธุรกิจ</dt><dd>' + escapeHtml(thaiDate(row.work_date)) + '</dd></div><div><dt>รหัสงาน</dt><dd>' + escapeHtml(row.work_session_id) + '</dd></div><div><dt>รหัสรายละเอียด</dt><dd>' + escapeHtml(row.id) + '</dd></div></dl></details></div><span class="badge ' + (row.ended_at ? 'badge-success' : 'badge-info') + '">' + (row.ended_at ? 'จบแล้ว' : 'กำลังทำงาน') + '</span></article>'
     ).join("") : '<div class="empty-state">ยังไม่มีรายละเอียดผลิตที่บันทึกในวันนี้</div>') + '</div></section>' +
     '<div class="form-actions"><button class="button" type="button" data-production-history-refresh>โหลดใหม่</button>' + (offset>0?'<button class="button" type="button" data-production-history-prev>หน้าก่อน</button>':'') + (offset+pageSize<Number(history?.total_count||0)?'<button class="button" type="button" data-production-history-next>หน้าถัดไป</button>':'') + '</div>' +
-    '<p class="notice notice-warning">แบบฟอร์มผลิตครั้งเดียวเดิมยังเก็บแยกในส่วน “แบบฟอร์มเดิม” ด้านล่าง และไม่รวมในยอดของงานผลิตแบบ session</p></section>';
+    '<p class="notice notice-info">ข้อมูลการผลิตนี้ผูกกับรอบงานผลิตที่เริ่มไว้ เพื่อใช้ตรวจจำนวนผลิตตอนจบงาน</p></section>';
 
   root.querySelector('[data-production-retry]')?.addEventListener('click', () => renderProductionWorkPanel(root, context, { active, onRefresh }));
   root.querySelector('[data-production-history-refresh]')?.addEventListener('click', () => renderProductionWorkPanel(root, context, { active, onRefresh }));
@@ -87,7 +87,7 @@ export async function renderProductionWorkPanel(root, context, { active = null, 
     try {
       await workApi.saveProductionWork({ workSessionId: active.id, requestId, expectedVersion: versionOf(saved), quantity, defective, note: values.note });
       if (context.signal?.aborted) { modal.close(); return; }
-      modal.update({ title: 'บันทึกสำเร็จ', message: 'ข้อมูลผลิตถูกบันทึกและอ่านกลับจาก Supabase แล้ว', tone: 'success' });
+      modal.update({ title: 'บันทึกสำเร็จ', message: 'บันทึกข้อมูลผลิตและตรวจสอบรายการเรียบร้อยแล้ว', tone: 'success' });
       form.dataset.dirty = 'false';
       setTimeout(() => { modal.close(); onRefresh(); }, 650);
     } catch (error) {

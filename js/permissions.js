@@ -18,12 +18,12 @@ export function canAccessModule(user, module) {
   if (["admin-employees", "admin-groups"].includes(module)) return true;
   if (user.role !== "employee") return true;
   const groups = Array.isArray(user.groups) ? user.groups.map(normalizeGroup) : [];
-  if (groups.includes("ออฟฟิต")) return ["home", "attendance", "leave", "calendar"].includes(module);
+  if (groups.includes("ออฟฟิต")) return ["home", "attendance", "leave", "calendar", "reports", "ot-report", "notifications"].includes(module);
   if (module === "work-session") return !groups.includes("ขนส่ง") && groups.some(group => ["ผลิต", "สกรีน"].includes(group));
   if (module === "delivery") return groups.includes("ขนส่ง");
   if (module === "delivery-home") return groups.includes("ขนส่ง");
   if (module === "production") return Array.isArray(user.groups) && user.groups.includes("สกรีน");
-  if (module === "production-record") return isProductionEmployee(user);
+  if (["production-record", "production-work", "production-data"].includes(module)) return isProductionEmployee(user);
   return true;
 }
 
@@ -36,14 +36,15 @@ export function calendarGroupsForUser(user, availableGroups) {
 }
 
 const workspaceModules = {
-  employee: ["attendance", "work-session", "leave", "calendar", "delivery", "production", "production-record", "ot"],
-  executive: ["attendance", "work-session", "leave", "calendar", "delivery", "production", "production-record", "reports", "ot", "reports-menu"]
+  employee: ["attendance", "work-session", "leave", "calendar", "delivery", "production", "production-record", "production-work", "production-data", "ot", "reports", "ot-report", "notifications"],
+  executive: ["attendance", "work-session", "leave", "calendar", "delivery", "production", "production-record", "reports", "ot", "reports-menu", "notifications"]
 };
 export function resolveWorkspaceRoute(path, role) {
   if (!["employee", "executive", "admin"].includes(role)) return { allowed:false };
   const ownWorkspace = role === "admin" ? "employee" : role;
   const parts = path.split("/");
   if (path === "home" || path === "") return { allowed:true, module:"home", workspace:role, canonical:"home" };
+  if (path === "production/work-session") return { allowed:["employee", "admin"].includes(role), module:"production-work", workspace:"employee", canonical:path };
   if (path === "admin") return { allowed:role === "admin", module:"admin", workspace:"admin", canonical:path };
     if (path === "admin/records" || ["admin/records/employees","admin/records/attendance","admin/records/leave","admin/records/calendar",
       "admin/records/work-sessions","admin/records/production","admin/records/deliveries","admin/records/screen","admin/records/ot","admin/records/audit"].includes(path))
@@ -71,9 +72,10 @@ export function assertMockPermission(role, key) {
     "package07.work.end", "package09.leave.submit", "package07.ot.submit"];
   if (entryActions.includes(key) && !canEnterData(normalized)) throw new Error("หน้านี้สำหรับดูข้อมูลเท่านั้น");
   if (["package08.calendar.save", "package08.calendar.batch.save", "package09.leave.review", "package06.reports.read",
-    "package03.attendance.read", "package03.attendance.dashboard", "package01.devices.read"].includes(key) && !canManage(normalized)) {
+    "package03.attendance.read", "package03.attendance.dashboard", "package01.devices.read"].includes(key) && !(normalized === "employee" && key === "package06.reports.read") && !canManage(normalized)) {
     throw new Error("เฉพาะผู้บริหารหรือ Admin เท่านั้น");
   }
-  if(key.startsWith("package06.reports.") && key!=="package06.reports.notifications.read" && !canManage(normalized))throw new Error("เฉพาะผู้บริหารหรือ Admin เท่านั้น");
+  if(key.startsWith("package06.reports.") && key!=="package06.reports.notifications.read" && key!=="package06.reports.read" && !canManage(normalized))throw new Error("เฉพาะผู้บริหารหรือ Admin เท่านั้น");
+  
   if (key.startsWith("package11.") && !canEditAll(normalized)) throw new Error("เฉพาะ Admin เท่านั้น");
 }

@@ -1,5 +1,5 @@
-import { attendanceCalculation } from "./business-rules.js?v=1.3.186";
-import { bangkokToday } from "./utils.js?v=1.3.186";
+import { attendanceCalculation } from "./business-rules.js?v=1.3.396";
+import { bangkokToday } from "./utils.js?v=1.3.396";
 
 // Synthetic development data only. Real names and calculated totals must come
 // from an authenticated, read-only backend joining the existing Sheet sources.

@@ -1,6 +1,6 @@
-import * as reportApi from "../../adapters/package06.js?v=1.3.186";
-import { statCard } from "../../components/app-card.js?v=1.3.340";
-import { escapeHtml } from "../../js/utils.js?v=1.3.186";
+import * as reportApi from "../../adapters/package06.js?v=1.3.396";
+import { statCard } from "../../components/app-card.js?v=1.3.396";
+import { escapeHtml } from "../../js/utils.js?v=1.3.396";
 
 const periods = [
   { key: "today", label: "วันนี้" },
@@ -14,7 +14,7 @@ export async function render(root, context) {
     const data = await reportApi.readReport(period);
     const current = periods.find(item => item.key === period);
     root.innerHTML =
-      '<div class="page-heading"><div><p class="eyebrow">Reports</p><h1>รายงาน</h1><p>สรุปจากข้อมูลใน Supabase</p></div></div>' +
+      '<div class="page-heading"><div><p class="eyebrow">รายงานการทำงาน</p><h1>รายงาน</h1><p>สรุปข้อมูลการทำงานของพนักงาน</p></div></div>' +
       '<div class="chip-row">' + periods.map(item =>
         '<button class="chip" type="button" data-period="' + item.key + '" aria-pressed="' + (period === item.key) + '">' +
         item.label + "</button>").join("") + "</div>" +
@@ -28,7 +28,7 @@ export async function render(root, context) {
         statCard("Production", Number(data.production).toLocaleString("th-TH"), "ชิ้น") +
         statCard("การขนส่ง", data.delivery, "รายการ") +
       '</div><section class="card card-pad" style="margin-top:.8rem"><p class="eyebrow">ผู้บันทึกยอดผลิตสูงสุดในช่วงนี้</p><h2>' +
-      escapeHtml(data.outstanding || "—") + '</h2><p class="small-muted">นับจากยอดผลิตที่บันทึกใน Supabase ไม่ใช่การประเมินผลงาน</p></section>';
+      escapeHtml(data.outstanding || "—") + '</h2><p class="small-muted">นับจากยอดผลิตที่บันทึก ไม่ใช่การประเมินผลงาน</p></section>';
     root.querySelectorAll("[data-period]").forEach(button => button.addEventListener("click", async () => {
       period = button.dataset.period;
       await draw();

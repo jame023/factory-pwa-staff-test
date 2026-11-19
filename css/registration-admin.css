@@ -71,3 +71,10 @@
  .registration-pagination{padding:16px 18px;flex-wrap:wrap}.registration-pagination>div{margin-left:auto}.registration-pagination .button{padding:8px 12px}
  .registration-admin .registration-table tr{gap:16px}.registration-admin .registration-table td .button{padding:9px 12px}
 }
+/* Shared detail presentation: registration detail uses the same centered, scrollable surface. */
+.registration-review-backdrop{background:rgba(12,39,47,.62);backdrop-filter:blur(2px);padding:1rem}
+.registration-review-card{width:min(760px,100%);max-height:min(90vh,840px);max-height:min(90dvh,840px);padding:clamp(1rem,3vw,1.5rem);border:1px solid #d7e5ed;border-radius:1rem;box-shadow:0 24px 80px rgba(0,0,0,.22)}
+.registration-review-card .section-title{position:sticky;top:-1.5rem;z-index:2;padding:.2rem 0 1rem;background:#fff;border-bottom:1px solid #d7e5ed}
+.registration-review-card dl.work-manager-fields>div{padding:.72rem .8rem;border:1px solid #dbe5e3;border-radius:.75rem;background:#f7faf9}
+.registration-review-card dl.work-manager-fields dd{margin:.25rem 0 0;font-weight:700}
+@media(max-width:640px){.registration-review-backdrop{padding:.5rem}.registration-review-card{max-height:92dvh}}
