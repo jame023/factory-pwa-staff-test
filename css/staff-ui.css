@@ -10,51 +10,7 @@
   color: #183e50;
   background: var(--sip-canvas);
 }
-.sip-ui .app-header {
-  box-sizing: border-box;
-  width: calc(100% - 16px);
-  margin: 8px 8px 0;
-  color: #f7fafc;
-  background: #0d1d2a;
-  border: 2px solid #08b9ce;
-  border-radius: 10px;
-  box-shadow: 0 4px 14px #00111e24;
-}
-.sip-ui .app-header .header-inner {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: none;
-  min-height: 50px;
-  margin: 0;
-  padding: 4px 10px;
-  gap: 10px;
-}
-.sip-ui .app-header .brand { gap: 8px; }
-.sip-ui .app-header .brand-mark { width: 54px; height: 34px; border-radius: 7px; }
-.sip-ui .app-header .brand-title { color: #f7fafc; font-size: .78rem; line-height: 1.2; }
-.sip-ui .app-header .header-tools { flex-wrap: nowrap; gap: 5px; }
-.sip-ui .app-header .header-tools .button {
-  min-height: 29px;
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-size: .7rem;
-  line-height: 1.15;
-}
-.sip-ui .app-header .workspace-switch {
-  min-height: 29px;
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-size: .7rem;
-}
-.sip-ui .app-header .mode-pill,
-.sip-ui .app-header .header-tools .badge { padding: .22rem .48rem; font-size: .66rem; }
-.sip-ui .app-header .header-tools .button.notification-inbox-bell {
-  width: 31px;
-  min-width: 31px !important;
-  height: 29px;
-  min-height: 29px !important;
-  padding: 3px !important;
-}
+.sip-ui .app-header { background: #12364a; border-bottom: 3px solid #1893a2; }
 .sip-ui .app-header .brand-mark { background: white; border-radius: 8px; }
 .sip-ui .main-shell:has(.login-screen) #pwa-install-root { max-width: 36rem; }
 .sip-ui .pwa-install-card { padding: 18px; border: 1px solid var(--sip-rule); border-radius: 12px; box-shadow: none; background: white; }
@@ -333,20 +289,4 @@
  .sip-ui #page-root nav.form-actions:has([data-screen-jump], [data-production-jump], [data-delivery-jump]){position:sticky;top:var(--sip-header-height,72px);z-index:8;display:flex;flex-wrap:nowrap;overflow-x:auto;gap:8px;padding:10px 0;background:var(--sip-canvas);}
  .sip-ui #page-root nav.form-actions :is([data-screen-jump],[data-production-jump],[data-delivery-jump]){flex:none;white-space:nowrap;}
  .sip-ui #page-root :is([data-screen-section],[data-production-section],[data-delivery-section]){scroll-margin-top:calc(var(--sip-header-height,72px) + 90px);}
-}
-
-@media (max-width: 700px) {
-  .sip-ui .app-header {
-    width: calc(100% - 12px);
-    margin: 6px 6px 0;
-  }
-  .sip-ui .app-header .header-inner { flex-wrap: wrap; gap: 5px 8px; }
-  .sip-ui .app-header .brand { flex: 0 0 auto; }
-  .sip-ui .app-header .header-tools {
-    flex: 1 1 220px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 4px;
-  }
-  .sip-ui .app-header .workspace-switch { flex-basis: auto; }
 }

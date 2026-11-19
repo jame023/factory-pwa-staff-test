@@ -1,6 +1,6 @@
-import { getLiveAdminContext } from '../../js/live-admin-context.js?v=1.3.400';
-import { escapeHtml, thaiDateTime } from '../../js/utils.js?v=1.3.400';
-import { APP_VERSION } from '../../js/config.js?v=1.3.400';
+import { getLiveAdminContext } from '../../js/live-admin-context.js?v=1.3.399';
+import { escapeHtml, thaiDateTime } from '../../js/utils.js?v=1.3.399';
+import { APP_VERSION } from '../../js/config.js?v=1.3.399';
 
 const stamp = value => value ? thaiDateTime(value) : 'ยังไม่มีข้อมูล';
 const number = value => Number.isSafeInteger(value) && value >= 0 ? String(value) : 'ยังตรวจสอบไม่ได้';
