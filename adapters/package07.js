@@ -1,5 +1,5 @@
-import { request } from "../js/api.js?v=1.3.396";
-import { withRequestId } from "../js/business-request.js?v=1.3.396";
+import { request } from "../js/api.js?v=1.3.397";
+import { withRequestId } from "../js/business-request.js?v=1.3.397";
 export const listWorkSessions = (options = {}) => request("package07", "work.read", {}, options);
 export const listAdminWorkSessions = filters => request("package07", "work.admin.history", filters || {});
 export const readAdminWorkSessionDetail = (id, sourceCategory = "workSessions") =>

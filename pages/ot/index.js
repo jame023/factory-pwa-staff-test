@@ -1,13 +1,13 @@
-import * as workApi from "../../adapters/package07.js?v=1.3.396";
-import { overtimeGroupsForContext } from "../../js/ot-service.js?v=1.3.396";
-import { escapeHtml as e, bangkokToday, thaiDateTime } from "../../js/utils.js?v=1.3.396";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.396";
-import { isOvertimeDateAllowed, previousBangkokDate } from "../../js/ot-date-rules.js?v=1.3.396";
-import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.396";
-import { getAuthContext } from "../../js/access-context.js?v=1.3.396";
-import { formatReportedDuration, OT_REPORT_PAGE_SIZE, validateExecutiveOtResponse, validateOtReportRange } from "../../js/executive-ot-report-rules.js?v=1.3.396";
-import { loadingView } from "../../components/loading.js?v=1.3.396";
-import { openDetailDialog } from "../../components/detail-dialog.js?v=1.3.396";
+import * as workApi from "../../adapters/package07.js?v=1.3.397";
+import { overtimeGroupsForContext } from "../../js/ot-service.js?v=1.3.397";
+import { escapeHtml as e, bangkokToday, thaiDateTime } from "../../js/utils.js?v=1.3.397";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.397";
+import { isOvertimeDateAllowed, previousBangkokDate } from "../../js/ot-date-rules.js?v=1.3.397";
+import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.397";
+import { getAuthContext } from "../../js/access-context.js?v=1.3.397";
+import { formatReportedDuration, OT_REPORT_PAGE_SIZE, validateExecutiveOtResponse, validateOtReportRange } from "../../js/executive-ot-report-rules.js?v=1.3.397";
+import { loadingView } from "../../components/loading.js?v=1.3.397";
+import { openDetailDialog } from "../../components/detail-dialog.js?v=1.3.397";
 
 const MAX_PHOTOS=5, MAX_FILE_BYTES=512*1024, MAX_TOTAL_BYTES=2*1024*1024, MAX_SOURCE_BYTES=20*1024*1024;
 const formatDuration=row=>{

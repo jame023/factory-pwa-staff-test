@@ -1,4 +1,4 @@
-import { hideActionPopup, showActionPopup } from "./action-popup.js?v=1.3.396";
+import { hideActionPopup, showActionPopup } from "./action-popup.js?v=1.3.397";
 
 export function showToast(message, tone = "info") {
   hideActionPopup();

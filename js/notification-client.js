@@ -1,10 +1,10 @@
-import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from './config.js?v=1.3.396';
-import { getSupabaseLineAccessToken } from './auth.js?v=1.3.396';
-import { decodeVapidKey } from './report-push-subscription.js?v=1.3.396';
+import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from './config.js?v=1.3.397';
+import { getSupabaseLineAccessToken } from './auth.js?v=1.3.397';
+import { decodeVapidKey } from './report-push-subscription.js?v=1.3.397';
 
 const FUNCTION_URL = SUPABASE_URL.replace(/\/+$/, '') + '/functions/v1/factory-notifications';
 
-async function request(path, init = {}) {
+async function request(path, init = {}, returnResponse = false) {
   const token = getSupabaseLineAccessToken();
   if (!token) throw new Error('SESSION_EXPIRED');
   const response = await fetch(SUPABASE_URL.replace(/\/+$/, '') + path, {
@@ -29,7 +29,18 @@ async function request(path, init = {}) {
     if (response.status === 404) throw new Error('ยังไม่ได้ติดตั้งระบบแจ้งเตือนบน Supabase');
     throw new Error('เชื่อมต่อระบบแจ้งเตือนไม่สำเร็จ');
   }
-  return data;
+  return returnResponse ? response : data;
+}
+
+export async function readUnreadNotificationCount() {
+  const params = new URLSearchParams({ select: 'id', read_at: 'is.null' });
+  const response = await request('/rest/v1/factory_notification_inbox?' + params, {
+    method: 'HEAD', headers: { Prefer: 'count=exact', Range: '0-0' }
+  }, true);
+  const match = /\/(\d+)$/.exec(response.headers.get('content-range') || '');
+  const count = match ? Number(match[1]) : NaN;
+  if (!Number.isSafeInteger(count) || count < 0) throw new Error('ตรวจจำนวนแจ้งเตือนไม่สำเร็จ');
+  return count;
 }
 
 export async function readNotificationInbox(options = 100) {
@@ -61,6 +72,7 @@ export async function markNotificationRead(id) {
     body: JSON.stringify({ read_at: new Date().toISOString() })
   });
   if (!Array.isArray(rows) || rows.length !== 1) throw new Error('ไม่พบรายการแจ้งเตือน');
+  globalThis.dispatchEvent?.(new Event('factory-notification-inbox-changed'));
   return rows[0];
 }
 

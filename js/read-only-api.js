@@ -1,5 +1,5 @@
-import { APP_MODE, API_BASE_URL } from "./config.js?v=1.3.396";
-import { normalizeAttendanceQuery } from "./attendance-contract.js?v=1.3.396";
+import { APP_MODE, API_BASE_URL } from "./config.js?v=1.3.397";
+import { normalizeAttendanceQuery } from "./attendance-contract.js?v=1.3.397";
 
 const messages = {
   UNAUTHENTICATED: "เซสชันหมดอายุ กรุณาเปิดแอปใหม่", FORBIDDEN: "บัญชีนี้ไม่มีสิทธิ์อ่านข้อมูลนี้",

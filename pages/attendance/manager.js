@@ -1,9 +1,9 @@
-import { subscribeStore } from "../../js/state.js?v=1.3.396";
-import { APP_MODE } from "../../js/config.js?v=1.3.396";
-import { readAttendanceDashboard } from "../../adapters/package03.js?v=1.3.396";
-import { showStatusModal } from "../../components/status-modal.js?v=1.3.396";
-import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.396";
-import { formatMinuteDuration, normalizeExecutiveAttendanceRows, summarizeExecutiveAttendance, validateAttendanceRange } from "../../js/executive-attendance-rules.js?v=1.3.396";
+import { subscribeStore } from "../../js/state.js?v=1.3.397";
+import { APP_MODE } from "../../js/config.js?v=1.3.397";
+import { readAttendanceDashboard } from "../../adapters/package03.js?v=1.3.397";
+import { showStatusModal } from "../../components/status-modal.js?v=1.3.397";
+import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.397";
+import { formatMinuteDuration, normalizeExecutiveAttendanceRows, summarizeExecutiveAttendance, validateAttendanceRange } from "../../js/executive-attendance-rules.js?v=1.3.397";
 
 const esc = value => escapeHtml(value == null ? "" : String(value));
 const groupsText = groups => Array.isArray(groups) && groups.length ? groups.join(", ") : "—";

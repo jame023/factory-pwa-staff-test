@@ -1,7 +1,7 @@
-import { request } from "../js/api.js?v=1.3.396";
-import { APP_MODE } from "../js/config.js?v=1.3.396";
-import { authProvider } from "../js/auth.js?v=1.3.396";
-import { normalizeAttendanceQuery } from "../js/attendance-contract.js?v=1.3.396";
+import { request } from "../js/api.js?v=1.3.397";
+import { APP_MODE } from "../js/config.js?v=1.3.397";
+import { authProvider } from "../js/auth.js?v=1.3.397";
+import { normalizeAttendanceQuery } from "../js/attendance-contract.js?v=1.3.397";
 export const readMyAttendance = (query = {}, options = {}) =>
   request("package10", APP_MODE === "mock" || APP_MODE === "development" ? "attendance.read" : "profile.attendance.read", normalizeAttendanceQuery(query), options);
 export const readMyProfile = async (options = {}) => {

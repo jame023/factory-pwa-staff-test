@@ -1,5 +1,5 @@
 export const APP_NAME = "ระบบโรงงาน SIP";
-export const APP_VERSION = "1.3.396";
+export const APP_VERSION = "1.3.397";
 export const APP_MODE = "supabase-line"; // mock | development | supabase-line | production
 
 export const MOCK_SESSION_ROLE = "employee"; // fixed by the local preview process; never selected from browser storage or URL

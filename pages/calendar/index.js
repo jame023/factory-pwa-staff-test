@@ -1,11 +1,11 @@
-import { watchChanges, mockLiveEnabled } from '../../js/live-updates.js?v=1.3.396';
-import * as calendarApi from "../../adapters/package08.js?v=1.3.396";
-import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.396";
-import { canManage } from "../../js/permissions.js?v=1.3.396";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.396";
-import { confirmAction } from "../../components/modal.js?v=1.3.396";
-import { APP_MODE } from "../../js/config.js?v=1.3.396";
-import { summarizeCalendarChanges } from "../../js/notification-client.js?v=1.3.396";
+import { watchChanges, mockLiveEnabled } from '../../js/live-updates.js?v=1.3.397';
+import * as calendarApi from "../../adapters/package08.js?v=1.3.397";
+import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.397";
+import { canManage } from "../../js/permissions.js?v=1.3.397";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.397";
+import { confirmAction } from "../../components/modal.js?v=1.3.397";
+import { APP_MODE } from "../../js/config.js?v=1.3.397";
+import { summarizeCalendarChanges } from "../../js/notification-client.js?v=1.3.397";
 
 const statuses = ["เต็มวัน","ครึ่งวัน","หยุด"];
 const dayTone = status => ({"เต็มวัน":"full","ครึ่งวัน":"half","หยุด":"holiday"})[status] || "";

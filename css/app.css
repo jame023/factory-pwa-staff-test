@@ -158,6 +158,13 @@
 .calendar-notification-panel { margin: 0 0 1rem; border-left: 4px solid var(--teal); }
 .calendar-notification-panel[hidden] { display: none; }
 .notification-header-link { white-space: nowrap; }
+.header-tools .notification-inbox-bell,.sip-ui .header-tools .button.notification-inbox-bell{position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:8px;flex-shrink:0}
+.notification-bell-symbol{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center}
+.notification-bell-symbol svg{display:block;width:24px;height:24px}
+.notification-inbox-count{position:absolute;top:2px;right:1px;min-width:18px;height:18px;padding:0 4px;border:2px solid #fff;border-radius:999px;color:#fff;background:#c92a31;font:700 10px/14px system-ui,sans-serif;text-align:center;pointer-events:none}
+.notification-inbox-count[hidden]{display:none}
+.notification-inbox-bell[data-count-error="true"] .notification-inbox-count{background:#986000}
+.notification-inbox-bell:focus-visible{outline:3px solid #f2c56f;outline-offset:3px}
 .notification-header-toggle { display:inline-flex; align-items:center; gap:.42rem; white-space:nowrap; }
 .notification-header-toggle[data-enabled="true"],.sip-ui .header-tools .notification-header-toggle[data-enabled="true"] { color:#146c43; background:#ecfdf3; border-color:#a7d8b5; }
 .notification-header-toggle[data-enabled="false"],.sip-ui .header-tools .notification-header-toggle[data-enabled="false"] { color:#b42318; background:#fff1f0; border-color:#f1b3b0; }
