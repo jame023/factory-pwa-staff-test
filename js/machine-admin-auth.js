@@ -1,7 +1,7 @@
-import { verifySession, revokeSession } from './session-manager.js?v=1.3.401';
-import { authProvider, getSupabaseLineAccessToken } from './auth.js?v=1.3.401';
-import { APP_MODE, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_LINE_PROVIDER } from './config.js?v=1.3.401';
-import { startPkceOAuth, completePkceOAuth } from './pkce-oauth.js?v=1.3.401';
+import { verifySession, revokeSession } from './session-manager.js?v=1.3.402';
+import { authProvider, getSupabaseLineAccessToken } from './auth.js?v=1.3.402';
+import { APP_MODE, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_LINE_PROVIDER } from './config.js?v=1.3.402';
+import { startPkceOAuth, completePkceOAuth } from './pkce-oauth.js?v=1.3.402';
 
 const SESSION_KEY = 'factory-pwa-machine-supabase-session-v1';
 

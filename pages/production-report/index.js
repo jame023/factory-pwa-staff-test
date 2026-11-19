@@ -1,8 +1,8 @@
-import { createProductionReportService } from '../../js/production-report-service.js?v=1.3.401';
-import * as workApi from '../../adapters/package07.js?v=1.3.401';
-import { getAuthContext } from '../../js/access-context.js?v=1.3.401';
-import { requireOnlineAction } from '../../js/offline.js?v=1.3.401';
-import { escapeHtml as e, thaiDateTime } from '../../js/utils.js?v=1.3.401';
+import { createProductionReportService } from '../../js/production-report-service.js?v=1.3.402';
+import * as workApi from '../../adapters/package07.js?v=1.3.402';
+import { getAuthContext } from '../../js/access-context.js?v=1.3.402';
+import { requireOnlineAction } from '../../js/offline.js?v=1.3.402';
+import { escapeHtml as e, thaiDateTime } from '../../js/utils.js?v=1.3.402';
 
 const MAX_UPLOAD=512*1024, MAX_SOURCE=20*1024*1024;
 const TYPES=new Set(['image/jpeg','image/png','image/webp']);
@@ -37,9 +37,9 @@ function reportCard(row){
 
 export async function render(root,context){
   const auth=getAuthContext();
-  const manager=auth?.role==='executive';
+  const manager=['executive','admin'].includes(auth?.role);
   const canSubmit=auth?.role==='employee'&&Array.isArray(auth?.groups)&&auth.groups.includes('ผลิต')&&auth?.active===true;
-  if(!manager&&!canSubmit){root.innerHTML='<section class="notice notice-warning"><h1>ไม่มีสิทธิ์เข้าหน้านี้</h1><p>เมนูนี้สำหรับพนักงานกลุ่มผลิตและผู้บริหาร</p></section>';return;}
+  if(!manager&&!canSubmit){root.innerHTML='<section class="notice notice-warning"><h1>ไม่มีสิทธิ์เข้าหน้านี้</h1><p>เมนูนี้สำหรับพนักงานกลุ่มผลิต ผู้บริหาร และ Admin</p></section>';return;}
   const service=createProductionReportService();
   let machines=[],machineError='';
   if(canSubmit){

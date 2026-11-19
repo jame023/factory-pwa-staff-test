@@ -1,6 +1,6 @@
-import { subscribeStore } from './state.js?v=1.3.401';
-import { APP_MODE } from './config.js?v=1.3.401';
-import { showActionPopup } from '../components/action-popup.js?v=1.3.401';
+import { subscribeStore } from './state.js?v=1.3.402';
+import { APP_MODE } from './config.js?v=1.3.402';
+import { showActionPopup } from '../components/action-popup.js?v=1.3.402';
 
 // Serial, coalesced refreshes. A write/confirmation in progress keeps its controls.
 export function watchChanges(refresh, { signal, busy = () => false, subscribe = subscribeStore,

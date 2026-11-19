@@ -1,4 +1,4 @@
-import { bangkokToday } from "./utils.js?v=1.3.401";
+import { bangkokToday } from "./utils.js?v=1.3.402";
 
 export const ATTENDANCE_STATUSES = Object.freeze([
   "present-full", "present-half", "in-progress", "leave", "absent", "holiday", "scheduled", "unrecorded"

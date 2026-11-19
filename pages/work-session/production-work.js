@@ -1,6 +1,6 @@
-import * as workApi from "../../adapters/package07.js?v=1.3.401";
-import { bangkokToday, escapeHtml, thaiDate, thaiDateTime } from "../../js/utils.js?v=1.3.401";
-import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.401";
+import * as workApi from "../../adapters/package07.js?v=1.3.402";
+import { bangkokToday, escapeHtml, thaiDate, thaiDateTime } from "../../js/utils.js?v=1.3.402";
+import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.402";
 
 const moneyless = value => new Intl.NumberFormat("th-TH").format(Number(value || 0));
 const versionOf = row => Number(row?.version || 0);

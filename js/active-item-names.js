@@ -1,6 +1,6 @@
-import { getMachineAdminSession } from './machine-admin-auth.js?v=1.3.401';
-import { createSupabaseItemNameRepository } from './item-name-admin-repository.js?v=1.3.401';
-import { APP_MODE, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js?v=1.3.401';
+import { getMachineAdminSession } from './machine-admin-auth.js?v=1.3.402';
+import { createSupabaseItemNameRepository } from './item-name-admin-repository.js?v=1.3.402';
+import { APP_MODE, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js?v=1.3.402';
 
 async function repository() {
   let session;

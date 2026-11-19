@@ -1,5 +1,5 @@
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js?v=1.3.401';
-import { getSupabaseLineAccessToken, checkSupabaseSession } from './auth.js?v=1.3.401';
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js?v=1.3.402';
+import { getSupabaseLineAccessToken, checkSupabaseSession } from './auth.js?v=1.3.402';
 
 export const ORDINARY_GROUPS = Object.freeze(['ออฟฟิศ','สกรีน','ผลิต','ขนส่ง']);
 const messages = {

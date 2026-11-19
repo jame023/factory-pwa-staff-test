@@ -1,8 +1,8 @@
-import { APP_MODE } from "../../js/config.js?v=1.3.401";
-import * as attendanceApi from "../../adapters/package10.js?v=1.3.401";
-import { statCard } from "../../components/app-card.js?v=1.3.401";
-import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.401";
-import { renderManagerAttendance } from "./manager.js?v=1.3.401";
+import { APP_MODE } from "../../js/config.js?v=1.3.402";
+import * as attendanceApi from "../../adapters/package10.js?v=1.3.402";
+import { statCard } from "../../components/app-card.js?v=1.3.402";
+import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.402";
+import { renderManagerAttendance } from "./manager.js?v=1.3.402";
 
 export const attendancePeriodForDay = day => Number(day) <= 15 ? "first" : "second";
 export function attendancePeriodRange(month, period) {

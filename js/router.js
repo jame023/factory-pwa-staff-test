@@ -1,43 +1,43 @@
-import { routeDecision, normalizeRoute, routeBackTarget, groupRoute } from './route-policy.js?v=1.3.401';
-import { getAuthContext as accessContext } from './access-context.js?v=1.3.401';
-import { APP_MODE, READ_ONLY_ROUTES } from "./config.js?v=1.3.401";
-import { resolveWorkspaceRoute, canAccessModule } from "./permissions.js?v=1.3.401";
-import { watchChanges, pageBusy, preservePageDraft, mockLiveEnabled } from './live-updates.js?v=1.3.401';
-import { showActionPopup } from '../components/action-popup.js?v=1.3.401';
-import { isStatusModalOpen } from '../components/status-modal.js?v=1.3.401';
-import { installDetailDisclosureDialogs } from '../components/detail-dialog.js?v=1.3.401';
+import { routeDecision, normalizeRoute, routeBackTarget, groupRoute } from './route-policy.js?v=1.3.402';
+import { getAuthContext as accessContext } from './access-context.js?v=1.3.402';
+import { APP_MODE, READ_ONLY_ROUTES } from "./config.js?v=1.3.402";
+import { resolveWorkspaceRoute, canAccessModule } from "./permissions.js?v=1.3.402";
+import { watchChanges, pageBusy, preservePageDraft, mockLiveEnabled } from './live-updates.js?v=1.3.402';
+import { showActionPopup } from '../components/action-popup.js?v=1.3.402';
+import { isStatusModalOpen } from '../components/status-modal.js?v=1.3.402';
+import { installDetailDisclosureDialogs } from '../components/detail-dialog.js?v=1.3.402';
 const routes = {
-  home: () => import("../pages/home/index.js?v=1.3.401"),
-  attendance: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/attendance/legacy.js?v=1.3.401") : import("../pages/attendance/index.js?v=1.3.401"),
-  "work-session": () => import("../pages/work-session/index.js?v=1.3.401"),
-  "production-work": () => import("../pages/work-session/production-combined.js?v=1.3.401"),
-  leave: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/leave/legacy.js?v=1.3.401") : import("../pages/leave/index.js?v=1.3.401"),
-  calendar: () => import("../pages/calendar/index.js?v=1.3.401"),
-  delivery: () => import("../pages/delivery/index.js?v=1.3.401"),
-  "delivery-combined": () => import("../pages/delivery/combined.js?v=1.3.401"),
-  "delivery-home": () => import("../pages/access/index.js?v=1.3.401"),
-  production: () => import("../pages/production/index.js?v=1.3.401"),
-  "production-record": () => import("../pages/production-record/index.js?v=1.3.401"),
-  "production-report": () => import("../pages/production-report/index.js?v=1.3.401"),
-  "production-data": () => import("../pages/work-session/production-data.js?v=1.3.401"),
-  "screen-data": () => import("../pages/work-session/screen-data.js?v=1.3.401"),
-  "screen-combined": () => import("../pages/work-session/screen-combined.js?v=1.3.401"),
-  ot: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/ot/legacy.js?v=1.3.401") : import("../pages/ot/index.js?v=1.3.401"),
-  reports: () => import("../pages/reports/index.js?v=1.3.401"),
-  notifications: () => import("../pages/notifications/index.js?v=1.3.401"),
-  "ot-report": () => import("../pages/ot/report.js?v=1.3.401"),
-  "reports-menu": () => import("../pages/reports/menu.js?v=1.3.401"),
-  'admin-system-status': () => import('../pages/admin/system-status.js?v=1.3.401'),
-  admin: () => import("../pages/admin/index.js?v=1.3.401"),
-  "admin-registrations": () => import("../pages/admin/registrations.js?v=1.3.401"),
-  "admin-employees": () => import("../pages/admin/employees.js?v=1.3.401"),
-  "admin-groups": () => import("../pages/admin/groups.js?v=1.3.401"),
-  "admin-machines": () => import("../pages/admin/machines.js?v=1.3.401"),
-  "admin-item-names": () => import("../pages/admin/item-names.js?v=1.3.401")
+  home: () => import("../pages/home/index.js?v=1.3.402"),
+  attendance: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/attendance/legacy.js?v=1.3.402") : import("../pages/attendance/index.js?v=1.3.402"),
+  "work-session": () => import("../pages/work-session/index.js?v=1.3.402"),
+  "production-work": () => import("../pages/work-session/production-combined.js?v=1.3.402"),
+  leave: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/leave/legacy.js?v=1.3.402") : import("../pages/leave/index.js?v=1.3.402"),
+  calendar: () => import("../pages/calendar/index.js?v=1.3.402"),
+  delivery: () => import("../pages/delivery/index.js?v=1.3.402"),
+  "delivery-combined": () => import("../pages/delivery/combined.js?v=1.3.402"),
+  "delivery-home": () => import("../pages/access/index.js?v=1.3.402"),
+  production: () => import("../pages/production/index.js?v=1.3.402"),
+  "production-record": () => import("../pages/production-record/index.js?v=1.3.402"),
+  "production-report": () => import("../pages/production-report/index.js?v=1.3.402"),
+  "production-data": () => import("../pages/work-session/production-data.js?v=1.3.402"),
+  "screen-data": () => import("../pages/work-session/screen-data.js?v=1.3.402"),
+  "screen-combined": () => import("../pages/work-session/screen-combined.js?v=1.3.402"),
+  ot: () => APP_MODE === 'mock' || APP_MODE === 'development' ? import("../pages/ot/legacy.js?v=1.3.402") : import("../pages/ot/index.js?v=1.3.402"),
+  reports: () => import("../pages/reports/index.js?v=1.3.402"),
+  notifications: () => import("../pages/notifications/index.js?v=1.3.402"),
+  "ot-report": () => import("../pages/ot/report.js?v=1.3.402"),
+  "reports-menu": () => import("../pages/reports/menu.js?v=1.3.402"),
+  'admin-system-status': () => import('../pages/admin/system-status.js?v=1.3.402'),
+  admin: () => import("../pages/admin/index.js?v=1.3.402"),
+  "admin-registrations": () => import("../pages/admin/registrations.js?v=1.3.402"),
+  "admin-employees": () => import("../pages/admin/employees.js?v=1.3.402"),
+  "admin-groups": () => import("../pages/admin/groups.js?v=1.3.402"),
+  "admin-machines": () => import("../pages/admin/machines.js?v=1.3.402"),
+  "admin-item-names": () => import("../pages/admin/item-names.js?v=1.3.402")
 };
 routes.employee = routes.home;
 routes.executive = routes.home;
-routes['access-shell']=()=>import('../pages/access/index.js?v=1.3.401');
+routes['access-shell']=()=>import('../pages/access/index.js?v=1.3.402');
 const access = {
   'access-shell':['employee','executive','admin'],
   home: ["employee", "executive", "admin"],
@@ -52,7 +52,7 @@ const access = {
   "delivery-home": ["employee", "executive", "admin"],
   production: ["employee", "executive", "admin"],
   "production-record": ["employee", "executive", "admin"],
-  "production-report": ["employee", "executive"],
+  "production-report": ["employee", "executive", "admin"],
   "production-data": ["employee", "admin"],
   "production-work": ["employee", "admin"],
   "screen-data": ["employee", "admin"],

@@ -1,7 +1,7 @@
-import * as screenApi from "../../adapters/package07.js?v=1.3.401";
-import { bangkokToday, escapeHtml, thaiDate, thaiDateTime } from "../../js/utils.js?v=1.3.401";
-import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.401";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.401";
+import * as screenApi from "../../adapters/package07.js?v=1.3.402";
+import { bangkokToday, escapeHtml, thaiDate, thaiDateTime } from "../../js/utils.js?v=1.3.402";
+import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.402";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.402";
 
 const intValue = value => Number.isInteger(Number(value)) && Number(value) >= 0 ? Number(value) : 0;
 const businessDateOf = value => {

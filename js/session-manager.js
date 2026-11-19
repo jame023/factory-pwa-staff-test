@@ -1,5 +1,5 @@
-import { authProvider, clearSupabaseSession } from './auth.js?v=1.3.401';
-import { loadSession } from './session-vault.js?v=1.3.401';
+import { authProvider, clearSupabaseSession } from './auth.js?v=1.3.402';
+import { loadSession } from './session-vault.js?v=1.3.402';
 
 let state='unknown', context=null, pending=null, revision=0, ending=false;
 const subscribers=new Set();

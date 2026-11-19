@@ -1,17 +1,17 @@
-import { normalizeRoute, safeReturnRoute } from './route-policy.js?v=1.3.401';
-import { requireAccess, getAuthContext as accessContext, resolveDefaultRoute } from './access-context.js?v=1.3.401';
-import { authProvider } from './auth.js?v=1.3.401';
-import { verifySession,refreshSession,revokeSession,listenAuthState,getAuthContext } from './session-manager.js?v=1.3.401';
-import { startRouter,stopRouter,refreshRoute,invalidateRoute,canNavigateBack,navigateBack } from './router.js?v=1.3.401';
-import { renderAppHeader } from '../components/app-header.js?v=1.3.401';
-import { renderBottomNav } from '../components/bottom-nav.js?v=1.3.401';
-import { renderLoginScreen } from '../components/login-screen.js?v=1.3.401';
-import { showStatusModal,isStatusModalOpen } from '../components/status-modal.js?v=1.3.401';
-import { showToast } from '../components/toast.js?v=1.3.401';
-import { hideActionPopup } from '../components/action-popup.js?v=1.3.401';
-import { escapeHtml } from './utils.js?v=1.3.401';
-import { startCalendarNotifications } from './notifications.js?v=1.3.401';
-import { disableDeviceNotifications, enableDeviceNotifications, readDeviceNotificationState } from './notification-client.js?v=1.3.401';
+import { normalizeRoute, safeReturnRoute } from './route-policy.js?v=1.3.402';
+import { requireAccess, getAuthContext as accessContext, resolveDefaultRoute } from './access-context.js?v=1.3.402';
+import { authProvider } from './auth.js?v=1.3.402';
+import { verifySession,refreshSession,revokeSession,listenAuthState,getAuthContext } from './session-manager.js?v=1.3.402';
+import { startRouter,stopRouter,refreshRoute,invalidateRoute,canNavigateBack,navigateBack } from './router.js?v=1.3.402';
+import { renderAppHeader } from '../components/app-header.js?v=1.3.402';
+import { renderBottomNav } from '../components/bottom-nav.js?v=1.3.402';
+import { renderLoginScreen } from '../components/login-screen.js?v=1.3.402';
+import { showStatusModal,isStatusModalOpen } from '../components/status-modal.js?v=1.3.402';
+import { showToast } from '../components/toast.js?v=1.3.402';
+import { hideActionPopup } from '../components/action-popup.js?v=1.3.402';
+import { escapeHtml } from './utils.js?v=1.3.402';
+import { startCalendarNotifications } from './notifications.js?v=1.3.402';
+import { disableDeviceNotifications, enableDeviceNotifications, readDeviceNotificationState } from './notification-client.js?v=1.3.402';
 
 const page=document.getElementById('page-root'),header=document.getElementById('header-root'),nav=document.getElementById('nav-root'),loading=document.getElementById('page-loading');
 let modal,session,stopNotifications,timer,working=false,started=false,applicantMounted=false;
@@ -209,7 +209,7 @@ async function bootOnce() {
     if(!session)return;
     if(session.applicant) {
       stopRouter();started=false;
-      applicantMounted=true;const {mountRegistration}=await import('../pages/registration/index.js?v=1.3.401');
+      applicantMounted=true;const {mountRegistration}=await import('../pages/registration/index.js?v=1.3.402');
       if(!session?.applicant||!applicantMounted)return;
       const registrationRoot=document.createElement('div');page.replaceChildren(registrationRoot);
       await mountRegistration(registrationRoot,{logout});

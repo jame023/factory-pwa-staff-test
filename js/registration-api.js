@@ -1,5 +1,5 @@
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js?v=1.3.401';
-import { getSupabaseLineAccessToken } from './auth.js?v=1.3.401';
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js?v=1.3.402';
+import { getSupabaseLineAccessToken } from './auth.js?v=1.3.402';
 
 const REQUEST_FIELDS='id,employee_name,employee_code,phone,note,line_display_name,requested_main_group,requested_groups,status,reviewed_at,review_reason,created_at,updated_at';
 function safeError(data,status){
