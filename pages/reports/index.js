@@ -1,5 +1,5 @@
-import * as api from '../../adapters/package06.js?v=1.3.399';
-import { escapeHtml as e } from '../../js/utils.js?v=1.3.399';
+import * as api from '../../adapters/package06.js?v=1.3.400';
+import { escapeHtml as e } from '../../js/utils.js?v=1.3.400';
 
 const periods=[['today','วันนี้'],['week','สัปดาห์นี้'],['month','เดือนนี้']];
 const number=value=>Number(value||0).toLocaleString('th-TH');

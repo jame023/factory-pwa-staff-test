@@ -1,5 +1,5 @@
-import { escapeHtml } from "../js/utils.js?v=1.3.399";
-import { iconMarkup, routeIcon } from "../js/ui-icons.js?v=1.3.399";
+import { escapeHtml } from "../js/utils.js?v=1.3.400";
+import { iconMarkup, routeIcon } from "../js/ui-icons.js?v=1.3.400";
 export function appCard({ route, title, hint }) {
   return '<a class="card module-card" href="#/' + escapeHtml(route) + '">' +
     '<span class="module-icon" aria-hidden="true">' + iconMarkup(routeIcon(route)) + "</span>" +
