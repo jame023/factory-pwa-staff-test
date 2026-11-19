@@ -1,8 +1,8 @@
-import { APP_MODE } from "./config.js?v=1.3.403";
-import { mockRequest } from "./mock-api.js?v=1.3.403";
-import { normalizeAttendanceQuery, validateAttendanceResponse, validateManagerResponse } from "./attendance-contract.js?v=1.3.403";
-import { requestReadOnly } from "./read-only-api.js?v=1.3.403";
-import { createSupabaseAppApi } from "./supabase-app-api.js?v=1.3.403";
+import { APP_MODE } from "./config.js?v=1.3.404";
+import { mockRequest } from "./mock-api.js?v=1.3.404";
+import { normalizeAttendanceQuery, validateAttendanceResponse, validateManagerResponse } from "./attendance-contract.js?v=1.3.404";
+import { requestReadOnly } from "./read-only-api.js?v=1.3.404";
+import { createSupabaseAppApi } from "./supabase-app-api.js?v=1.3.404";
 
 export async function request(module, action, payload = {}, options = {}) {
   let data;

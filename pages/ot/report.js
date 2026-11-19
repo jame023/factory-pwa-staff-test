@@ -1,3 +1,3 @@
-import { renderOvertimeReport } from "./index.js?v=1.3.403";
+import { renderOvertimeReport } from "./index.js?v=1.3.404";
 export const render = renderOvertimeReport;
 

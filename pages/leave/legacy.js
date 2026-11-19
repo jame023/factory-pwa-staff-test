@@ -1,12 +1,12 @@
-import { renderLeaveMedia } from "../../js/leave-media.js?v=1.3.403";
-import * as api from "../../adapters/package09-legacy.js?v=1.3.403";
-import * as adminApi from "../../adapters/package11.js?v=1.3.403";
-import { enumerateLeaveDates, storedLeaveItems, isLeaveSubmissionOpen, LEAVE_WINDOW_MESSAGE } from "../../js/leave-rules-legacy.js?v=1.3.403";
-import { mountApprovedLeaveCalendar } from "./approved-calendar-legacy.js?v=1.3.403";
-import { escapeHtml as e, thaiDate, statusText, bangkokToday } from "../../js/utils.js?v=1.3.403";
-import { canManage } from "../../js/permissions.js?v=1.3.403";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.403";
-import { confirmAction } from "../../components/modal.js?v=1.3.403";
+import { renderLeaveMedia } from "../../js/leave-media.js?v=1.3.404";
+import * as api from "../../adapters/package09-legacy.js?v=1.3.404";
+import * as adminApi from "../../adapters/package11.js?v=1.3.404";
+import { enumerateLeaveDates, storedLeaveItems, isLeaveSubmissionOpen, LEAVE_WINDOW_MESSAGE } from "../../js/leave-rules-legacy.js?v=1.3.404";
+import { mountApprovedLeaveCalendar } from "./approved-calendar-legacy.js?v=1.3.404";
+import { escapeHtml as e, thaiDate, statusText, bangkokToday } from "../../js/utils.js?v=1.3.404";
+import { canManage } from "../../js/permissions.js?v=1.3.404";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.404";
+import { confirmAction } from "../../components/modal.js?v=1.3.404";
 
 const MAX_LEAVE_PHOTOS = 5;
 const MAX_LEAVE_FILE_BYTES = 1024 * 1024;

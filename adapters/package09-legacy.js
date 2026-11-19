@@ -1,4 +1,4 @@
-import { request } from "../js/api.js?v=1.3.403";
+import { request } from "../js/api.js?v=1.3.404";
 export const listLeaveRequests = () => request("package09", "leave.read");
 export const submitLeaveRequest = payload => request("package09", "leave.submit", payload);
 export const reviewLeaveRequest = (id, decision, rejectionReason = "") =>
