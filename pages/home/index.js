@@ -1,10 +1,10 @@
-import * as attendanceApi from "../../adapters/package10.js?v=1.3.406";
-import * as workApi from "../../adapters/package07.js?v=1.3.406";
-import * as leaveApi from "../../adapters/package09.js?v=1.3.406";
-import { appCard, statCard } from "../../components/app-card.js?v=1.3.406";
-import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.406";
-import { APP_MODE } from "../../js/config.js?v=1.3.406";
-import { canAccessModule } from "../../js/permissions.js?v=1.3.406";
+import * as attendanceApi from "../../adapters/package10.js?v=1.3.407";
+import * as workApi from "../../adapters/package07.js?v=1.3.407";
+import * as leaveApi from "../../adapters/package09.js?v=1.3.407";
+import { appCard, statCard } from "../../components/app-card.js?v=1.3.407";
+import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.407";
+import { APP_MODE } from "../../js/config.js?v=1.3.407";
+import { canAccessModule } from "../../js/permissions.js?v=1.3.407";
 
 const employeeModules = [
   { route:"attendance", icon:"🪪", title:"ข้อมูลของฉัน", hint:"ดูเวลาเข้าออกและสถานะ" },

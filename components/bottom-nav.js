@@ -1,4 +1,4 @@
-import { iconMarkup } from '../js/ui-icons.js?v=1.3.406';
+import { iconMarkup } from '../js/ui-icons.js?v=1.3.407';
 export function renderBottomNav(currentRoute, homeRoute = 'home') {
   return '<nav class="bottom-nav" aria-label="เมนูหลัก">' +
     '<a class="nav-item" href="#/' + homeRoute + '"' +

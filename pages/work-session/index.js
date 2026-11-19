@@ -1,11 +1,11 @@
-import { renderWorkManager } from "./manager.js?v=1.3.406";
-import * as workApi from "../../adapters/package07.js?v=1.3.406";
-import * as screenApi from "../../adapters/package01.js?v=1.3.406";
-import { escapeHtml, thaiDate, thaiDateTime } from "../../js/utils.js?v=1.3.406";
-import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.406";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.406";
-import { isProductionEmployee, isScreenEmployee } from "../../js/permissions.js?v=1.3.406";
-import { APP_MODE } from "../../js/config.js?v=1.3.406";
+import { renderWorkManager } from "./manager.js?v=1.3.407";
+import * as workApi from "../../adapters/package07.js?v=1.3.407";
+import * as screenApi from "../../adapters/package01.js?v=1.3.407";
+import { escapeHtml, thaiDate, thaiDateTime } from "../../js/utils.js?v=1.3.407";
+import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.407";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.407";
+import { isProductionEmployee, isScreenEmployee } from "../../js/permissions.js?v=1.3.407";
+import { APP_MODE } from "../../js/config.js?v=1.3.407";
 
 const duration = (start, end) => {
   const minutes = Math.max(0, Math.floor((new Date(end || Date.now()) - new Date(start)) / 60000));
@@ -13,7 +13,7 @@ const duration = (start, end) => {
 };
 export async function render(root, context, { recoverScreenDraft = null } = {}) {
   if (APP_MODE === 'mock') {
-    const legacy = await import('./legacy.js?v=1.3.406');
+    const legacy = await import('./legacy.js?v=1.3.407');
     if (!context.signal?.aborted) return legacy.render(root, context);
     return;
   }

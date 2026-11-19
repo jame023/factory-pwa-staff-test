@@ -1,5 +1,5 @@
-import { getAuthContext as sessionContext, verifySession, revokeSession } from './session-manager.js?v=1.3.406';
-import { canonicalGroup, routeDecision, defaultRoute, workspaceGroups, groupRoute } from './route-policy.js?v=1.3.406';
+import { getAuthContext as sessionContext, verifySession, revokeSession } from './session-manager.js?v=1.3.407';
+import { canonicalGroup, routeDecision, defaultRoute, workspaceGroups, groupRoute } from './route-policy.js?v=1.3.407';
 const KEY='factory-pwa-last-workspace-v2';
 let volatileEmployee=null, volatileWorkspace=null;
 const preferenceKey=employee=>KEY+':'+encodeURIComponent(employee);

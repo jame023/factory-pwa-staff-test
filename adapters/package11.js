@@ -1,4 +1,4 @@
-import { request } from "../js/api.js?v=1.3.406";
+import { request } from "../js/api.js?v=1.3.407";
 export const readAdminSummary = () => request("package11", "admin.read");
 export const readAdminAuditPage = (filters = {}, options = {}) => request("package11", "admin.audit.list", { filters }, options);
 export const readAdminAuditDetail = (id, options = {}) => request("package11", "admin.audit.detail", { id }, options);

@@ -1,6 +1,6 @@
-import { createClient } from '../vendor/supabase-js-2.118.0.js?v=1.3.406';
-import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from './config.js?v=1.3.406';
-import { getSupabaseLineAccessToken } from './auth.js?v=1.3.406';
+import { createClient } from '../vendor/supabase-js-2.118.0.js?v=1.3.407';
+import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from './config.js?v=1.3.407';
+import { getSupabaseLineAccessToken } from './auth.js?v=1.3.407';
 
 export const PRODUCTION_REPORT_BUCKET = 'factory-production-report-photos';
 const fail = (message, code='API_ERROR') => Object.assign(new Error(message), {code});

@@ -1,4 +1,4 @@
-import { validDay } from './business-rules.js?v=1.3.406';
+import { validDay } from './business-rules.js?v=1.3.407';
 export const REPORT_KINDS=Object.freeze({daily:'สรุปรายวัน',weekly:'สรุปรายสัปดาห์',outstanding:'พนักงานดีเด่น'});
 const metricKeys=['present','late','leave','absent','production','delivery'];
 const plain=(value,max)=>{

@@ -1,11 +1,11 @@
-import { APP_MODE } from "../../js/config.js?v=1.3.406";
-import * as deliveryApi from "../../adapters/package04.js?v=1.3.406";
-import { escapeHtml, thaiDateTime } from "../../js/utils.js?v=1.3.406";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.406";
-import { canEnterData } from "../../js/permissions.js?v=1.3.406";
-import { showStatusModal } from "../../components/status-modal.js?v=1.3.406";
-import { openDetailDialog } from "../../components/detail-dialog.js?v=1.3.406";
-import { deriveDeliveryRequestId, normalizeDeliveryBillNumber, normalizeDeliveryEventAt } from "../../js/delivery-service.js?v=1.3.406";
+import { APP_MODE } from "../../js/config.js?v=1.3.407";
+import * as deliveryApi from "../../adapters/package04.js?v=1.3.407";
+import { escapeHtml, thaiDateTime } from "../../js/utils.js?v=1.3.407";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.407";
+import { canEnterData } from "../../js/permissions.js?v=1.3.407";
+import { showStatusModal } from "../../components/status-modal.js?v=1.3.407";
+import { openDetailDialog } from "../../components/detail-dialog.js?v=1.3.407";
+import { deriveDeliveryRequestId, normalizeDeliveryBillNumber, normalizeDeliveryEventAt } from "../../js/delivery-service.js?v=1.3.407";
 
 const PAGE_SIZE = 25;
 const MAX_DELIVERY_PHOTOS = 10;

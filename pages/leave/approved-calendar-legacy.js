@@ -1,6 +1,6 @@
-import * as calendarApi from "../../adapters/package08.js?v=1.3.406";
-import { watchChanges, mockLiveEnabled } from "../../js/live-updates.js?v=1.3.406";
-import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.406";
+import * as calendarApi from "../../adapters/package08.js?v=1.3.407";
+import { watchChanges, mockLiveEnabled } from "../../js/live-updates.js?v=1.3.407";
+import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.407";
 
 const monthPattern = /^\d{4}-(0[1-9]|1[0-2])$/;
 
