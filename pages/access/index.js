@@ -1,12 +1,12 @@
-import { iconMarkup, routeIcon } from '../../js/ui-icons.js?v=1.3.399';
-import { getAuthContext, canAccessRoute, selectActiveGroup, availableWorkspaces } from '../../js/access-context.js?v=1.3.399';
-import { ROUTES, normalizeRoute, workspaceGroups, groupRoute } from '../../js/route-policy.js?v=1.3.399';
-import { escapeHtml } from '../../js/utils.js?v=1.3.399';
-import { showStatusModal } from '../../components/status-modal.js?v=1.3.399';
-import { getMachineAdminSession } from '../../js/machine-admin-auth.js?v=1.3.399';
-import { createSupabaseMachineRepository } from '../../js/machine-admin-repository.js?v=1.3.399';
-import { createSupabaseItemNameRepository } from '../../js/item-name-admin-repository.js?v=1.3.399';
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '../../js/config.js?v=1.3.399';
+import { iconMarkup, routeIcon } from '../../js/ui-icons.js?v=1.3.401';
+import { getAuthContext, canAccessRoute, selectActiveGroup, availableWorkspaces } from '../../js/access-context.js?v=1.3.401';
+import { ROUTES, normalizeRoute, workspaceGroups, groupRoute } from '../../js/route-policy.js?v=1.3.401';
+import { escapeHtml } from '../../js/utils.js?v=1.3.401';
+import { showStatusModal } from '../../components/status-modal.js?v=1.3.401';
+import { getMachineAdminSession } from '../../js/machine-admin-auth.js?v=1.3.401';
+import { createSupabaseMachineRepository } from '../../js/machine-admin-repository.js?v=1.3.401';
+import { createSupabaseItemNameRepository } from '../../js/item-name-admin-repository.js?v=1.3.401';
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '../../js/config.js?v=1.3.401';
 const adminMenuPresentation = Object.freeze({
   '/admin/system-status': {tone:'teal',hint:'ตรวจเครื่องอ่านบัตร รายงานอัตโนมัติ และการส่งแจ้งเตือน',icon:'<path d="M3 12h4l3-8 4 16 3-8h4"/>'},
   '/admin/employees': {tone:'blue',hint:'ข้อมูลพนักงานและสถานะการใช้งาน',icon:'<circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6M21 21v-3a6 6 0 0 0-4-5.65"/>'},
@@ -76,28 +76,29 @@ const workspaceHints={
  '/employee/leave':'คำขอลาและประวัติการลา', '/employee/calendar':'วันทำงาน วันหยุด และกิจกรรม', '/employee/reports':'สรุปการทำงานทุกหมวดของพนักงาน', '/employee/ot-report':'รายงาน OT ของพนักงานทุกคน',
  '/employee/ot':'งานล่วงเวลาและรายการของฉัน', '/employee/screen':'พื้นที่ทำงานของกลุ่มสกรีน',
  '/employee/screen/work-menu':'เริ่ม–จบงาน บันทึกยอดสกรีน และ OT', '/employee/screen/work-session':'เริ่มงานและจบงานของกลุ่มสกรีน', '/employee/screen/data':'บันทึกจำนวนแพ็คและของเสีย', '/employee/production':'พื้นที่ทำงานของกลุ่มผลิต',
- '/employee/production/work-session':'เริ่ม–จบงาน กรอกยอดผลิต และบันทึก OT', '/employee/production-data':'กรอกจำนวนผลิตและของเสียได้ทันที โดยไม่ต้องเริ่มงานก่อน', '/employee/delivery':'เมนูการทำงานของกลุ่มขนส่ง', '/employee/delivery/record':'บันทึกการขนส่งและ OT',
+ '/employee/production/work-session':'เริ่ม–จบงาน กรอกยอดผลิต และบันทึก OT', '/employee/production-data':'กรอกจำนวนผลิตและของเสียได้ทันที โดยไม่ต้องเริ่มงานก่อน', '/employee/production/report':'ถ่ายรูปและส่งรายงานให้ผู้บริหาร', '/executive/production-report':'ดูรายงานรูปถ่ายจากพื้นที่ผลิต', '/employee/delivery':'เมนูการทำงานของกลุ่มขนส่ง', '/employee/delivery/record':'บันทึกการขนส่งและ OT',
  '/employee/office':'พื้นที่ทำงานของกลุ่มออฟฟิศ', '/employee/select-group':'เปลี่ยนพื้นที่จากกลุ่มงานที่ได้รับ',
  '/executive/attendance':'ภาพรวมเวลาทำงานของพนักงาน', '/executive/work-session':'ดูรายการเริ่มงาน–จบงาน',
  '/executive/leave':'ตรวจคำขอลาและรายงานตามช่วงวันที่', '/executive/calendar':'กำหนดวันทำงานของแต่ละกลุ่ม',
- '/executive/production':'ดูรายการงานสกรีนที่บันทึกแล้ว', '/executive/delivery':'ดูรายการขนส่งที่บันทึกแล้ว',
- '/executive/production-record':'ดูยอดผลิตที่บันทึกแล้ว', '/executive/reports':'รายงานและภาพรวมการทำงาน',
+  '/executive/production':'ดูรายการงานสกรีนที่บันทึกแล้ว', '/executive/delivery':'ดูรายการขนส่งที่บันทึกแล้ว',
+  '/executive/production-record':'ดูยอดผลิตที่บันทึกแล้ว', '/executive/production-report':'ดูรูปถ่ายรายงานการผลิตที่พนักงานส่ง', '/executive/reports':'รายงานและภาพรวมการทำงาน',
  '/executive/ot':'ภาพรวมงานล่วงเวลา', '/executive/reports-menu':'เลือกดูรายงานสรุปหรือรายงาน OT', '/employee':'เมนูการทำงานของฉัน','/employee/home':'กลับหน้าหลักพนักงาน',
  '/executive':'ภาพรวมและรายงานสำหรับผู้บริหาร', '/admin':'กลับพื้นที่ Admin'
 };
 const workspaceHomes=['/employee','/employee/home','/executive','/employee/office','/employee/screen','/employee/screen/work-menu','/employee/production','/employee/delivery','/employee/select-group'];
 function workspaceLink(route){
  const enabled=workspaceHomes.includes(route.path)||route.path==='/executive/manage'||['/employee/leave','/employee/ot','/employee/profile','/employee/attendance','/employee/calendar','/employee/reports','/employee/ot-report',
-  '/executive/attendance','/executive/work-session','/executive/leave','/executive/calendar','/executive/production','/executive/delivery','/executive/production-record','/executive/reports','/executive/ot','/executive/reports-menu',
-  '/employee/screen/work-session','/employee/screen/data','/employee/production/work-session','/employee/production-data','/employee/delivery/record'].includes(route.path);
+  '/executive/attendance','/executive/work-session','/executive/leave','/executive/calendar','/executive/production','/executive/delivery','/executive/production-record','/executive/production-report','/executive/reports','/executive/ot','/executive/reports-menu',
+  '/employee/screen/work-session','/employee/screen/data','/employee/production/work-session','/employee/production-data','/employee/production/report','/employee/delivery/record'].includes(route.path);
  return '<'+(enabled?'a href="#'+route.path+'"':'div aria-disabled="true"')+' class="workspace-card"><span class="workspace-card-icon">'+iconMarkup(routeIcon(route.path))+'</span><span class="workspace-card-copy"><strong>'+escapeHtml(route.label)+'</strong><span>'+escapeHtml(route.hint||workspaceHints[route.path]||'เลือกเพื่อเปิดพื้นที่นี้')+'</span>'+(!enabled?'<span class="admin-hub-pending">ยังไม่เปิดใช้งาน</span>':'')+'</span>'+(enabled?'<span class="workspace-card-arrow">'+iconMarkup('arrow')+'</span>':'')+'</'+(enabled?'a':'div')+'>';
 }
 function productionWorkspaceLinks(links){
  const byPath=new Map(links.map(route=>[route.path,route]));
  const workMenu=byPath.get('/employee/production/work-session');
+ const productionReport=byPath.get('/employee/production/report');
  const personal=['/employee/profile','/employee/attendance','/employee/leave','/employee/calendar','/employee/reports','/employee/ot-report']
   .map(path=>byPath.get(path)).filter(Boolean);
- return [...personal.slice(0,4),...(workMenu?[workMenu]:[]),...personal.slice(4)];
+ return [...personal.slice(0,4),...(workMenu?[workMenu]:[]),...(productionReport?[productionReport]:[]),...personal.slice(4)];
 }
 function deliveryWorkspaceLinks(links){
  const byPath=new Map(links.map(route=>[route.path,route]));

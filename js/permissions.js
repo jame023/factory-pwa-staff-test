@@ -23,7 +23,7 @@ export function canAccessModule(user, module) {
   if (module === "delivery") return groups.includes("ขนส่ง");
   if (module === "delivery-home") return groups.includes("ขนส่ง");
   if (module === "production") return Array.isArray(user.groups) && user.groups.includes("สกรีน");
-  if (["production-record", "production-work", "production-data"].includes(module)) return isProductionEmployee(user);
+  if (["production-record", "production-work", "production-data", "production-report"].includes(module)) return isProductionEmployee(user);
   return true;
 }
 
@@ -36,8 +36,8 @@ export function calendarGroupsForUser(user, availableGroups) {
 }
 
 const workspaceModules = {
-  employee: ["attendance", "work-session", "leave", "calendar", "delivery", "production", "production-record", "production-work", "production-data", "ot", "reports", "ot-report", "notifications"],
-  executive: ["attendance", "work-session", "leave", "calendar", "delivery", "production", "production-record", "reports", "ot", "reports-menu", "notifications"]
+  employee: ["attendance", "work-session", "leave", "calendar", "delivery", "production", "production-record", "production-work", "production-data", "production-report", "ot", "reports", "ot-report", "notifications"],
+  executive: ["attendance", "work-session", "leave", "calendar", "delivery", "production", "production-record", "production-report", "reports", "ot", "reports-menu", "notifications"]
 };
 export function resolveWorkspaceRoute(path, role) {
   if (!["employee", "executive", "admin"].includes(role)) return { allowed:false };
@@ -45,6 +45,7 @@ export function resolveWorkspaceRoute(path, role) {
   const parts = path.split("/");
   if (path === "home" || path === "") return { allowed:true, module:"home", workspace:role, canonical:"home" };
   if (path === "production/work-session") return { allowed:["employee", "admin"].includes(role), module:"production-work", workspace:"employee", canonical:path };
+  if (path === "employee/production/report") return { allowed:["employee", "admin"].includes(role), module:"production-report", workspace:"employee", canonical:path };
   if (path === "admin") return { allowed:role === "admin", module:"admin", workspace:"admin", canonical:path };
     if (path === "admin/records" || ["admin/records/employees","admin/records/attendance","admin/records/leave","admin/records/calendar",
       "admin/records/work-sessions","admin/records/production","admin/records/deliveries","admin/records/screen","admin/records/ot","admin/records/audit"].includes(path))

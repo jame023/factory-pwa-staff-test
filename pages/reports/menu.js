@@ -1,5 +1,5 @@
-import { appCard } from "../../components/app-card.js?v=1.3.399";
-import { canAccessModule } from "../../js/permissions.js?v=1.3.399";
+import { appCard } from "../../components/app-card.js?v=1.3.401";
+import { canAccessModule } from "../../js/permissions.js?v=1.3.401";
 
 const executiveMenus = [
   { module:"attendance", route:"executive/attendance", icon:"🪪", title:"เวลาเข้าออก", hint:"ดูเวลาเข้าออกและสถานะพนักงาน" },
@@ -9,6 +9,7 @@ const executiveMenus = [
   { module:"production", route:"executive/production", icon:"🖨️", title:"ข้อมูลสกรีน", hint:"ดูรายการงานสกรีนที่บันทึกแล้ว" },
   { module:"delivery", route:"executive/delivery", icon:"🚚", title:"ข้อมูลการขนส่ง", hint:"ดูรายการขนส่งที่บันทึกแล้ว" },
   { module:"production-record", route:"executive/production-record", icon:"🏭", title:"ข้อมูลผลิต", hint:"ดูยอดผลิตที่บันทึกแล้ว" },
+  { module:"production-report", route:"executive/production-report", icon:"📷", title:"รายงานการผลิต", hint:"ดูรูป รายชื่อผู้ส่ง เครื่องจักร และเวลาที่ส่ง" },
   { module:"reports", route:"executive/reports", icon:"📊", title:"รายงานสรุป", hint:"ดูภาพรวมรายวัน รายสัปดาห์ และพนักงานดีเด่น" },
   { module:"ot", route:"executive/ot", icon:"⏱️", title:"รายงาน OT", hint:"ตรวจรายการ OT รายละเอียดงาน และรูปหลักฐาน" }
 ];
@@ -21,5 +22,5 @@ export async function render(root, { user } = {}) {
     '<div class="section-title"><div><h2>ข้อมูลแยกตามหมวด</h2></div></div>' +
     '<div class="module-grid">' + visibleMenus.filter(item => !["reports","ot"].includes(item.module)).map(appCard).join("") + '</div>' +
     '<div class="section-title"><div><h2>รายงาน</h2></div></div>' +
-    '<div class="module-grid">' + visibleMenus.filter(item => ["reports","ot"].includes(item.module)).map(appCard).join("") + '</div>';
+    '<div class="module-grid">' + visibleMenus.filter(item => ["reports","ot","production-report"].includes(item.module)).map(appCard).join("") + '</div>';
 }

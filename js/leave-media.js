@@ -1,4 +1,4 @@
-import { escapeHtml } from './utils.js?v=1.3.399';
+import { escapeHtml } from './utils.js?v=1.3.401';
 const assets=Object.freeze({submitted:'leave-notice-pending.svg',approved:'leave-notice-approved.svg',rejected:'leave-notice-rejected.svg',cancelled:'leave-notice-cancelled.svg'});
 export function canReadLeaveNotice(row,user){
   if(!user?.id||user.active===false||!['employee','executive','admin'].includes(user.role)||!['submitted','decided','cancelled'].includes(row.event))return false;

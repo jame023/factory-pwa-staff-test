@@ -1,9 +1,9 @@
-import { subscribeStore } from "../../js/state.js?v=1.3.399";
-import { APP_MODE } from "../../js/config.js?v=1.3.399";
-import { readAttendanceDashboard } from "../../adapters/package03.js?v=1.3.399";
-import { showStatusModal } from "../../components/status-modal.js?v=1.3.399";
-import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.399";
-import { formatMinuteDuration, normalizeExecutiveAttendanceRows, summarizeExecutiveAttendance, validateAttendanceRange } from "../../js/executive-attendance-rules.js?v=1.3.399";
+import { subscribeStore } from "../../js/state.js?v=1.3.401";
+import { APP_MODE } from "../../js/config.js?v=1.3.401";
+import { readAttendanceDashboard } from "../../adapters/package03.js?v=1.3.401";
+import { showStatusModal } from "../../components/status-modal.js?v=1.3.401";
+import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.401";
+import { formatMinuteDuration, normalizeExecutiveAttendanceRows, summarizeExecutiveAttendance, validateAttendanceRange } from "../../js/executive-attendance-rules.js?v=1.3.401";
 
 const esc = value => escapeHtml(value == null ? "" : String(value));
 const groupsText = groups => Array.isArray(groups) && groups.length ? groups.join(", ") : "—";

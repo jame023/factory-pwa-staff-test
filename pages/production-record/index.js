@@ -1,13 +1,13 @@
-import * as api from '../../adapters/package05.js?v=1.3.399';
-import {isProductionEmployee} from '../../js/permissions.js?v=1.3.399';
-import * as workApi from '../../adapters/package07.js?v=1.3.399';
-import {bangkokToday, escapeHtml as e, thaiDate} from '../../js/utils.js?v=1.3.399';
-import {requireOnlineAction} from '../../js/offline.js?v=1.3.399';
-import {statCard} from '../../components/app-card.js?v=1.3.399';
+import * as api from '../../adapters/package05.js?v=1.3.401';
+import {isProductionEmployee} from '../../js/permissions.js?v=1.3.401';
+import * as workApi from '../../adapters/package07.js?v=1.3.401';
+import {bangkokToday, escapeHtml as e, thaiDate} from '../../js/utils.js?v=1.3.401';
+import {requireOnlineAction} from '../../js/offline.js?v=1.3.401';
+import {statCard} from '../../components/app-card.js?v=1.3.401';
 
 export async function render(root, context, {embedded=false} = {}) {
   if(!embedded && context.workspace==='employee' && ['employee','admin'].includes(context.user.role)){
-    const work=await import('../work-session/index.js?v=1.3.399');
+    const work=await import('../work-session/index.js?v=1.3.401');
     return work.render(root,{...context,workType:'ผลิต'});
   }
   root.innerHTML='<p class="page-loading">กำลังโหลดข้อมูลผลิต…</p>';

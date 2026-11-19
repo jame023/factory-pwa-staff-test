@@ -4,8 +4,8 @@ import {
   markNotificationRead,
   readDeviceNotificationState,
   readNotificationInbox
-} from '../../js/notification-client.js?v=1.3.399';
-import { escapeHtml as e } from '../../js/utils.js?v=1.3.399';
+} from '../../js/notification-client.js?v=1.3.401';
+import { escapeHtml as e } from '../../js/utils.js?v=1.3.401';
 
 const number = value => Number(value || 0).toLocaleString('th-TH');
 const duration = value => {

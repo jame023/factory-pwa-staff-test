@@ -10,13 +10,13 @@ const entries = [
   ['/employee/attendance','เวลาของฉัน','member'], ['/employee/leave','การลา','member'],
   ['/employee/calendar','ปฏิทิน','member'], ['/employee/ot','OT','ot'], ['/employee/reports','รายงานสรุป','member'], ['/employee/ot-report','รายงาน OT','member'],
   ['/employee/screen','งานสกรีน','สกรีน'], ['/employee/screen/work-menu','งานสกรีน','สกรีน'], ['/employee/screen/work-session','เริ่มงาน–จบงานสกรีน','สกรีน'], ['/employee/screen/data','บันทึกงานสกรีน','สกรีน'],
-  ['/employee/production','งานผลิต','ผลิต'], ['/employee/production/work-session','งานผลิต','ผลิต'], ['/employee/production-data','กรอกข้อมูลผลิต','ผลิต'],
+  ['/employee/production','งานผลิต','ผลิต'], ['/employee/production/work-session','งานผลิต','ผลิต'], ['/employee/production-data','กรอกข้อมูลผลิต','ผลิต'], ['/employee/production/report','รายงานการผลิต','ผลิต'],
   ['/employee/delivery','งานขนส่ง','ขนส่ง'], ['/employee/delivery/record','บันทึกการขนส่ง','ขนส่ง'], ['/employee/office','งานออฟฟิศ','ออฟฟิศ'],
   ['/executive','พื้นที่ผู้บริหาร','executive'], ['/executive/attendance','เวลาพนักงาน','executive'],
   ['/executive/work-session','ข้อมูลการทำงาน','executive'], ['/executive/leave','คำขอลา','executive'],
   ['/executive/calendar','ปฏิทินการทำงาน','executive'], ['/executive/production','ข้อมูลสกรีน','executive'],
   ['/executive/delivery','ข้อมูลการขนส่ง','executive'], ['/executive/production-record','ข้อมูลผลิต','executive'],
-  ['/executive/reports','รายงาน','executive'], ['/executive/ot','รายงาน OT','executive'], ['/executive/reports-menu','เมนูรายงาน','executive'],
+  ['/executive/reports','รายงาน','executive'], ['/executive/ot','รายงาน OT','executive'], ['/executive/production-report','รายงานการผลิต','executive'], ['/executive/reports-menu','เมนูรายงาน','executive'],
   ['/admin/system-status','สถานะระบบ','admin'], ['/admin','พื้นที่ Admin','admin'], ['/admin/manage','เมนูจัดการของ Admin','admin'], ['/admin/employees','พนักงาน','admin'], ['/admin/groups','กลุ่มงาน','admin'],
   ['/admin/machines','เครื่องจักร','admin'], ['/admin/items','รายชื่อสินค้า','admin'],
   ['/admin/registration-requests','คำขอลงทะเบียน','admin'], ['/admin/records','รายการจากแบบฟอร์ม','admin'], ['/admin/audit-logs','ประวัติระบบ','admin']
@@ -59,7 +59,7 @@ export function routeBackTarget(currentPath, trail=[], role=null) {
   if(path.startsWith('/admin/'))return '/admin/manage';
   if(path==='/employee/screen/work-session'||path==='/employee/screen/data')return '/employee/screen/work-menu';
   if(path==='/employee/screen/work-menu')return '/employee/screen';
-  if(path==='/employee/production-data')return '/employee/production';
+  if(path==='/employee/production-data'||path==='/employee/production/report')return '/employee/production';
   if(path==='/employee/production/work-session'||path==='/employee/production-record')return '/employee/production';
   if(path==='/employee/delivery/record')return '/employee/delivery';
   if(path.startsWith('/employee/'))return '/employee';

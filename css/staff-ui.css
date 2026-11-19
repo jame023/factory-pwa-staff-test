@@ -257,6 +257,10 @@
   font-size: .82rem;
   line-height: 1.5;
 }
+.sip-ui #page-root .production-report-list { display:grid; gap:12px; }
+.sip-ui #page-root .production-photo-report .list-meta { margin:.3rem 0 0; }
+.sip-ui #page-root .production-report-photo { margin-top:12px; }
+.sip-ui #page-root .production-report-photo img { display:block; width:min(100%,720px); max-height:70vh; object-fit:contain; border:1px solid var(--sip-border,#cbdde5); border-radius:12px; background:#f7fafb; }
 /* Use the desktop viewport with a modest shared edge inset. */
 @media (min-width: 1024px) {
   .sip-ui { --sip-desktop-inset: clamp(24px, 1.67vw, 32px); }
