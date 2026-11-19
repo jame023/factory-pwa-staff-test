@@ -1,7 +1,7 @@
-import { render as renderWorkSession } from './index.js?v=1.3.402';
-import { renderIndependentOutput } from './independent-output.js?v=1.3.402';
-import { render as renderOvertime } from '../ot/index.js?v=1.3.402';
-import { bangkokToday } from '../../js/utils.js?v=1.3.402';
+import { render as renderWorkSession } from './index.js?v=1.3.403';
+import { renderIndependentOutput } from './independent-output.js?v=1.3.403';
+import { render as renderOvertime } from '../ot/index.js?v=1.3.403';
+import { bangkokToday } from '../../js/utils.js?v=1.3.403';
 
 export async function render(root, context) {
   const canEnter = ['employee', 'admin'].includes(context.user.role);

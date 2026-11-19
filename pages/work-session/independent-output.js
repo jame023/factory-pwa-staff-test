@@ -1,6 +1,6 @@
-import * as workApi from '../../adapters/package07.js?v=1.3.402';
-import { bangkokToday, escapeHtml as e, thaiDate } from '../../js/utils.js?v=1.3.402';
-import { requireOnlineAction } from '../../js/offline.js?v=1.3.402';
+import * as workApi from '../../adapters/package07.js?v=1.3.403';
+import { bangkokToday, escapeHtml as e, thaiDate } from '../../js/utils.js?v=1.3.403';
+import { requireOnlineAction } from '../../js/offline.js?v=1.3.403';
 
 export async function renderIndependentOutput(root, context, group) {
   root.innerHTML='<p class="page-loading">กำลังโหลดข้อมูล…</p>';

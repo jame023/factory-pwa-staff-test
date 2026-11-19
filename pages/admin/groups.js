@@ -1,6 +1,6 @@
-import { escapeHtml } from '../../js/utils.js?v=1.3.402';
-import { getLiveAdminContext, loginToMachineAdmin } from '../../js/live-admin-context.js?v=1.3.402';
-import { showStatusModal } from '../../components/status-modal.js?v=1.3.402';
+import { escapeHtml } from '../../js/utils.js?v=1.3.403';
+import { getLiveAdminContext, loginToMachineAdmin } from '../../js/live-admin-context.js?v=1.3.403';
+import { showStatusModal } from '../../components/status-modal.js?v=1.3.403';
 
 const GROUPS = Object.freeze(['ออฟฟิศ', 'สกรีน', 'ผลิต', 'ขนส่ง', 'ผู้บริหาร', 'Admin']);
 const text = value => typeof value === 'string' ? value.trim() : '';

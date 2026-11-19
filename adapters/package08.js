@@ -1,4 +1,4 @@
-import { request } from "../js/api.js?v=1.3.402";
+import { request } from "../js/api.js?v=1.3.403";
 export const readCalendar = (month, group) => request("package08", "calendar.read", { month, ...(group === undefined ? {} : { group }) });
 export const saveCalendarDay = values => request("package08", "calendar.save", values);
 

@@ -1,5 +1,5 @@
-import { withRequestId } from "../js/business-request.js?v=1.3.402";
-import { request } from "../js/api.js?v=1.3.402";
+import { withRequestId } from "../js/business-request.js?v=1.3.403";
+import { request } from "../js/api.js?v=1.3.403";
 export const readDeviceOverview = () => request("package01", "devices.read");
 
 // Future bridge contract follows Package 01 saveManualEntry arguments.

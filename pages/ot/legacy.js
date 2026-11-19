@@ -1,6 +1,6 @@
-import * as workApi from "../../adapters/package07-legacy.js?v=1.3.402";
-import { escapeHtml as e, bangkokToday, thaiDateTime } from "../../js/utils.js?v=1.3.402";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.402";
+import * as workApi from "../../adapters/package07-legacy.js?v=1.3.403";
+import { escapeHtml as e, bangkokToday, thaiDateTime } from "../../js/utils.js?v=1.3.403";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.403";
 
 const MAX_PHOTOS=5, MAX_FILE_BYTES=512*1024, MAX_TOTAL_BYTES=2*1024*1024, MAX_SOURCE_BYTES=20*1024*1024;
 const formatDuration=hours=>{

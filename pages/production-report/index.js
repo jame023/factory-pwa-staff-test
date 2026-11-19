@@ -1,8 +1,8 @@
-import { createProductionReportService } from '../../js/production-report-service.js?v=1.3.402';
-import * as workApi from '../../adapters/package07.js?v=1.3.402';
-import { getAuthContext } from '../../js/access-context.js?v=1.3.402';
-import { requireOnlineAction } from '../../js/offline.js?v=1.3.402';
-import { escapeHtml as e, thaiDateTime } from '../../js/utils.js?v=1.3.402';
+import { createProductionReportService } from '../../js/production-report-service.js?v=1.3.403';
+import * as workApi from '../../adapters/package07.js?v=1.3.403';
+import { getAuthContext } from '../../js/access-context.js?v=1.3.403';
+import { requireOnlineAction } from '../../js/offline.js?v=1.3.403';
+import { escapeHtml as e, thaiDateTime } from '../../js/utils.js?v=1.3.403';
 
 const MAX_UPLOAD=512*1024, MAX_SOURCE=20*1024*1024;
 const TYPES=new Set(['image/jpeg','image/png','image/webp']);
@@ -38,7 +38,11 @@ function reportCard(row){
 export async function render(root,context){
   const auth=getAuthContext();
   const manager=['executive','admin'].includes(auth?.role);
-  const canSubmit=auth?.role==='employee'&&Array.isArray(auth?.groups)&&auth.groups.includes('ผลิต')&&auth?.active===true;
+  const productionWorkspace=auth?.selected_workspace==='ผลิต';
+  const canSubmit=auth?.active===true&&(
+    (auth.role==='employee'&&Array.isArray(auth.groups)&&auth.groups.includes('ผลิต')&&productionWorkspace)||
+    (auth.role==='admin'&&productionWorkspace)
+  );
   if(!manager&&!canSubmit){root.innerHTML='<section class="notice notice-warning"><h1>ไม่มีสิทธิ์เข้าหน้านี้</h1><p>เมนูนี้สำหรับพนักงานกลุ่มผลิต ผู้บริหาร และ Admin</p></section>';return;}
   const service=createProductionReportService();
   let machines=[],machineError='';
@@ -46,9 +50,9 @@ export async function render(root,context){
     try{machines=(await workApi.readWorkOptions('ผลิต')).machines||[];}
     catch(error){machineError=friendlyError(error);}
   }
-  root.innerHTML='<div class="page-heading"><div><p class="eyebrow">ผลิต</p><h1>รายงานการผลิต</h1><p>'+(manager?'ดูรูปภาพ รายชื่อผู้ส่ง เครื่องจักร และเวลาที่ส่งจากพื้นที่ผลิต':'ถ่ายรูปและส่งรายงานให้ผู้บริหารดู')+'</p></div><button class="button" type="button" data-refresh-report>รีเฟรช</button></div>'+
+  root.innerHTML='<div class="page-heading"><div><p class="eyebrow">ผลิต</p><h1>รายงานการผลิต</h1><p>'+(canSubmit?'ถ่ายรูปและส่งรายงานจากพื้นที่ผลิต':manager?'ดูรูปภาพ รายชื่อผู้ส่ง เครื่องจักร และเวลาที่ส่งจากพื้นที่ผลิต':'ถ่ายรูปและส่งรายงานให้ผู้บริหารดู')+'</p></div><button class="button" type="button" data-refresh-report>รีเฟรช</button></div>'+
     (canSubmit?'<section class="card form-card"><h2>ส่งรายงานการผลิต</h2><p>ชื่อผู้ส่งและเวลาจะยืนยันจากบัญชีและเวลาของระบบ</p><form data-production-report-form><div class="form-grid"><label class="field"><span>ชื่อผู้ส่ง</span><input value="'+e(auth.employee_name||context.user.name||'')+'" readonly></label><label class="field"><span>เครื่องจักร</span><select name="machineId" required '+(!machines.length?'disabled':'')+'><option value="">'+(machineError?'โหลดเครื่องจักรไม่สำเร็จ':'เลือกเครื่องจักร')+'</option>'+machines.map(machine=>'<option value="'+e(machine.id)+'">'+e(machine.machine_code||'')+' · '+e(machine.machine_name)+'</option>').join('')+'</select>'+(machineError?'<small class="field-error">'+e(machineError)+'</small>':'')+'</label><label class="field field-full"><span>รูปภาพรายงาน</span><input name="photo" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" required><small class="help-text">ถ่ายรูปหรือเลือกจากเครื่อง · JPG, PNG, WebP · ระบบย่อรูปอัตโนมัติ · ไม่เกิน 512 KB หลังเตรียมรูป</small><span role="status" data-photo-status>ยังไม่ได้เลือกรูป</span></label></div><div class="form-actions"><button class="button button-primary" type="submit" '+(!machines.length?'disabled':'')+'>ส่งรายงานการผลิต</button></div></form></section>':'')+
-    '<div class="section-title"><div><h2>'+(manager?'รายงานที่พนักงานส่ง':'ประวัติรายงานของฉัน')+'</h2><p>แสดงรายการล่าสุดไม่เกิน 40 รายการ</p></div></div><div class="production-report-list" data-report-list><p class="page-loading">กำลังโหลดรายงาน…</p></div>';
+    '<div class="section-title"><div><h2>'+(manager?'รายงานที่ส่งจากพื้นที่ผลิต':'ประวัติรายงานของฉัน')+'</h2><p>แสดงรายการล่าสุดไม่เกิน 40 รายการ</p></div></div><div class="production-report-list" data-report-list><p class="page-loading">กำลังโหลดรายงาน…</p></div>';
   const list=root.querySelector('[data-report-list]');
   const load=async()=>{
     list.innerHTML='<p class="page-loading">กำลังโหลดรายงาน…</p>';
