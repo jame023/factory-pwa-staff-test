@@ -28,7 +28,7 @@ entries.push(
   ['/executive/registration-requests','คำขอลงทะเบียน','executive'], ['/executive/audit-logs','ประวัติระบบ','executive'],
   ['/admin/records/employees','พนักงานและสิทธิ์','admin'], ['/admin/records/attendance','เวลาเข้า–ออก','admin'],
   ['/admin/records/leave','การลา','admin'], ['/admin/records/calendar','ปฏิทินการทำงาน','admin'],
-  ['/admin/records/work-sessions','เริ่มงาน–จบงาน','admin'], ['/admin/records/production','งานผลิต','admin'],
+  ['/admin/records/work-sessions','เริ่มงาน–จบงาน','admin'], ['/admin/records/production','งานผลิต','admin'], ['/admin/records/production-reports','รายงานการผลิต','admin'],
   ['/admin/records/deliveries','การขนส่ง','admin'], ['/admin/records/screen','งานสกรีน','admin'],
   ['/admin/records/ot','ทำงานล่วงเวลา (OT)','admin'], ['/admin/records/audit','ประวัติการแก้ไข','admin']
 );

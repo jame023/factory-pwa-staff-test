@@ -1,6 +1,6 @@
-import * as reportApi from "../../adapters/package06.js?v=1.3.404";
-import { statCard } from "../../components/app-card.js?v=1.3.404";
-import { escapeHtml } from "../../js/utils.js?v=1.3.404";
+import * as reportApi from "../../adapters/package06.js?v=1.3.406";
+import { statCard } from "../../components/app-card.js?v=1.3.406";
+import { escapeHtml } from "../../js/utils.js?v=1.3.406";
 
 const periods = [
   { key: "today", label: "วันนี้" },

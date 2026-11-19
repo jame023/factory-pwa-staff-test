@@ -1,6 +1,6 @@
 import { createClient } from '../vendor/supabase-js-2.118.0.js';
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js?v=1.3.404';
-import { saveSession, loadSession, deleteSession } from './session-vault.js?v=1.3.404';
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js?v=1.3.406';
+import { saveSession, loadSession, deleteSession } from './session-vault.js?v=1.3.406';
 let client;
 // The SDK owns refresh rotation, expiry and the persisted Auth session format.
 // Browser encryption cannot protect against compromised same-origin scripts.

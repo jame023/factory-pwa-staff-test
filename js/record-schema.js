@@ -1,4 +1,4 @@
-import { bangkokToday } from "./utils.js?v=1.3.404";
+import { bangkokToday } from "./utils.js?v=1.3.406";
 
 const field = (key, label, type = "text", extra = {}) => ({ key, label, type, ...extra });
 const required = { required: true };

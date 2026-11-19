@@ -1,12 +1,12 @@
-import { iconMarkup, routeIcon } from '../../js/ui-icons.js?v=1.3.404';
-import { getAuthContext, canAccessRoute, selectActiveGroup, availableWorkspaces } from '../../js/access-context.js?v=1.3.404';
-import { ROUTES, normalizeRoute, workspaceGroups, groupRoute } from '../../js/route-policy.js?v=1.3.404';
-import { escapeHtml } from '../../js/utils.js?v=1.3.404';
-import { showStatusModal } from '../../components/status-modal.js?v=1.3.404';
-import { getMachineAdminSession } from '../../js/machine-admin-auth.js?v=1.3.404';
-import { createSupabaseMachineRepository } from '../../js/machine-admin-repository.js?v=1.3.404';
-import { createSupabaseItemNameRepository } from '../../js/item-name-admin-repository.js?v=1.3.404';
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '../../js/config.js?v=1.3.404';
+import { iconMarkup, routeIcon } from '../../js/ui-icons.js?v=1.3.406';
+import { getAuthContext, canAccessRoute, selectActiveGroup, availableWorkspaces } from '../../js/access-context.js?v=1.3.406';
+import { ROUTES, normalizeRoute, workspaceGroups, groupRoute } from '../../js/route-policy.js?v=1.3.406';
+import { escapeHtml } from '../../js/utils.js?v=1.3.406';
+import { showStatusModal } from '../../components/status-modal.js?v=1.3.406';
+import { getMachineAdminSession } from '../../js/machine-admin-auth.js?v=1.3.406';
+import { createSupabaseMachineRepository } from '../../js/machine-admin-repository.js?v=1.3.406';
+import { createSupabaseItemNameRepository } from '../../js/item-name-admin-repository.js?v=1.3.406';
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '../../js/config.js?v=1.3.406';
 const adminMenuPresentation = Object.freeze({
   '/admin/system-status': {tone:'teal',hint:'ตรวจเครื่องอ่านบัตร รายงานอัตโนมัติ และการส่งแจ้งเตือน',icon:'<path d="M3 12h4l3-8 4 16 3-8h4"/>'},
   '/admin/employees': {tone:'blue',hint:'ข้อมูลพนักงานและสถานะการใช้งาน',icon:'<circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6M21 21v-3a6 6 0 0 0-4-5.65"/>'},
@@ -20,13 +20,14 @@ const adminMenuPresentation = Object.freeze({
   '/admin/records/calendar': {tone:'slate',hint:'วันทำงาน วันหยุด และปฏิทินแยกกลุ่ม'},
   '/admin/records/work-sessions': {tone:'green',hint:'เครื่องจักร ออเดอร์ และเวลาเริ่ม–จบ'},
   '/admin/records/production': {tone:'green',hint:'จำนวนผลิต ของเสีย และผู้บันทึก'},
+  '/admin/records/production-reports': {tone:'green',hint:'ดูรายงานรูปถ่ายและส่งรายงานจากบัญชี Admin'},
   '/admin/records/deliveries': {tone:'teal',hint:'สินค้า ผู้ส่ง และสถานะรายการ'},
   '/admin/records/screen': {tone:'blue',hint:'จำนวนแพ็คและของเสียจากงานสกรีน'},
   '/admin/records/ot': {tone:'amber',hint:'รายการ OT และรูปหลักฐาน'},
 });
 const adminManagementSections = Object.freeze([
   {title:'เมนูจัดการข้อมูล',description:'พนักงาน กลุ่มงาน เครื่องจักร รายชื่อสินค้า คำขอลงทะเบียน และประวัติระบบ',paths:['/admin/employees','/admin/groups','/admin/machines','/admin/items','/admin/registration-requests','/admin/audit-logs','/admin/system-status']},
-  {title:'รายการที่บันทึกจากแบบฟอร์ม',description:'เลือกหมวดเพื่อเปิดรายการของหมวดนั้นโดยตรง',paths:['/admin/records/attendance','/admin/records/leave','/admin/records/calendar','/admin/records/work-sessions','/admin/records/production','/admin/records/deliveries','/admin/records/screen','/admin/records/ot']}
+  {title:'รายการที่บันทึกจากแบบฟอร์ม',description:'เลือกหมวดเพื่อเปิดรายการของหมวดนั้นโดยตรง',paths:['/admin/records/attendance','/admin/records/leave','/admin/records/calendar','/admin/records/work-sessions','/admin/records/production','/admin/records/production-reports','/admin/records/deliveries','/admin/records/screen','/admin/records/ot']}
 ]);
 function adminHubCardMarkup(item) {
   const tag=item.pending?'div':'a';
