@@ -1,12 +1,12 @@
-import { notificationReadKey, readAcknowledgedIds } from './notification-read-state.js?v=1.3.398';
-import { readAttendanceNotifications } from '../adapters/package10.js?v=1.3.398';
-import { readReportNotifications } from '../adapters/package06.js?v=1.3.398';
-import { readCalendarNotifications } from '../adapters/package08.js?v=1.3.398';
-import { readLeaveNotifications } from '../adapters/package09.js?v=1.3.398';
-import { subscribeStore } from './state.js?v=1.3.398';
-import { APP_MODE } from './config.js?v=1.3.398';
-import { readUnreadNotificationCount } from './notification-client.js?v=1.3.398';
-import { setNotificationBadge } from './notification-badge.js?v=1.3.398';
+import { notificationReadKey, readAcknowledgedIds } from './notification-read-state.js?v=1.3.399';
+import { readAttendanceNotifications } from '../adapters/package10.js?v=1.3.399';
+import { readReportNotifications } from '../adapters/package06.js?v=1.3.399';
+import { readCalendarNotifications } from '../adapters/package08.js?v=1.3.399';
+import { readLeaveNotifications } from '../adapters/package09.js?v=1.3.399';
+import { subscribeStore } from './state.js?v=1.3.399';
+import { APP_MODE } from './config.js?v=1.3.399';
+import { readUnreadNotificationCount } from './notification-client.js?v=1.3.399';
+import { setNotificationBadge } from './notification-badge.js?v=1.3.399';
 
 export function startCalendarNotifications(user, showToast) {
   setNotificationBadge(null);

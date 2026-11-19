@@ -1,7 +1,7 @@
-import {hideActionPopup} from '../../components/action-popup.js?v=1.3.398';
-import {escapeHtml as esc,thaiDateTime} from '../../js/utils.js?v=1.3.398';
-import {showStatusModal,isStatusModalOpen} from '../../components/status-modal.js?v=1.3.398';
-import {createRegistrationRequest,validateRegistration,refreshMyRegistrationStatus,checkApprovedEmployeeStatus} from '../../js/registration-api.js?v=1.3.398';
+import {hideActionPopup} from '../../components/action-popup.js?v=1.3.399';
+import {escapeHtml as esc,thaiDateTime} from '../../js/utils.js?v=1.3.399';
+import {showStatusModal,isStatusModalOpen} from '../../components/status-modal.js?v=1.3.399';
+import {createRegistrationRequest,validateRegistration,refreshMyRegistrationStatus,checkApprovedEmployeeStatus} from '../../js/registration-api.js?v=1.3.399';
 
 const STATUS_LABELS={pending:'รอ Admin ตรวจสอบ',approved:'อนุมัติแล้ว',rejected:'ไม่ได้รับอนุมัติ',cancelled:'ยกเลิกแล้ว'};
 const STATUS_COPY={pending:'คำขอสมัครสมาชิกอยู่ระหว่างตรวจสอบ',approved:'คำขอได้รับอนุมัติแล้ว',rejected:'คำขอไม่ได้รับอนุมัติ',cancelled:'คำขอนี้ถูกยกเลิก'};

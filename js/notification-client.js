@@ -1,6 +1,6 @@
-import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from './config.js?v=1.3.398';
-import { getSupabaseLineAccessToken } from './auth.js?v=1.3.398';
-import { decodeVapidKey } from './report-push-subscription.js?v=1.3.398';
+import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from './config.js?v=1.3.399';
+import { getSupabaseLineAccessToken } from './auth.js?v=1.3.399';
+import { decodeVapidKey } from './report-push-subscription.js?v=1.3.399';
 
 const FUNCTION_URL = SUPABASE_URL.replace(/\/+$/, '') + '/functions/v1/factory-notifications';
 

@@ -4,8 +4,8 @@ import {
   markNotificationRead,
   readDeviceNotificationState,
   readNotificationInbox
-} from '../../js/notification-client.js?v=1.3.398';
-import { escapeHtml as e } from '../../js/utils.js?v=1.3.398';
+} from '../../js/notification-client.js?v=1.3.399';
+import { escapeHtml as e } from '../../js/utils.js?v=1.3.399';
 
 const number = value => Number(value || 0).toLocaleString('th-TH');
 const duration = value => {
@@ -55,7 +55,11 @@ function dateLabel(value) {
   return new Intl.DateTimeFormat('th-TH', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Bangkok' }).format(date);
 }
 
-function safeRoute(route) {
+function safeRoute(route, row, context) {
+  if (row?.kind === 'daily_report' || row?.kind === 'weekly_report') {
+    const role = context?.user?.role || context?.role;
+    return role === 'executive' ? '#/executive/reports' : '#/employee/reports';
+  }
   const allowed = new Set([
     '#/notifications',
     '#/employee/leave',
@@ -77,7 +81,10 @@ export async function render(root, context) {
   const deviceHost=root.querySelector('[data-device-card]'),list=root.querySelector('[data-inbox-items]'),status=root.querySelector('[data-inbox-status]'),more=root.querySelector('[data-inbox-more]');
   const alive=()=>!context.signal?.aborted&&root.isConnected;
   const paintRows=()=>{
-    list.innerHTML=rows.length?rows.map(row=>'<article class="notification-inbox-item'+(row.read_at?'':' is-unread')+'" data-notification-id="'+e(row.id)+'"><div class="notification-inbox-item-heading"><div><h2>'+e(row.title)+'</h2><time datetime="'+e(row.created_at)+'">'+e(dateLabel(row.created_at))+'</time></div>'+(!row.read_at?'<span class="notification-unread-badge">ใหม่</span>':'')+'</div><p class="notification-inbox-body">'+e(row.body)+'</p>'+eventDetails(row)+'<div class="form-actions"><a class="button button-small" href="'+e(safeRoute(row.route))+'">เปิดข้อมูล</a>'+(!row.read_at?'<button class="button button-small" type="button" data-mark-read>รับทราบ</button>':'')+'</div></article>').join(''):'<p class="empty-state">ไม่พบข้อความตามเงื่อนไข</p>';
+    list.innerHTML=rows.length?rows.map(row=>{
+      const report=row.kind==='daily_report'||row.kind==='weekly_report';
+      return '<article class="notification-inbox-item'+(row.read_at?'':' is-unread')+'" data-notification-id="'+e(row.id)+'"><div class="notification-inbox-item-heading"><div><h2>'+e(row.title)+'</h2><time datetime="'+e(row.created_at)+'">'+e(dateLabel(row.created_at))+'</time></div>'+(!row.read_at?'<span class="notification-unread-badge">ใหม่</span>':'')+'</div><p class="notification-inbox-body">'+e(row.body)+'</p>'+eventDetails(row)+'<div class="form-actions"><a class="button button-small" href="'+e(safeRoute(row.route,row,context))+'">'+(report?'ดูรายงาน':'เปิดข้อมูล')+'</a>'+(!row.read_at?'<button class="button button-small" type="button" data-mark-read>รับทราบ</button>':'')+'</div></article>';
+    }).join(''):'<p class="empty-state">ไม่พบข้อความตามเงื่อนไข</p>';
   };
   async function load(append=false){
     const version=++generation;
