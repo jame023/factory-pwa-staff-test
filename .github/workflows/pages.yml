@@ -39,7 +39,8 @@ jobs:
           for attempt in {1..10}; do
             artifact_count="$(gh api "repos/${REPOSITORY}/actions/runs/${RUN_ID}/artifacts" --jq "[.artifacts[] | select(.name == \"${ARTIFACT_NAME}\")] | length")"
             if [ "$artifact_count" -eq 1 ]; then
-              echo "Pages artifact is visible."
+              echo "Pages artifact is visible; allowing the Pages artifact service to catch up."
+              sleep 10
               exit 0
             fi
             sleep 3
