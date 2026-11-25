@@ -1,4 +1,4 @@
-import { ICONS, routeIcon } from './ui-icons.js?v=1.3.407';
+import { ICONS, routeIcon } from './ui-icons.js?v=1.3.408';
 
 // Add decorative icon attributes only. Never replace controls or change names,
 // values, listeners, visibility, session state or authorization.

@@ -1,6 +1,6 @@
-import { attendanceCalculation, monthlyOverview } from "./business-rules.js?v=1.3.407";
-import { bangkokToday } from "./utils.js?v=1.3.407";
-import { inAttendancePeriod, normalizeAttendanceQuery } from "./attendance-contract.js?v=1.3.407";
+import { attendanceCalculation, monthlyOverview } from "./business-rules.js?v=1.3.408";
+import { bangkokToday } from "./utils.js?v=1.3.408";
+import { inAttendancePeriod, normalizeAttendanceQuery } from "./attendance-contract.js?v=1.3.408";
 
 // Synthetic rows only. Time metrics use the inspected Package03 rules; monthly weights use Package10.
 export function createAttendanceFixture(input = {}, options = {}) {

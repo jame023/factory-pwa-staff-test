@@ -1,13 +1,13 @@
-import { renderEmployeeLeave } from './employee.js?v=1.3.407';
-import { renderLeaveMedia } from "../../js/leave-media.js?v=1.3.407";
-import * as api from "../../adapters/package09.js?v=1.3.407";
-import { enumerateLeaveDates, storedLeaveItems, isLeaveSubmissionOpen, LEAVE_WINDOW_MESSAGE } from "../../js/leave-rules.js?v=1.3.407";
-import { mountApprovedLeaveCalendar } from "./approved-calendar.js?v=1.3.407";
-import { escapeHtml as e, thaiDate, statusText, bangkokToday } from "../../js/utils.js?v=1.3.407";
-import { canManage } from "../../js/permissions.js?v=1.3.407";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.407";
-import { confirmAction } from "../../components/modal.js?v=1.3.407";
-import { renderLeaveManager } from './manager.js?v=1.3.407';
+import { renderEmployeeLeave } from './employee.js?v=1.3.408';
+import { renderLeaveMedia } from "../../js/leave-media.js?v=1.3.408";
+import * as api from "../../adapters/package09.js?v=1.3.408";
+import { enumerateLeaveDates, storedLeaveItems, isLeaveSubmissionOpen, LEAVE_WINDOW_MESSAGE } from "../../js/leave-rules.js?v=1.3.408";
+import { mountApprovedLeaveCalendar } from "./approved-calendar.js?v=1.3.408";
+import { escapeHtml as e, thaiDate, statusText, bangkokToday } from "../../js/utils.js?v=1.3.408";
+import { canManage } from "../../js/permissions.js?v=1.3.408";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.408";
+import { confirmAction } from "../../components/modal.js?v=1.3.408";
+import { renderLeaveManager } from './manager.js?v=1.3.408';
 
 const MAX_LEAVE_PHOTOS = 5;
 const MAX_LEAVE_FILE_BYTES = 1024 * 1024;
@@ -98,7 +98,7 @@ export async function render(root, context) {
             <div class="ot-photo-grid" data-photo-grid></div>
           </div>
         </div>
-        <p class="help-text leave-rule-note">รูปแนบจะถูกส่งและบันทึกพร้อมคำขอในระบบ • ส่งคำขอได้เฉพาะ 05:00–ก่อน 21:00 น. เวลาไทย • วันเดียวกันลาเช้าและบ่ายได้ทุกกลุ่มงาน แต่ช่วงเวลาที่ทับกันยื่นซ้ำไม่ได้ • ลากิจไม่เกิน 2 วันต่อครั้ง / 2 คำขอต่อเดือน • ลาป่วยไม่มีใบรับรองยื่นได้ 1 คำขอต่อเดือน นับรวมทุกช่วงเวลา</p>
+        <p class="help-text leave-rule-note">ส่งคำขอเวลา 05:00–21:00 น. เวลาไทย (เซิร์ฟเวอร์รับถึง 21:00:59) • ลากิจรวมไม่เกิน 2 วันต่อเดือนและต่อคำขอ คิดตามเดือนที่ลา • ครึ่งวันเท่ากับ 0.5 วัน และเลือกได้เพียง 1 วันต่อคำขอ • ลาป่วยไม่มีรูปแนบได้ 1 คำขอต่อเดือน โดยไม่จำกัดจำนวนวันในคำขอ • ลาป่วยมีรูปแนบไม่มีเพดานรายเดือน แต่ยังตรวจวันซ้ำ • รูปแนบใช้เป็นสัญญาณว่ามีเอกสาร ระบบไม่ตรวจว่าเป็นใบรับรองแพทย์จริง • วันหยุดตามปฏิทินกลุ่มไม่นับเป็นวันลา • คำขอปกติห้ามชนวันที่มีคำขอรอตรวจหรืออนุมัติแล้ว</p>
         <button class="button button-primary leave-submit" type="submit">ส่งคำขอ</button>
       </form>
     </section>` : "";
@@ -106,7 +106,7 @@ export async function render(root, context) {
     employeeForm+
     (manage ? '<section class="card card-pad attendance-section"><h2>รออนุมัติ</h2>'+ (rows.filter(row=>row.status==='pending').map(item=>'<article class="card card-pad attendance-section leave-request" data-request="'+e(item.id)+'">'+details(item)+'<label class="field">เหตุผลปฏิเสธ (กรอกเมื่อไม่อนุมัติ)<textarea data-rejection maxlength="500" placeholder="ระบุเหตุผลให้ผู้ขอลาทราบ"></textarea></label><div class="form-actions leave-decision-actions"><button class="button button-primary" data-decision="approved">อนุมัติ</button><button class="button button-danger" data-decision="rejected">ปฏิเสธ</button></div></article>').join('') || '<p>ไม่มีคำขอรออนุมัติ</p>')+'</section>' : '')+
     '<section class="card card-pad attendance-section" data-leave-calendar></section>'+
-    '<section class="card card-pad attendance-section"><h2>ประวัติคำขอ</h2>'+ (rows.map(item=>'<article class="card card-pad attendance-section leave-request" data-request="'+e(item.id)+'">'+details(item)+'<strong class="leave-status" data-status="'+e(item.status)+'">'+e(statusText(item.status))+'</strong>'+(item.rejectionReason?'<p>เหตุผลปฏิเสธ: '+e(item.rejectionReason)+'</p>':'')+(item.employeeId===context.user.id && item.status==='pending' ? '<label class="field">เหตุผลยกเลิก<textarea data-cancel-reason maxlength="500"></textarea></label><button class="button button-danger" data-cancel>ยกเลิกคำขอ</button>' : '')+'</article>').join('') || '<p>ยังไม่มีคำขอ</p>')+'</section>';
+    '<section class="card card-pad attendance-section"><h2>ประวัติคำขอ</h2>'+ (rows.map(item=>'<article class="card card-pad attendance-section leave-request" data-request="'+e(item.id)+'">'+details(item)+'<strong class="leave-status" data-status="'+e(item.status)+'">'+e(statusText(item.status))+'</strong>'+(item.rejectionReason?'<p>เหตุผลปฏิเสธ: '+e(item.rejectionReason)+'</p>':'')+(item.employeeId===context.user.id && ['pending','approved'].includes(item.status) && storedLeaveItems(item).at(-1)?.date>=bangkokToday() ? '<label class="field">เหตุผลยกเลิก<textarea data-cancel-reason maxlength="500"></textarea></label><button class="button button-danger" data-cancel>ยกเลิกคำขอ</button>' : '')+'</article>').join('') || '<p>ยังไม่มีคำขอ</p>')+'</section>';
   root.insertAdjacentHTML('beforeend','<section class="card card-pad attendance-section"><h2>รูปแจ้งผลและประวัติแจ้งเตือนการลา</h2><p class="help-text">แสดงตามสิทธิ์ผู้ขอ / ผู้บริหาร / ออฟฟิต • อ่านข้อมูลจากระบบ</p>'+ (notices.map(notice=>'<article class="leave-request card card-pad attendance-section"><h3>'+e(notice.title)+'</h3><p style="white-space:pre-wrap">'+e(notice.body)+'</p>'+ (renderLeaveMedia(notice.mediaPreview)||'<p class="help-text">รายการเดิมยังไม่มีรูปแนบแจ้งผล</p>')+'</article>').join('') || '<p>ยังไม่มีประวัติแจ้งเตือนการลา</p>')+'</section>');
   mountApprovedLeaveCalendar(root, context);
   const form = root.querySelector('#leave-form');
@@ -203,8 +203,12 @@ export async function render(root, context) {
     if(!isLeaveSubmissionOpen()){context.showToast(LEAVE_WINDOW_MESSAGE,'error');return;}
     button.disabled=true; button.textContent='กำลังส่ง…';
     try {
-      await api.submitLeaveRequest({type:form.elements.type.value,startDate:form.elements.startDate.value,endDate:form.elements.endDate.value,reason:form.elements.reason.value,
-        dates:[...form.querySelectorAll('[data-date]')].map(el=>({date:el.dataset.date,period:el.value})),
+      const reason=form.elements.reason.value.trim();
+      if(!reason||reason.length>500)throw new Error('กรุณาระบุเหตุผลการลาไม่เกิน 500 ตัวอักษร');
+      const dates=[...form.querySelectorAll('[data-date]')].map(el=>({date:el.dataset.date,period:el.value}));
+      if(dates.filter(day=>day.period==='morning'||day.period==='afternoon').length>1)throw new Error('เลือกช่วงครึ่งวันได้เพียง 1 วันต่อคำขอ');
+      await api.submitLeaveRequest({type:form.elements.type.value,startDate:form.elements.startDate.value,endDate:form.elements.endDate.value,reason,
+        dates,
         images:await Promise.all(selectedPhotos.map(file=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve({name:file.name,mimeType:file.type,size:file.size,dataUrl:reader.result});reader.onerror=()=>reject(new Error("อ่านรูปแนบไม่สำเร็จ"));reader.readAsDataURL(file);})))});
       clearPreviewUrls();
       context.showToast('ส่งคำขอลาแล้ว','success'); await render(root,context);
@@ -218,6 +222,7 @@ export async function render(root, context) {
     const cancel=button.hasAttribute('data-cancel'), decision=button.dataset.decision;
     const reason=article.querySelector(cancel?'[data-cancel-reason]':'[data-rejection]')?.value.trim() || '';
     if((cancel || decision==='rejected') && !reason){context.showToast('กรุณาระบุเหตุผล','error');return;}
+    if((cancel || decision==='rejected') && reason.length>500){context.showToast('เหตุผลต้องไม่เกิน 500 ตัวอักษร','error');return;}
     controls.forEach(el=>{el.disabled=true;});
     const original=button.textContent;
     try {

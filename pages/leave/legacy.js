@@ -1,12 +1,12 @@
-import { renderLeaveMedia } from "../../js/leave-media.js?v=1.3.407";
-import * as api from "../../adapters/package09-legacy.js?v=1.3.407";
-import * as adminApi from "../../adapters/package11.js?v=1.3.407";
-import { enumerateLeaveDates, storedLeaveItems, isLeaveSubmissionOpen, LEAVE_WINDOW_MESSAGE } from "../../js/leave-rules-legacy.js?v=1.3.407";
-import { mountApprovedLeaveCalendar } from "./approved-calendar-legacy.js?v=1.3.407";
-import { escapeHtml as e, thaiDate, statusText, bangkokToday } from "../../js/utils.js?v=1.3.407";
-import { canManage } from "../../js/permissions.js?v=1.3.407";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.407";
-import { confirmAction } from "../../components/modal.js?v=1.3.407";
+import { renderLeaveMedia } from "../../js/leave-media.js?v=1.3.408";
+import * as api from "../../adapters/package09-legacy.js?v=1.3.408";
+import * as adminApi from "../../adapters/package11.js?v=1.3.408";
+import { enumerateLeaveDates, storedLeaveItems, isLeaveSubmissionOpen, LEAVE_WINDOW_MESSAGE } from "../../js/leave-rules-legacy.js?v=1.3.408";
+import { mountApprovedLeaveCalendar } from "./approved-calendar-legacy.js?v=1.3.408";
+import { escapeHtml as e, thaiDate, statusText, bangkokToday } from "../../js/utils.js?v=1.3.408";
+import { canManage } from "../../js/permissions.js?v=1.3.408";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.408";
+import { confirmAction } from "../../components/modal.js?v=1.3.408";
 
 const MAX_LEAVE_PHOTOS = 5;
 const MAX_LEAVE_FILE_BYTES = 1024 * 1024;
@@ -98,7 +98,7 @@ export async function render(root, context) {
             <div class="ot-photo-grid" data-photo-grid></div>
           </div>
         </div>
-        <p class="help-text leave-rule-note">รูปแนบจะถูกส่งและบันทึกพร้อมคำขอใน Supabase • ส่งคำขอได้เฉพาะ 05:00–21:00 น. เวลาไทย • ลากิจไม่เกิน 2 วันต่อครั้ง / 2 ครั้งต่อเดือน • ลาป่วยไม่มีใบรับรองไม่เกิน 1 ครั้งต่อเดือน</p>
+        <p class="help-text leave-rule-note">ส่งคำขอเวลา 05:00–21:00 น. เวลาไทย (เซิร์ฟเวอร์รับถึง 21:00:59) • ลากิจรวมไม่เกิน 2 วันต่อเดือนและต่อคำขอ คิดตามเดือนที่ลา • ครึ่งวันเท่ากับ 0.5 วัน และเลือกได้เพียง 1 วันต่อคำขอ • ลาป่วยไม่มีรูปแนบได้ 1 คำขอต่อเดือน โดยไม่จำกัดจำนวนวันในคำขอ • ลาป่วยมีรูปแนบไม่มีเพดานรายเดือน แต่ยังตรวจวันซ้ำ • รูปแนบใช้เป็นสัญญาณว่ามีเอกสาร ระบบไม่ตรวจว่าเป็นใบรับรองแพทย์จริง • วันหยุดตามปฏิทินกลุ่มไม่นับเป็นวันลา</p>
         <button class="button button-primary leave-submit" type="submit">ส่งคำขอ</button>
       </form>
     </section>` : "";
@@ -223,8 +223,12 @@ export async function render(root, context) {
     if(!isLeaveSubmissionOpen()){context.showToast(LEAVE_WINDOW_MESSAGE,'error');return;}
     button.disabled=true; button.textContent='กำลังส่ง…';
     try {
+      const reason=form.elements.reason.value.trim();
+      if(!reason||reason.length>500)throw new Error('กรุณาระบุเหตุผลการลาไม่เกิน 500 ตัวอักษร');
+      const dates=[...form.querySelectorAll('[data-date]')].map(el=>({date:el.dataset.date,period:el.value}));
+      if(dates.filter(day=>day.period==='morning'||day.period==='afternoon').length>1)throw new Error('เลือกช่วงครึ่งวันได้เพียง 1 วันต่อคำขอ');
       await api.submitLeaveRequest({type:form.elements.type.value,startDate:form.elements.startDate.value,endDate:form.elements.endDate.value,reason:form.elements.reason.value,
-        dates:[...form.querySelectorAll('[data-date]')].map(el=>({date:el.dataset.date,period:el.value})),
+        dates,
         images:await Promise.all(selectedPhotos.map(file=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve({name:file.name,mimeType:file.type,size:file.size,dataUrl:reader.result});reader.onerror=()=>reject(new Error("อ่านรูปแนบไม่สำเร็จ"));reader.readAsDataURL(file);})))});
       clearPreviewUrls();
       context.showToast('ส่งคำขอลาแล้ว','success'); await render(root,context);
@@ -238,6 +242,7 @@ export async function render(root, context) {
     const cancel=button.hasAttribute('data-cancel'), decision=button.dataset.decision;
     const reason=article.querySelector(cancel?'[data-cancel-reason]':'[data-rejection]')?.value.trim() || '';
     if((cancel || decision==='rejected') && !reason){context.showToast('กรุณาระบุเหตุผล','error');return;}
+    if((cancel || decision==='rejected') && reason.length>500){context.showToast('เหตุผลต้องไม่เกิน 500 ตัวอักษร','error');return;}
     controls.forEach(el=>{el.disabled=true;});
     const original=button.textContent;
     try {

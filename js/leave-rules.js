@@ -1,12 +1,12 @@
 const periodMap = {full:{amount:1,label:"เต็มวัน"},morning:{amount:0.5,label:"ครึ่งวันเช้า"},afternoon:{amount:0.5,label:"ครึ่งวันบ่าย"},none:{amount:0,label:"ไม่ลา"}};
 const validDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value || "") && Number.isFinite(Date.parse(value+"T00:00:00Z")) && new Date(value+"T00:00:00Z").toISOString().slice(0,10)===value;
-export const LEAVE_WINDOW_MESSAGE = "ส่ง แก้ไข และยกเลิกคำขอลาได้เวลา 05:00–ก่อน 21:00 น. (เวลาไทย) เท่านั้น";
+export const LEAVE_WINDOW_MESSAGE = "ส่งหรือแก้ไขคำขอลาได้เวลา 05:00–21:00 น. เวลาไทย (เซิร์ฟเวอร์รับถึง 21:00:59)";
 export function isLeaveSubmissionOpen(now = new Date()) {
   const time = Object.fromEntries(new Intl.DateTimeFormat("en-GB", {
     timeZone:"Asia/Bangkok", hour:"2-digit", minute:"2-digit", second:"2-digit", hourCycle:"h23"
   }).formatToParts(now).map(part => [part.type,part.value]));
   const seconds = Number(time.hour)*3600 + Number(time.minute)*60 + Number(time.second);
-  return seconds >= 18000 && seconds < 75600;
+  return seconds >= 18000 && seconds < 75660;
 }
 export function enumerateLeaveDates(start,end) {
   if(!validDate(start)||!validDate(end)||start>end)throw new Error("ช่วงวันที่ลาไม่ถูกต้อง");
@@ -20,11 +20,9 @@ export function storedLeaveItems(row) {
   return enumerateLeaveDates(row.startDate,row.endDate).map(date=>({date,period:code,...periodMap[code]}));
 }
 const periodCode = value => Object.hasOwn(periodMap,value) ? value : Object.keys(periodMap).find(key=>periodMap[key].label===value) || null;
-const leavePeriodsOverlap = (left,right) => {
-  const a=periodCode(left.period), b=periodCode(right.period);
-  if(left.amount===0 || right.amount===0 || a==="none" || b==="none")return false;
-  if(!a || !b)return true;
-  return a==="full" || b==="full" || a===b;
+const leaveAmount = day => {
+  const amount=Number(day?.amount);
+  return Number.isFinite(amount) ? amount : periodMap[periodCode(day?.period)||"full"].amount;
 };
 export function validateLeaveSubmission(input,user,rows,calendar,now=new Date(),options={}) {
   const proxy = options.adminProxy;
@@ -34,8 +32,9 @@ export function validateLeaveSubmission(input,user,rows,calendar,now=new Date(),
   const group=user.primaryWorkGroup || user.workGroup || (groups.length===1 ? groups[0] : "");
   if(!["ผลิต","สกรีน","ขนส่ง","ออฟฟิต"].includes(group) || !groups.includes(group))throw new Error("บัญชีนี้ยังไม่ได้กำหนดกลุ่มงานหลักที่ชัดเจน");
   if(!["ลากิจ","ลาป่วย"].includes(input.type))throw new Error("ประเภทการลาไม่ถูกต้อง");
-  const reason=String(input.reason||"").replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,"").trim().slice(0,500);
+  const reason=String(input.reason||"").replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,"").trim();
   if(!reason)throw new Error("กรุณากรอกเหตุผลการลา");
+  if(reason.length>500)throw new Error("เหตุผลการลาต้องไม่เกิน 500 ตัวอักษร");
   const range=enumerateLeaveDates(input.startDate,input.endDate);
   let items;
   if(Object.hasOwn(input,"dates")) {
@@ -55,8 +54,7 @@ export function validateLeaveSubmission(input,user,rows,calendar,now=new Date(),
   if(!items.length)throw new Error("วันที่เลือกลาเป็นวันหยุดทั้งหมด หรือกำหนดเป็นไม่ลาทั้งหมด");
   const totalDays=items.reduce((sum,row)=>sum+row.amount,0);
   if(input.type==="ลากิจ"&&totalDays>2)throw new Error("ลากิจได้ไม่เกิน 2 วันต่อครั้ง");
-  const occupied=rows.filter(row=>["pending","approved"].includes(row.status));
-  if(occupied.some(row=>storedLeaveItems(row).some(day=>items.some(item=>item.date===day.date&&leavePeriodsOverlap(item,day)))))throw new Error("มีคำขอลารออนุมัติหรืออนุมัติแล้วทับช่วงเวลาที่เลือก กรุณาติดต่อออฟฟิตหากต้องการขอลา");
+  if(items.filter(row=>row.period==="morning"||row.period==="afternoon").length>1)throw new Error("เลือกช่วงครึ่งวันได้เพียง 1 วันต่อคำขอ");
   const images=input.images || [];
   if(!Array.isArray(images)||images.length>5)throw new Error("แนบรูปได้สูงสุด 5 รูป");
   let totalBytes=0;
@@ -65,12 +63,22 @@ export function validateLeaveSubmission(input,user,rows,calendar,now=new Date(),
     totalBytes+=image.size;return {name:String(image.name||"รูปแนบ").slice(0,120),mimeType:image.mimeType,size:image.size};
   });
   if(totalBytes>5242880)throw new Error("รูปทั้งหมดต้องไม่เกิน 5 MB");
+  const occupied=rows.filter(row=>["pending","approved"].includes(row.status)&&row.id!==input.id);
+  const skipOverlap=input.type==="ลาป่วย"&&attachments.length===0;
+  if(!skipOverlap&&occupied.some(row=>storedLeaveItems(row).some(day=>leaveAmount(day)>0&&items.some(item=>item.date===day.date))))
+    throw new Error("มีคำขอลารออนุมัติหรืออนุมัติแล้วในวันที่เลือก กรุณาติดต่อออฟฟิตหากต้องการขอลา");
   const months=new Set(items.map(row=>row.date.slice(0,7)));
   for(const month of months) {
-    const existing=occupied.filter(row=>row.employeeId===user.id&&row.type===input.type&&storedLeaveItems(row).some(day=>day.date.startsWith(month)));
-    const count=new Set(existing.filter(row=>input.type==="ลากิจ" || !(row.attachments?.length || row.hasMedicalCertificate)).map(row=>row.id)).size;
-    if(input.type==="ลากิจ"&&count>=2)throw new Error("ลากิจครบโควตาเดือน "+month+" แล้ว (สูงสุด 2 ครั้งต่อเดือน)");
-    if(input.type==="ลาป่วย"&&!attachments.length&&count>=1)throw new Error("ลาป่วยโดยไม่มีใบรับรองแพทย์ครบโควตาเดือน "+month+" แล้ว (สูงสุด 1 คำขอต่อเดือน นับรวมทุกช่วงเวลา)");
+    const existing=occupied.filter(row=>row.employeeId===user.id&&row.type===input.type);
+    if(input.type==="ลากิจ") {
+      const usedDays=existing.reduce((sum,row)=>sum+storedLeaveItems(row).filter(day=>day.date.startsWith(month)).reduce((subtotal,day)=>subtotal+leaveAmount(day),0),0);
+      const requestedDays=items.filter(row=>row.date.startsWith(month)).reduce((sum,row)=>sum+row.amount,0);
+      if(usedDays+requestedDays>2)throw new Error("ลากิจเดือน "+month+" จะเกินโควตาสะสม 2 วัน");
+    }
+    if(input.type==="ลาป่วย"&&!attachments.length) {
+      const count=new Set(existing.filter(row=>!row.attachments?.length&&storedLeaveItems(row).some(day=>day.date.startsWith(month)&&leaveAmount(day)>0)).map(row=>row.requestId||row.id)).size;
+      if(count>=1)throw new Error("ลาป่วยไม่มีรูปแนบครบโควตาเดือน "+month+" แล้ว (สูงสุด 1 คำขอต่อเดือน)");
+    }
   }
   return {type:input.type,reason,startDate:input.startDate,endDate:input.endDate,group,
     period:new Set(items.map(row=>row.label)).size===1?items[0].label:"หลายช่วงเวลา",
@@ -78,8 +86,9 @@ export function validateLeaveSubmission(input,user,rows,calendar,now=new Date(),
 }
 export function assertLeaveCancellation(row,user,reason,today) {
   if(!row||row.employeeId!==user.id)throw new Error("คุณไม่มีสิทธิ์ยกเลิกคำขอลานี้");
-  if(row.status!=="pending")throw new Error("ยกเลิกได้เฉพาะคำขอที่รออนุมัติ");
-  const last=storedLeaveItems(row).at(-1)?.date;
+  if(!["pending","approved"].includes(row.status))throw new Error("ยกเลิกได้เฉพาะคำขอที่รออนุมัติหรืออนุมัติแล้ว");
+  const last=storedLeaveItems(row).filter(day=>leaveAmount(day)>0).map(day=>day.date).sort().at(-1);
   if(!last||today>last)throw new Error("ยกเลิกได้ถึงวันสิ้นสุดการลาเท่านั้น");
-  if(!String(reason||"").trim()||String(reason).length>500)throw new Error("กรุณาระบุเหตุผลยกเลิกไม่เกิน 500 ตัวอักษร");
+  const value=String(reason||"").trim();
+  if(!value||value.length>500)throw new Error("กรุณาระบุเหตุผลยกเลิกไม่เกิน 500 ตัวอักษร");
 }
