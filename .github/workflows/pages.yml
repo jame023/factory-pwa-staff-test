@@ -4,6 +4,7 @@ on:
     branches: [main]
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 concurrency:
@@ -26,6 +27,27 @@ jobs:
         uses: actions/upload-pages-artifact@v4
         with:
           path: _site
+          name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Wait for uploaded Pages artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          ARTIFACT_NAME: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+        shell: bash
+        run: |
+          for attempt in {1..10}; do
+            artifact_count="$(gh api "repos/${REPOSITORY}/actions/runs/${RUN_ID}/artifacts" --jq "[.artifacts[] | select(.name == \"${ARTIFACT_NAME}\")] | length")"
+            if [ "$artifact_count" -eq 1 ]; then
+              echo "Pages artifact is visible."
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "::error::Pages artifact is not visible exactly once."
+          exit 1
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
