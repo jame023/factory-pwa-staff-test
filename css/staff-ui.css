@@ -76,6 +76,8 @@
 .sip-ui #page-root :is(.stat-card, .admin-stat-card) {
   background: white;
   border: 1px solid var(--sip-rule);
+}
+.sip-ui #page-root :is(.stat-card:not(.attendance-tone), .admin-stat-card) {
   border-block-start: 3px solid #96bfc9;
 }
 .sip-ui #page-root :is(.toolbar, .filter-panel) { background: #edf3f5; border-color: var(--sip-rule); }

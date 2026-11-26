@@ -1,4 +1,4 @@
-import { request } from '../js/api.js?v=1.3.408';
+import { request } from '../js/api.js?v=1.3.409';
 
 export const listLeaveRequests = (scope = 'self') => request("package09", "leave.read", {scope});
 export const readLeaveHistoryPage = filters => request("package09", "leave.history", filters);
@@ -14,6 +14,7 @@ export const reviewLeaveRequest = (id, decision, rejectionReason = "", updatedAt
 export const readLeaveNotifications = () => request("package09", "leave.notifications.read");
 export const cancelLeaveRequest = (id, reason, updatedAt) => request("package09", "leave.cancel", { id, reason, updatedAt });
 export const readLeaveOptions = () => request('package09','leave.options');
+export const readLeaveEntitlement = (filters,options={}) => request('package09','leave.entitlement',filters,options);
 export const readLeaveDetail = (id, options = {}) => request('package09','leave.detail',{id},options);
 export const readLeaveImages = (id, options = {}) => request('package09','leave.images',{id},options);
 export const recoverLeaveOperations = () => request('package09','leave.recover');

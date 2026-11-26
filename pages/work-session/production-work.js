@@ -1,6 +1,6 @@
-import * as workApi from "../../adapters/package07.js?v=1.3.408";
-import { bangkokToday, escapeHtml, thaiDate, thaiDateTime } from "../../js/utils.js?v=1.3.408";
-import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.408";
+import * as workApi from "../../adapters/package07.js?v=1.3.409";
+import { bangkokToday, escapeHtml, thaiDate, thaiDateTime } from "../../js/utils.js?v=1.3.409";
+import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.409";
 
 const moneyless = value => new Intl.NumberFormat("th-TH").format(Number(value || 0));
 const versionOf = row => Number(row?.version || 0);
@@ -29,7 +29,7 @@ export async function renderProductionWorkPanel(root, context, { active = null, 
   root.innerHTML =
     '<section class="card card-pad production-work-panel"><div class="section-title"><div><p class="eyebrow">ข้อมูลการผลิต</p><h2>ข้อมูลการผลิต</h2><p>บันทึกยอดผลิตและของเสียแยกจากหน้าเริ่มและจบงาน</p></div></div>' +
     readError +
-    (active ? '<div class="form-grid"><label class="field">วันที่ของงาน<input type="date" readonly value="' + escapeHtml(saved?.work_date || today) + '"></label>' +
+    (active ? (loadError ? '<p class="notice notice-warning">ยังอ่านรายละเอียดงานนี้ไม่ได้ กรุณาลองใหม่ก่อนบันทึกข้อมูลผลิต</p>' : '<div class="form-grid"><label class="field">วันที่ของงาน<input type="date" readonly value="' + escapeHtml(saved?.work_date || today) + '"></label>' +
       '<label class="field">ผู้บันทึก<input readonly value="' + escapeHtml(context.user.name) + '"></label>' +
       '<label class="field">เครื่องจักร<input readonly value="' + escapeHtml(active.machine || "") + '"></label>' +
       '<label class="field">สถานะ<input readonly value="กำลังทำงาน"></label></div>' +
@@ -41,13 +41,13 @@ export async function renderProductionWorkPanel(root, context, { active = null, 
         '<label class="field field-full">หมายเหตุ<textarea name="note" maxlength="500">' + escapeHtml(saved?.note || "") + '</textarea></label></div>' +
         '<p class="help-text">จำนวนดีคำนวณอัตโนมัติ = จำนวนผลิต − ของเสีย · หน่วย “ใบ” · ของเสียต้องไม่เกินจำนวนผลิต</p>' +
         '<div class="form-actions"><button class="button button-primary" type="submit" ' + (loadError ? 'disabled' : '') + '>' + (saved ? 'บันทึกการแก้ไข' : 'บันทึกข้อมูลผลิต') + '</button></div></form>' +
-      (!saved ? '<p class="notice notice-warning">บันทึกข้อมูลผลิตก่อนจบงาน จำนวนตอนจบจะใช้ยอดผลิตชุดนี้โดยอัตโนมัติ</p>' : '')
+      (!saved ? '<p class="notice notice-warning">บันทึกข้อมูลผลิตก่อนจบงาน จำนวนตอนจบจะใช้ยอดผลิตชุดนี้โดยอัตโนมัติ</p>' : ''))
       : '<p class="notice notice-info">เริ่มงานผลิตจากเมนู “เริ่มงาน–จบงานผลิต” ก่อน แล้วกลับมาบันทึกข้อมูลของ session เดิม</p><a class="button button-secondary" href="#/employee/production/work-session">ไปหน้าเริ่มงาน–จบงานผลิต</a>') +
     '<div class="section-title"><div><h3>สรุปวันนี้ · ' + escapeHtml(thaiDate(today)) + '</h3><p>เฉพาะรายละเอียดที่บันทึกแล้ว ทั้งงานกำลังทำและงานจบแล้ว; ไม่นับร่างหรือฟอร์มผลิตครั้งเดียวเก่า</p></div></div>' +
-    '<div class="grid grid-3 attendance-section"><div class="card card-pad"><span>ยอดผลิต</span><strong>' + moneyless(daily?.total_quantity) + ' ใบ</strong></div><div class="card card-pad"><span>ของเสีย</span><strong>' + moneyless(daily?.total_defective) + ' ใบ</strong></div><div class="card card-pad"><span>จำนวนดี</span><strong>' + moneyless(daily?.total_good) + ' ใบ</strong></div></div>' +
-    '<div class="section-title"><div><h3>ประวัติงานผลิต</h3><p>เรียงวันที่และเวลาเริ่มงานล่าสุดก่อน · หน้า ' + (Math.floor(offset/pageSize)+1) + ' / ' + Math.max(1, Math.ceil(Number(history?.total_count || 0) / pageSize)) + '</p></div></div>' +
+    '<div class="grid grid-3 attendance-section"><div class="card card-pad"><span>ยอดผลิต</span><strong>' + (daily ? moneyless(daily.total_quantity) + ' ใบ' : '—') + '</strong></div><div class="card card-pad"><span>ของเสีย</span><strong>' + (daily ? moneyless(daily.total_defective) + ' ใบ' : '—') + '</strong></div><div class="card card-pad"><span>จำนวนดี</span><strong>' + (daily ? moneyless(daily.total_good) + ' ใบ' : '—') + '</strong></div></div>' +
+    '<div class="section-title"><div><h3>ประวัติงานผลิต</h3><p>' + (history ? 'เรียงวันที่และเวลาเริ่มงานล่าสุดก่อน · หน้า ' + (Math.floor(offset/pageSize)+1) + ' / ' + Math.max(1, Math.ceil(Number(history.total_count || 0) / pageSize)) : 'ยังอ่านประวัติไม่ได้ กรุณาลองใหม่') + '</p></div></div>' +
     '<form data-production-history-filter class="form-grid"><label class="field">ตั้งแต่วันที่<input type="date" name="from" value="' + escapeHtml(from) + '"></label><label class="field">ถึงวันที่<input type="date" name="to" value="' + escapeHtml(to) + '"></label><div class="form-actions"><button class="button button-primary" type="submit">ค้นหาประวัติ</button></div></form>' +
-    '<section class="card card-pad"><div class="list">' + (history?.items?.length ? history.items.map(row =>
+    '<section class="card card-pad"><div class="list">' + (!history ? '<p role="status">ยังอ่านประวัติไม่ได้ กรุณาลองใหม่</p>' : history.items?.length ? history.items.map(row =>
       '<article class="list-row"><div class="list-main"><div class="list-title">' + escapeHtml(row.machine || "เครื่องจักร") + ' · ' + escapeHtml(thaiDate(row.work_date)) + '</div>' +
       '<div class="list-meta">' + escapeHtml(row.ended_at ? 'จบแล้ว' : 'กำลังทำงาน') + ' · ' + escapeHtml(row.started_at ? thaiDateTime(row.started_at) : "—") + ' – ' + escapeHtml(row.ended_at ? thaiDateTime(row.ended_at) : "กำลังทำงาน") + '</div>' +
       '<p>ผลิต ' + moneyless(row.quantity) + ' ใบ · เสีย ' + moneyless(row.defective) + ' ใบ · ดี ' + moneyless(row.good_quantity) + ' ใบ</p>' +

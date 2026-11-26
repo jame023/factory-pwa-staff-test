@@ -1,6 +1,6 @@
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js?v=1.3.408';
-import { getMachineAdminSession, loginToMachineAdmin } from './machine-admin-auth.js?v=1.3.408';
-import { createSupabaseEmployeeRepository } from './supabase-employee-repository.js?v=1.3.408';
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js?v=1.3.409';
+import { getMachineAdminSession, loginToMachineAdmin } from './machine-admin-auth.js?v=1.3.409';
+import { createSupabaseEmployeeRepository } from './supabase-employee-repository.js?v=1.3.409';
 
 export async function getLiveAdminContext() {
   const session = await getMachineAdminSession();

@@ -1,4 +1,4 @@
-import { MOCK_STORAGE_KEY } from './config.js?v=1.3.408';
+import { MOCK_STORAGE_KEY } from './config.js?v=1.3.409';
 export function notificationReadKey(userId) {
   if(typeof userId!=='string' || !userId.trim())throw new Error('ไม่พบบัญชีสำหรับรับทราบแจ้งเตือน');
   return MOCK_STORAGE_KEY+':notice-read:'+encodeURIComponent(userId);

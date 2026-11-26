@@ -1,9 +1,9 @@
-import { subscribeStore } from "../../js/state.js?v=1.3.408";
-import { APP_MODE } from "../../js/config.js?v=1.3.408";
-import { renderManagerAttendance } from "./manager.js?v=1.3.408";
-import * as attendanceApi from "../../adapters/package10.js?v=1.3.408";
-import { statCard, attendanceToneClass } from "../../components/app-card.js?v=1.3.408";
-import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.408";
+import { subscribeStore } from "../../js/state.js?v=1.3.409";
+import { APP_MODE } from "../../js/config.js?v=1.3.409";
+import { renderManagerAttendance } from "./manager.js?v=1.3.409";
+import * as attendanceApi from "../../adapters/package10.js?v=1.3.409";
+import { statCard, attendanceToneClass } from "../../components/app-card.js?v=1.3.409";
+import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.409";
 
 const labels = {
   "present-full":"เต็มวัน", "present-half":"ครึ่งวัน", "in-progress":"กำลังทำงาน",

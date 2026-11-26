@@ -1,6 +1,6 @@
-import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from './config.js?v=1.3.408';
-import { getSupabaseLineAccessToken } from './auth.js?v=1.3.408';
-import { decodeVapidKey } from './report-push-subscription.js?v=1.3.408';
+import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from './config.js?v=1.3.409';
+import { getSupabaseLineAccessToken } from './auth.js?v=1.3.409';
+import { decodeVapidKey } from './report-push-subscription.js?v=1.3.409';
 
 const FUNCTION_URL = SUPABASE_URL.replace(/\/+$/, '') + '/functions/v1/factory-notifications';
 
@@ -50,7 +50,14 @@ export async function readNotificationInbox(options = 100) {
   for(const key of ['from','to'])if(input[key]&&!/^\d{4}-\d{2}-\d{2}$/.test(input[key]))throw new Error('วันที่ไม่ถูกต้อง');
   if(input.from)params.append('created_at','gte.'+input.from+'T00:00:00+07:00');
   if(input.to){const end=new Date(input.to+'T00:00:00+07:00');end.setUTCDate(end.getUTCDate()+1);params.append('created_at','lt.'+end.toISOString());}
-  if(input.before){const {created_at,id}=input.before;if(!/^[0-9a-f-]{36}$/i.test(id)||!Number.isFinite(Date.parse(created_at)))throw new Error('ตัวแบ่งหน้าไม่ถูกต้อง');const stamp=new Date(created_at).toISOString();params.set('or',`(created_at.lt.${stamp},and(created_at.eq.${stamp},id.lt.${id}))`);}
+  if(input.before){
+    const {created_at:stamp,id}=input.before;
+    // PostgreSQL timestamps carry microseconds; Date.toISOString() truncates the
+    // cursor and can skip rows between that millisecond and the original value.
+    if(typeof stamp!=='string'||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:\d{2})$/.test(stamp)||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)||!Number.isFinite(Date.parse(stamp)))throw new Error('ตัวแบ่งหน้าไม่ถูกต้อง');
+    params.set('or',`(created_at.lt.${stamp},and(created_at.eq.${stamp},id.lt.${id}))`);
+  }
   const rows=await request('/rest/v1/factory_notification_inbox?'+params);
   if(!Array.isArray(rows))throw new Error('รูปแบบรายการแจ้งเตือนไม่ถูกต้อง');
   return rows;

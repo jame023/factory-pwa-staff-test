@@ -1,4 +1,5 @@
 import { createClient } from '../vendor/supabase-js-2.118.0.js';
+import {buildLeaveEntitlementRequest,validateLeaveEntitlement} from './leave-entitlement.js?v=1.3.409';
 
 export const LEAVE_BUCKET = 'factory-record-attachments';
 const RECEIPT_PREFIX = 'factory-leave-operation-v1:';
@@ -39,6 +40,11 @@ export function createLeaveService({url,key,token,getToken,fetchImpl=fetch,stora
     return data;
   }
   const options=()=>rpc('options');
+  const entitlement=async(input,options={})=>{
+    const request=buildLeaveEntitlementRequest(input);
+    const data=await rpc('entitlement',request,options);current();
+    return validateLeaveEntitlement(data,{employeeId:input.employeeId,months:request.p_months,recordId:request.p_exclude_record_id});
+  };
   const detail=async (id,options={})=>mapLeave(await rpc('get',{p_id:id},options));
   const managerQueuePage=async (filters={},options={})=>rpc('manager_queue_page',{
     p_status:filters.status||'pending',p_group:filters.group||null,p_type:filters.type||null,
@@ -216,5 +222,5 @@ export function createLeaveService({url,key,token,getToken,fetchImpl=fetch,stora
     }
     return result;
   }
-  return {options,list,historyPage,managerQueuePage,managerReportPage,detail,recover,images,mutate,adminProxySubmit,calendar:month=>rpc('calendar',{p_month:month})};
+  return {options,entitlement,list,historyPage,managerQueuePage,managerReportPage,detail,recover,images,mutate,adminProxySubmit,calendar:month=>rpc('calendar',{p_month:month})};
 }

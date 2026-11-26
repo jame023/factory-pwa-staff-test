@@ -1,14 +1,14 @@
-import { createLeaveService } from './leave-service.js?v=1.3.408';
-import { createOtService } from './ot-service.js?v=1.3.408';
-import { createDeliveryService } from './delivery-service.js?v=1.3.408';
-import { validateLeaveSubmission, storedLeaveItems } from './leave-rules.js?v=1.3.408';
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js?v=1.3.408';
+import { createLeaveService } from './leave-service.js?v=1.3.409';
+import { createOtService } from './ot-service.js?v=1.3.409';
+import { createDeliveryService } from './delivery-service.js?v=1.3.409';
+import { validateLeaveSubmission, storedLeaveItems } from './leave-rules.js?v=1.3.409';
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from './config.js?v=1.3.409';
 
-import { RECORD_SCHEMAS, validateRecord } from './record-schema.js?v=1.3.408';
-import { bangkokToday } from './utils.js?v=1.3.408';
-import { getSupabaseLineAccessToken } from './auth.js?v=1.3.408';
-import { normalizeExecutiveAttendanceRows, summarizeExecutiveAttendance, validateAttendanceRange } from './executive-attendance-rules.js?v=1.3.408';
-import { ADMIN_AUDIT_PAGE_SIZE, buildAuditDetailSelect, buildAuditListParams, auditAllowsReason, resolveAuditActor, safeAuditChanges, validateAuditFilters } from './admin-audit-contract.js?v=1.3.408';
+import { RECORD_SCHEMAS, validateRecord } from './record-schema.js?v=1.3.409';
+import { bangkokToday } from './utils.js?v=1.3.409';
+import { getSupabaseLineAccessToken } from './auth.js?v=1.3.409';
+import { normalizeExecutiveAttendanceRows, summarizeExecutiveAttendance, validateAttendanceRange } from './executive-attendance-rules.js?v=1.3.409';
+import { ADMIN_AUDIT_PAGE_SIZE, buildAuditDetailSelect, buildAuditListParams, auditAllowsReason, resolveAuditActor, safeAuditChanges, validateAuditFilters } from './admin-audit-contract.js?v=1.3.409';
 
 const CATEGORIES = new Set(['attendance','workSessions','leaveRequests','calendar','deliveries','production','screenEntries','otRequests']);
 const GENERIC_ADMIN_WRITE_BLOCKED = new Set(['workSessions','leaveRequests','deliveries','production','screenEntries','otRequests']);
@@ -183,6 +183,13 @@ export function createSupabaseAppApi() {
     if(employeeId) params.set('employee_id',`eq.${employeeId}`);
     const result=await call('/rest/v1/employee_rfid_daily_attendance?'+params,{signal:requestSignal});
     if(!Array.isArray(result)||result.length>1000) throw fail('ช่วงเวลามีรายการ RFID มากเกินกำหนด กรุณาเลือกช่วงให้แคบลง','TOO_MANY_ATTENDANCE_ROWS');
+    if(result.length===1000){
+      // PostgREST may cap a request for 1001 rows at 1000. Probe the next row
+      // before treating a capped response as a complete attendance summary.
+      params.set('offset','1000');params.set('limit','1');
+      const overflow=await call('/rest/v1/employee_rfid_daily_attendance?'+params,{signal:requestSignal});
+      if(!Array.isArray(overflow)||overflow.length)throw fail('ช่วงเวลามีรายการ RFID มากเกินกำหนด กรุณาเลือกช่วงให้แคบลง','TOO_MANY_ATTENDANCE_ROWS');
+    }
     return result.map(mapRfidAttendance);
   }
 function normalizeImages(images) {
@@ -571,6 +578,7 @@ let normalized;
       }
       if(action==='leave.calendar')return leave().calendar(p.month);
       if(action==='leave.options')return leave().options();
+      if(action==='leave.entitlement')return leave().entitlement(p,{signal});
       if(action==='leave.detail')return leave().detail(p.id,{signal});
       if(action==='leave.images')return leave().images(p.id,{signal});
       if(action==='leave.recover')return leave().recover();
@@ -585,8 +593,9 @@ let normalized;
       if(action==='leave.review')return leave().mutate('review',{...p,reason:p.rejectionReason||(p.decision==='approved'?'อนุมัติคำขอลา':'')});
     }
     if (module==='package08' && action==='calendar.read') {
-      const filters={}; if(p.group) filters.group_name=`eq.${canonical(p.group)}`;
-      const result=await rows('calendar',filters);
+      if(typeof p.month!=='string'||!/^\d{4}-(0[1-9]|1[0-2])$/.test(p.month)||p.month.startsWith('0000'))throw fail('กรุณาเลือกเดือนให้ถูกต้อง','VALIDATION_ERROR');
+      const filters={'payload->>date':`like.${p.month}-*`}; if(p.group) filters.group_name=`eq.${canonical(p.group)}`;
+      const result=await allRows('calendar',filters);
       const role=claims?.app_metadata?.role;
       const allWorkGroups=['ออฟฟิศ','สกรีน','ผลิต','ขนส่ง'];
       let groups;
