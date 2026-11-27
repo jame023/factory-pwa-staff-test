@@ -1,8 +1,8 @@
-import * as screenApi from "../../adapters/package01.js?v=1.3.409";
-import { statCard } from "../../components/app-card.js?v=1.3.409";
-import { bangkokToday, escapeHtml, thaiDate, thaiDateTime } from "../../js/utils.js?v=1.3.409";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.409";
-import { isScreenEmployee } from "../../js/permissions.js?v=1.3.409";
+import * as screenApi from "../../adapters/package01.js?v=1.3.410";
+import { statCard } from "../../components/app-card.js?v=1.3.410";
+import { bangkokToday, escapeHtml, thaiDate, thaiDateTime } from "../../js/utils.js?v=1.3.410";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.410";
+import { isScreenEmployee } from "../../js/permissions.js?v=1.3.410";
 
 const machines = ["สกรีน B1 (แพ็คคอยาว)", "สกรีน B2 (คอสั้น)", "สกรีน B3 (คอยาว)"];
 const renderRows = rows => [...rows].sort((a,b) => String(b.createdAt || "").localeCompare(String(a.createdAt || ""))).slice(0, 8).map(item => {
@@ -20,7 +20,7 @@ const renderRows = rows => [...rows].sort((a,b) => String(b.createdAt || "").loc
 
 export async function render(root, context) {
   if (context.workspace === "employee" && ["employee","admin"].includes(context.user.role)) {
-    const work = await import('../work-session/index.js?v=1.3.409');
+    const work = await import('../work-session/index.js?v=1.3.410');
     return work.render(root,{...context,workType:'ผลิต'});
   }
   root.innerHTML = '<div class="page-loading"><span class="loading-spinner"></span><span>กำลังโหลดข้อมูลสกรีน…</span></div>';

@@ -1,12 +1,12 @@
-import { iconMarkup, routeIcon } from '../../js/ui-icons.js?v=1.3.409';
-import { getAuthContext, canAccessRoute, selectActiveGroup, availableWorkspaces } from '../../js/access-context.js?v=1.3.409';
-import { ROUTES, normalizeRoute, workspaceGroups, groupRoute } from '../../js/route-policy.js?v=1.3.409';
-import { escapeHtml } from '../../js/utils.js?v=1.3.409';
-import { showStatusModal } from '../../components/status-modal.js?v=1.3.409';
-import { getMachineAdminSession } from '../../js/machine-admin-auth.js?v=1.3.409';
-import { createSupabaseMachineRepository } from '../../js/machine-admin-repository.js?v=1.3.409';
-import { createSupabaseItemNameRepository } from '../../js/item-name-admin-repository.js?v=1.3.409';
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '../../js/config.js?v=1.3.409';
+import { iconMarkup, routeIcon } from '../../js/ui-icons.js?v=1.3.410';
+import { getAuthContext, canAccessRoute, selectActiveGroup, availableWorkspaces } from '../../js/access-context.js?v=1.3.410';
+import { ROUTES, normalizeRoute, workspaceGroups, groupRoute } from '../../js/route-policy.js?v=1.3.410';
+import { escapeHtml } from '../../js/utils.js?v=1.3.410';
+import { showStatusModal } from '../../components/status-modal.js?v=1.3.410';
+import { getMachineAdminSession } from '../../js/machine-admin-auth.js?v=1.3.410';
+import { createSupabaseMachineRepository } from '../../js/machine-admin-repository.js?v=1.3.410';
+import { createSupabaseItemNameRepository } from '../../js/item-name-admin-repository.js?v=1.3.410';
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '../../js/config.js?v=1.3.410';
 const adminMenuPresentation = Object.freeze({
   '/admin/system-status': {tone:'teal',hint:'ตรวจเครื่องอ่านบัตร รายงานอัตโนมัติ และการส่งแจ้งเตือน',icon:'<path d="M3 12h4l3-8 4 16 3-8h4"/>'},
   '/admin/employees': {tone:'blue',hint:'ข้อมูลพนักงานและสถานะการใช้งาน',icon:'<circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6M21 21v-3a6 6 0 0 0-4-5.65"/>'},
@@ -48,7 +48,7 @@ function renderAdminHome(root,context,links) {
   }).filter(Boolean)}));
   const menuMarkup=managing?managementSections.map(section=>'<section class="admin-management-section"><div class="admin-management-section-heading"><div><h2>'+escapeHtml(section.title)+'</h2><p>'+escapeHtml(section.description)+'</p></div></div><nav class="admin-hub-grid" aria-label="'+escapeHtml(section.title)+'">'+section.items.map(adminHubCardMarkup).join('')+'</nav></section>').join(''):'<div class="workspace-section-title"><h2>หมวดการใช้งาน</h2></div><nav class="admin-hub-grid" aria-label="เลือกหมวดการใช้งาน">'+categoryItems.map(adminHubCardMarkup).join('')+'</nav>';
   const title=executive?'เมนูจัดการของผู้บริหาร':managing?'เมนูจัดการของ Admin':'เลือกพื้นที่ใช้งาน';
-  root.innerHTML='<section class="admin-hub" aria-labelledby="admin-hub-title"><header class="admin-hub-heading"><div><span class="admin-hub-kicker">ระบบโรงงาน SIP</span><h1 id="admin-hub-title">'+title+'</h1><p>สวัสดี, <strong>'+escapeHtml(context.employee_name||'ผู้ดูแลระบบ')+'</strong><span>'+ (managing?'เลือกข้อมูลที่ต้องการจัดการ':'เลือกหมวดเพื่อเปิดเมนูที่ต้องการใช้งาน')+'</span></p></div><span class="admin-hub-role">'+iconMarkup(routeIcon('/admin'))+(executive?'ผู้บริหาร':'ผู้ดูแลระบบ')+'</span></header>'+ 
+  root.innerHTML='<section class="admin-hub" aria-labelledby="admin-hub-title"><header class="admin-hub-heading"><div><span class="admin-hub-kicker">ระบบโรงงาน SIP</span><h1 id="admin-hub-title">'+title+'</h1><p>สวัสดี, <strong>'+escapeHtml(context.employee_name||'ผู้ดูแลระบบ')+'</strong><span>'+ (managing?'เลือกข้อมูลที่ต้องการจัดการ':'เลือกหมวดเพื่อเปิดเมนูที่ต้องการใช้งาน')+'</span></p></div><span class="admin-hub-role">'+iconMarkup(routeIcon('/admin'))+(executive?'ผู้บริหาร':'ผู้ดูแลระบบ')+'</span></header>'+
     (managing?'':'<section class="admin-overview" aria-labelledby="admin-overview-title"><div class="admin-overview-heading"><h2 id="admin-overview-title">ภาพรวมข้อมูลกลาง</h2><span>อ่านล่าสุดจาก Supabase</span></div><div class="admin-stats-grid" data-admin-home-stats aria-live="polite"><article class="admin-stat-card is-loading"><span>เครื่องจักรที่เปิดใช้</span><strong>—</strong><small>กำลังโหลด…</small></article><article class="admin-stat-card is-loading"><span>รายการชื่อที่เปิดใช้</span><strong>—</strong><small>กำลังโหลด…</small></article><article class="admin-stat-card"><span>หมวดที่เข้าถึงได้</span><strong>'+categoryItems.length+'</strong><small>ตามสิทธิ์บัญชีปัจจุบัน</small></article></div></section>')+menuMarkup+'</section>';
 }
 async function loadAdminHomeStats(root,context,categoryCount) {

@@ -1,18 +1,18 @@
-import { openOperationalEditor } from './operational-editor.js?v=1.3.409';
-import { pageBusy } from '../../js/live-updates.js?v=1.3.409';
-import { attendanceCalculation } from '../../js/business-rules.js?v=1.3.409';
-import { render as renderWorkCalendar } from "../calendar/index.js?v=1.3.409";
-import * as adminApi from "../../adapters/package11.js?v=1.3.409";
-import * as workApi from "../../adapters/package07.js?v=1.3.409";
-import * as deliveryApi from "../../adapters/package04.js?v=1.3.409";
-import * as leaveApi from "../../adapters/package09.js?v=1.3.409";
-import { escapeHtml, thaiDateTime } from "../../js/utils.js?v=1.3.409";
-import { RECORD_SCHEMAS, blankRecord, validateRecord } from "../../js/record-schema.js?v=1.3.409";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.409";
-import { confirmAction } from "../../components/modal.js?v=1.3.409";
-import { normalizeRoute } from "../../js/route-policy.js?v=1.3.409";
-import { adminLeaveProxyMarkup, bindAdminLeaveProxy } from "./leave-proxy.js?v=1.3.409";
-import { ADMIN_AUDIT_PAGE_SIZE, AUDIT_TABLE_OPTIONS, auditTableLabel, validateAuditFilters } from "../../js/admin-audit-contract.js?v=1.3.409";
+import { openOperationalEditor } from './operational-editor.js?v=1.3.410';
+import { pageBusy } from '../../js/live-updates.js?v=1.3.410';
+import { attendanceCalculation } from '../../js/business-rules.js?v=1.3.410';
+import { render as renderWorkCalendar } from "../calendar/index.js?v=1.3.410";
+import * as adminApi from "../../adapters/package11.js?v=1.3.410";
+import * as workApi from "../../adapters/package07.js?v=1.3.410";
+import * as deliveryApi from "../../adapters/package04.js?v=1.3.410";
+import * as leaveApi from "../../adapters/package09.js?v=1.3.410";
+import { escapeHtml, thaiDateTime } from "../../js/utils.js?v=1.3.410";
+import { RECORD_SCHEMAS, blankRecord, validateRecord } from "../../js/record-schema.js?v=1.3.410";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.410";
+import { confirmAction } from "../../components/modal.js?v=1.3.410";
+import { normalizeRoute } from "../../js/route-policy.js?v=1.3.410";
+import { adminLeaveProxyMarkup, bindAdminLeaveProxy } from "./leave-proxy.js?v=1.3.410";
+import { ADMIN_AUDIT_PAGE_SIZE, AUDIT_TABLE_OPTIONS, auditTableLabel, validateAuditFilters } from "../../js/admin-audit-contract.js?v=1.3.410";
 
 const modules = [
   ["employees","พนักงานและสิทธิ์","ชื่อ กลุ่มงาน บทบาท และสถานะบัญชี"],

@@ -1,11 +1,11 @@
-import { renderWorkManager } from "./manager.js?v=1.3.409";
-import * as workApi from "../../adapters/package07.js?v=1.3.409";
-import * as screenApi from "../../adapters/package01.js?v=1.3.409";
-import { escapeHtml, thaiDate, thaiDateTime } from "../../js/utils.js?v=1.3.409";
-import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.409";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.409";
-import { isProductionEmployee, isScreenEmployee } from "../../js/permissions.js?v=1.3.409";
-import { APP_MODE } from "../../js/config.js?v=1.3.409";
+import { renderWorkManager } from "./manager.js?v=1.3.410";
+import * as workApi from "../../adapters/package07.js?v=1.3.410";
+import * as screenApi from "../../adapters/package01.js?v=1.3.410";
+import { escapeHtml, thaiDate, thaiDateTime } from "../../js/utils.js?v=1.3.410";
+import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.410";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.410";
+import { isProductionEmployee, isScreenEmployee } from "../../js/permissions.js?v=1.3.410";
+import { APP_MODE } from "../../js/config.js?v=1.3.410";
 
 const duration = (start, end) => {
   const minutes = Math.max(0, Math.floor((new Date(end || Date.now()) - new Date(start)) / 60000));
@@ -13,7 +13,7 @@ const duration = (start, end) => {
 };
 export async function render(root, context, { recoverScreenDraft = null } = {}) {
   if (APP_MODE === 'mock') {
-    const legacy = await import('./legacy.js?v=1.3.409');
+    const legacy = await import('./legacy.js?v=1.3.410');
     if (!context.signal?.aborted) return legacy.render(root, context);
     return;
   }
@@ -83,7 +83,7 @@ export async function render(root, context, { recoverScreenDraft = null } = {}) 
         '<div class="field work-start-order-field" id="order-field" hidden><label for="orderNameSearch">ค้นหารายการชื่อ</label><div class="work-start-order-controls"><input id="orderNameSearch" type="search" autocomplete="off" placeholder="พิมพ์ชื่อรายการเพื่อค้นหา" aria-describedby="orderNameHelp"><select id="orderName" name="orderName" aria-label="เลือกรายการชื่อ" disabled required><option value="">เลือกชื่อรายการ</option>' + itemNameOptions + '</select></div><p id="orderNameHelp" class="help-text">เรียงตามชื่อและรหัส · เมื่อชื่อซ้ำจะแสดงรหัสช่วยแยก</p><p data-order-search-empty class="small-muted" role="status" hidden></p></div>' +
         '<div class="field field-full"><label for="workNote">หมายเหตุ</label><textarea id="workNote" name="note" maxlength="300" placeholder="รายละเอียดเพิ่มเติม (ถ้ามี)"></textarea></div>' +
         '</div><div class="form-actions"><button class="button button-primary" type="submit">▶️ เริ่มงาน</button></div></form></section>') : '') +
-    
+
     '<div class="section-title"><div><h2>ประวัติงาน</h2><p>ประวัติงานตามสิทธิ์บัญชี</p></div></div>' +
     '<section class="card card-pad"><div class="list" data-work-history-list>' + renderWorkHistory() + "</div></section>" +
     '<p class="small-muted" style="margin-top:.8rem">ออฟไลน์จะไม่บันทึกหรือเข้าคิวรายการ</p>';

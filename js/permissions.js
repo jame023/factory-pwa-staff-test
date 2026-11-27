@@ -77,6 +77,6 @@ export function assertMockPermission(role, key) {
     throw new Error("เฉพาะผู้บริหารหรือ Admin เท่านั้น");
   }
   if(key.startsWith("package06.reports.") && key!=="package06.reports.notifications.read" && key!=="package06.reports.read" && !canManage(normalized))throw new Error("เฉพาะผู้บริหารหรือ Admin เท่านั้น");
-  
+
   if (key.startsWith("package11.") && !canEditAll(normalized)) throw new Error("เฉพาะ Admin เท่านั้น");
 }

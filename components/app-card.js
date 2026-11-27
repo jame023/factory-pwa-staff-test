@@ -1,5 +1,5 @@
-import { escapeHtml } from "../js/utils.js?v=1.3.409";
-import { iconMarkup, routeIcon } from "../js/ui-icons.js?v=1.3.409";
+import { escapeHtml } from "../js/utils.js?v=1.3.410";
+import { iconMarkup, routeIcon } from "../js/ui-icons.js?v=1.3.410";
 export function appCard({ route, title, hint }) {
   return '<a class="card module-card" href="#/' + escapeHtml(route) + '">' +
     '<span class="module-icon" aria-hidden="true">' + iconMarkup(routeIcon(route)) + "</span>" +
@@ -20,7 +20,7 @@ export function attendanceToneClass(tone, value) {
   return positive ? 'attendance-tone attendance-tone-' + tone : '';
 }
 export function statCard(label, value, note = "", tone = "") {
-  const colorClass = attendanceToneClass(tone, value); 
+  const colorClass = attendanceToneClass(tone, value);
   return '<article class="card stat-card ' + colorClass + '"><div class="stat-label">' + escapeHtml(label) +
     '</div><div class="stat-value">' + escapeHtml(value) + '</div>' +
     (note ? '<div class="stat-note">' + escapeHtml(note) + "</div>" : "") + "</article>";

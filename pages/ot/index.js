@@ -1,13 +1,13 @@
-import * as workApi from "../../adapters/package07.js?v=1.3.409";
-import { overtimeGroupsForContext } from "../../js/ot-service.js?v=1.3.409";
-import { escapeHtml as e, bangkokToday, thaiDateTime } from "../../js/utils.js?v=1.3.409";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.409";
-import { isOvertimeDateAllowed, previousBangkokDate } from "../../js/ot-date-rules.js?v=1.3.409";
-import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.409";
-import { getAuthContext } from "../../js/access-context.js?v=1.3.409";
-import { formatReportedDuration, OT_REPORT_PAGE_SIZE, validateExecutiveOtResponse, validateOtReportRange } from "../../js/executive-ot-report-rules.js?v=1.3.409";
-import { loadingView } from "../../components/loading.js?v=1.3.409";
-import { openDetailDialog } from "../../components/detail-dialog.js?v=1.3.409";
+import * as workApi from "../../adapters/package07.js?v=1.3.410";
+import { overtimeGroupsForContext } from "../../js/ot-service.js?v=1.3.410";
+import { escapeHtml as e, bangkokToday, thaiDateTime } from "../../js/utils.js?v=1.3.410";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.410";
+import { isOvertimeDateAllowed, previousBangkokDate } from "../../js/ot-date-rules.js?v=1.3.410";
+import { showStatusModal, isStatusModalOpen } from "../../components/status-modal.js?v=1.3.410";
+import { getAuthContext } from "../../js/access-context.js?v=1.3.410";
+import { formatReportedDuration, OT_REPORT_PAGE_SIZE, validateExecutiveOtResponse, validateOtReportRange } from "../../js/executive-ot-report-rules.js?v=1.3.410";
+import { loadingView } from "../../components/loading.js?v=1.3.410";
+import { openDetailDialog } from "../../components/detail-dialog.js?v=1.3.410";
 
 const MAX_PHOTOS=5, MAX_FILE_BYTES=512*1024, MAX_TOTAL_BYTES=2*1024*1024, MAX_SOURCE_BYTES=20*1024*1024;
 const formatDuration=row=>{
@@ -79,7 +79,7 @@ async function renderExecutiveOtDashboard(root, context) {
     '<section class="ot-manager-summary" aria-label="สรุปรายงาน OT"><h2>สรุปตามตัวกรอง</h2><div class="ot-manager-summary-grid">'+
     '<article class="card card-pad"><span>รายงาน OT</span><strong data-manager-report-count>—</strong></article><article class="card card-pad"><span>พนักงานไม่ซ้ำ</span><strong data-manager-employee-count>—</strong></article><article class="card card-pad"><span>วันที่ทำ OT ไม่ซ้ำ</span><strong data-manager-day-count>—</strong></article><article class="card card-pad"><span>ระยะเวลาที่รายงานรวม</span><strong data-manager-total-duration>—</strong></article></div></section>'+
     '<section class="ot-manager-people"><div class="section-title"><h2>สรุปรายบุคคล</h2><span class="small-muted">เรียงตามชื่อพนักงาน</span></div><div data-manager-employees></div></section>'+
-    '<section class="ot-manager-list"><div class="section-title"><h2>รายการรายงาน OT</h2><span class="small-muted" data-manager-list-count></span></div><div data-manager-list aria-live="polite"></div><div class="ot-manager-more"><button class="button" data-manager-more type="button" hidden>โหลดเพิ่ม</button></div></section>'+ 
+    '<section class="ot-manager-list"><div class="section-title"><h2>รายการรายงาน OT</h2><span class="small-muted" data-manager-list-count></span></div><div data-manager-list aria-live="polite"></div><div class="ot-manager-more"><button class="button" data-manager-more type="button" hidden>โหลดเพิ่ม</button></div></section>'+
     '<dialog class="admin-record-detail-dialog" data-manager-detail-dialog aria-labelledby="manager-ot-detail-title"><div class="admin-record-detail-dialog__body"><header class="admin-record-detail-dialog__header"><h2 id="manager-ot-detail-title">รายละเอียดทำงานล่วงเวลา (OT)</h2><button class="button admin-record-detail-dialog__close admin-detail-close-button" type="button" data-manager-detail-close aria-label="ปิดรายละเอียด">×</button></header><div class="screen-detail-content" data-manager-detail-content aria-live="polite"></div></div></dialog>';
   const form=root.querySelector("[data-manager-filters]"),list=root.querySelector("[data-manager-list]"),detailDialog=root.querySelector("[data-manager-detail-dialog]"),detailHost=root.querySelector("[data-manager-detail-content]");
   form.elements.query.value=initialFilters.query;

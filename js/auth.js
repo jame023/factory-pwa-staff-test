@@ -1,13 +1,13 @@
-import { loadSession, deleteSession, withSessionLock } from './session-vault.js?v=1.3.409';
-import { getAuthClient } from './supabase-auth-client.js?v=1.3.409';
+import { loadSession, deleteSession, withSessionLock } from './session-vault.js?v=1.3.410';
+import { getAuthClient } from './supabase-auth-client.js?v=1.3.410';
 import { APP_MODE, MOCK_USERS, ROLE_LABELS, MOCK_SESSION_ROLE, MOCK_SESSION_GROUP, LINE_LIFF_ID, API_BASE_URL,
-  SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_LINE_PROVIDER } from "./config.js?v=1.3.409";
-import { startPkceOAuth, completePkceOAuth } from "./pkce-oauth.js?v=1.3.409";
+  SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_LINE_PROVIDER } from "./config.js?v=1.3.410";
+import { startPkceOAuth, completePkceOAuth } from "./pkce-oauth.js?v=1.3.410";
 
-import { requestReadOnly } from "./read-only-api.js?v=1.3.409";
-import { normalizeRole, normalizeGroup } from "./permissions.js?v=1.3.409";
-import { ACTIVE_DIRECTORY_NAMES, DIRECTORY_SNAPSHOT_DATE } from './directory-snapshot.js?v=1.3.409';
-import { getStore } from './state.js?v=1.3.409';
+import { requestReadOnly } from "./read-only-api.js?v=1.3.410";
+import { normalizeRole, normalizeGroup } from "./permissions.js?v=1.3.410";
+import { ACTIVE_DIRECTORY_NAMES, DIRECTORY_SNAPSHOT_DATE } from './directory-snapshot.js?v=1.3.410';
+import { getStore } from './state.js?v=1.3.410';
 
 const MOCK_LOGIN_KEY = "factory-pwa-demo-login-v1";
 const LINE_SIGNED_OUT_KEY = "factory-pwa-line-signed-out-v1";
@@ -261,7 +261,7 @@ export class SupabaseLineAuthProvider extends AuthProvider {
     const client=getAuthClient();
     // The callback contains Supabase tokens only. Never persist provider tokens.
     const callback=await completePkceOAuth({supabaseUrl:SUPABASE_URL,publishableKey:SUPABASE_PUBLISHABLE_KEY});
-    if (callback?.error) throw authFailure('invalid_identity');
+    if (callback?.error) {const error=new Error(callback.error);error.code=callback.errorCode||'oauth_exchange_failed';throw error;}
     if (callback?.accessToken) {
       localStorage.removeItem('factory-pwa-session-signed-out');
       const imported=await client.auth.setSession({access_token:callback.accessToken,refresh_token:callback.refreshToken});

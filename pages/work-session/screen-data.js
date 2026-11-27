@@ -1,2 +1,2 @@
-import { renderIndependentOutput } from './independent-output.js?v=1.3.409';
+import { renderIndependentOutput } from './independent-output.js?v=1.3.410';
 export function render(root,context) { return renderIndependentOutput(root,context,'สกรีน'); }

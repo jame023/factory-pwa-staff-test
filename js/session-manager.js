@@ -1,5 +1,5 @@
-import { authProvider, clearSupabaseSession } from './auth.js?v=1.3.409';
-import { loadSession } from './session-vault.js?v=1.3.409';
+import { authProvider, clearSupabaseSession } from './auth.js?v=1.3.410';
+import { loadSession } from './session-vault.js?v=1.3.410';
 
 let state='unknown', context=null, pending=null, revision=0, ending=false;
 const subscribers=new Set();
@@ -56,6 +56,11 @@ export function verifySession({forceRefresh=false}={}) {
       return context;
     } catch(error) {
       if(version!==revision) return null;
+      if(String(error.code||'').startsWith('oauth_')) {
+        // A failed/stale callback must not revoke an existing account session
+        // shared with another tab or the installed PWA.
+        context=null;publish('unauthenticated',{reason:error.message});throw error;
+      }
       const transient=error instanceof TypeError || error.name==='AuthRetryableFetchError' || error.status>=500 || error.status===429 || error.code==='NETWORK_ERROR' || ['TimeoutError','AbortError'].includes(error.name);
       if(transient) {context=null;publish('error',{reason:'ไม่สามารถตรวจสอบ Session ได้ กรุณาตรวจอินเทอร์เน็ตแล้วลองใหม่'});throw error;}
       await revokeSession(error.code||error.message);
