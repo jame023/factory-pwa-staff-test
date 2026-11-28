@@ -1,5 +1,5 @@
-import { authProvider, clearSupabaseSession } from './auth.js?v=1.3.411';
-import { loadSession } from './session-vault.js?v=1.3.411';
+import { authProvider, clearSupabaseSession } from './auth.js?v=1.3.412';
+import { loadSession } from './session-vault.js?v=1.3.412';
 
 let state='unknown', context=null, pending=null, revision=0, ending=false;
 const subscribers=new Set();
@@ -19,7 +19,7 @@ export async function getStoredSession() {
   const saved=await loadSession();
   return saved?{stored:true,session_reference:'factory-pwa-auth-sdk',expires_at:saved.expires_at||Math.floor(saved.expiresAt/1000)}:null;
 }
-export function getAuthContext() {return state==='authenticated'?context:null;}
+export function getAuthContext() {return state==='authenticated' && Date.parse(context?.session_expiry)>Date.now()?context:null;}
 export function getCurrentEmployee() {return getAuthContext()?.user||null;}
 export function getCurrentEmployeeGroups() {return [...(getCurrentEmployee()?.groups||[])];}
 export function resolveCurrentRole() {return getCurrentEmployee()?.role||null;}
@@ -37,22 +37,25 @@ export async function revokeSession(reason='revoked',broadcast=true) {
   try {await clearLocalSession();}
   finally {ending=false;}
 }
-export function verifySession({forceRefresh=false}={}) {
+export function verifySession({forceRefresh=false,background=false}={}) {
   if(ending) return Promise.resolve(null);
   if(pending) return pending;
   const version=revision;
   const previous=context;
-  context=null;publish('checking',{phase:forceRefresh?'กำลังต่ออายุ Session':'กำลังตรวจสอบ Session'});
+  // Keep a previously verified, unexpired context while revalidating. Data
+  // operations still use the unchanged server-side authorization path.
+  const silent=Boolean(background && previous);
+  if(!silent){context=null;publish('checking',{phase:forceRefresh?'กำลังต่ออายุ Session':'กำลังตรวจสอบ Session'});}
   pending=(async()=>{
     try {
       const hadSession=await getStoredSession();
-      const latest=await authProvider.getSession({forceRefresh,onPhase:phase=>{if(version===revision)publish('checking',{phase});}});
+      const latest=await authProvider.getSession({forceRefresh,onPhase:phase=>{if(!silent && version===revision)publish('checking',{phase});}});
       if(version!==revision) return null;
-      if(!latest) {if(hadSession)await revokeSession('session_expired');else publish('unauthenticated');return null;}
-      if(latest.applicant) {publish('unauthenticated',{applicant:latest});return latest;}
-      const changed=previous && JSON.stringify([previous.main_group,previous.user.role,previous.groups])!==JSON.stringify([latest.main_group,latest.user.role,latest.groups]);
+      if(!latest) {context=null;if(hadSession)await revokeSession('session_expired');else publish('unauthenticated');return null;}
+      if(latest.applicant) {context=null;publish('unauthenticated',{applicant:latest});return latest;}
+      const changed=previous && JSON.stringify([previous.employee_id,previous.main_group,previous.user.role,previous.groups])!==JSON.stringify([latest.employee_id,latest.main_group,latest.user.role,latest.groups]);
       context=Object.freeze({...latest,user:Object.freeze({...latest.user,groups:Object.freeze([...latest.user.groups])}),groups:Object.freeze([...latest.groups])});
-      publish('authenticated',{changed:Boolean(changed)});
+      publish('authenticated',{changed:Boolean(changed),background:silent});
       return context;
     } catch(error) {
       if(version!==revision) return null;
@@ -69,7 +72,7 @@ export function verifySession({forceRefresh=false}={}) {
   })();
   return pending;
 }
-export function refreshSession() {return verifySession({forceRefresh:true});}
+export function refreshSession(options={}) {return verifySession({...options,forceRefresh:true});}
 function invalidated(event) {
   if(!event?.reason) return;
   void revokeSession(event.reason,false).catch(()=>{});

@@ -1,6 +1,6 @@
-import { request } from '../../js/api.js?v=1.3.411';
-import { openDetailDialog } from '../../components/detail-dialog.js?v=1.3.411';
-import { escapeHtml as e, bangkokToday } from '../../js/utils.js?v=1.3.411';
+import { request } from '../../js/api.js?v=1.3.412';
+import { openDetailDialog } from '../../components/detail-dialog.js?v=1.3.412';
+import { escapeHtml as e, bangkokToday } from '../../js/utils.js?v=1.3.412';
 
 const labels={workSessions:'เริ่มงาน–จบงาน',production:'ข้อมูลผลิต',screenEntries:'ข้อมูลสกรีน',deliveries:'การขนส่ง',otRequests:'รายงาน OT',leaveRequests:'คำขอลา'};
 const field=(key,label,type='text',value='',extra='')=>'<label class="field">'+e(label)+'<input name="'+key+'" type="'+type+'" value="'+e(value??'')+'" '+extra+'></label>';

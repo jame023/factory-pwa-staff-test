@@ -1,5 +1,5 @@
-import { getAuthContext as sessionContext, verifySession, revokeSession } from './session-manager.js?v=1.3.411';
-import { canonicalGroup, routeDecision, defaultRoute, workspaceGroups, groupRoute } from './route-policy.js?v=1.3.411';
+import { getAuthContext as sessionContext, verifySession, revokeSession } from './session-manager.js?v=1.3.412';
+import { canonicalGroup, routeDecision, defaultRoute, workspaceGroups, groupRoute } from './route-policy.js?v=1.3.412';
 const KEY='factory-pwa-last-workspace-v2';
 let volatileEmployee=null, volatileWorkspace=null;
 const preferenceKey=employee=>KEY+':'+encodeURIComponent(employee);
@@ -44,7 +44,7 @@ export const resolveDefaultRoute=()=>{
   const context=getAuthContext();
   return availableWorkspaces(context).find(area=>area.id===context.selected_workspace)?.path||defaultRoute(context);
 };
-export async function refreshPermissions(){await verifySession();return getAuthContext();}
+export async function refreshPermissions(){await verifySession({background:true});return getAuthContext();}
 export async function requireAccess(route,{signal}={}){
   let context=await refreshPermissions();const decision=routeDecision(context,route);
   if(signal?.aborted)return {...decision,allowed:false,context};

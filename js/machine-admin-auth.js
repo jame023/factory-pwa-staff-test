@@ -1,7 +1,7 @@
-import { verifySession, revokeSession } from './session-manager.js?v=1.3.411';
-import { authProvider, getSupabaseLineAccessToken } from './auth.js?v=1.3.411';
-import { APP_MODE, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_LINE_PROVIDER } from './config.js?v=1.3.411';
-import { startPkceOAuth, completePkceOAuth } from './pkce-oauth.js?v=1.3.411';
+import { verifySession, revokeSession } from './session-manager.js?v=1.3.412';
+import { authProvider, getSupabaseLineAccessToken } from './auth.js?v=1.3.412';
+import { APP_MODE, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_LINE_PROVIDER } from './config.js?v=1.3.412';
+import { startPkceOAuth, completePkceOAuth } from './pkce-oauth.js?v=1.3.412';
 
 const SESSION_KEY = 'factory-pwa-machine-supabase-session-v1';
 
@@ -79,7 +79,7 @@ export async function logoutFromMachineAdmin(accessToken) {
 
 export function getMachineAdminSession() {
   if(APP_MODE==='supabase-line')return (async()=>{
-    const current=await verifySession();
+    const current=await verifySession({background:true});
     if(!current?.authenticated)return null;
     if(!['admin','executive'].includes(current.user.role))throw Object.assign(new Error('ไม่มีสิทธิ์ดำเนินการ'),{code:'PERMISSION_DENIED',status:403});
     const accessToken=getSupabaseLineAccessToken();

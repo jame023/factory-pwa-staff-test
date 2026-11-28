@@ -1,17 +1,17 @@
-import { normalizeRoute, safeReturnRoute } from './route-policy.js?v=1.3.411';
-import { requireAccess, getAuthContext as accessContext, resolveDefaultRoute } from './access-context.js?v=1.3.411';
-import { authProvider } from './auth.js?v=1.3.411';
-import { verifySession,refreshSession,revokeSession,listenAuthState,getAuthContext } from './session-manager.js?v=1.3.411';
-import { startRouter,stopRouter,refreshRoute,invalidateRoute,canNavigateBack,navigateBack } from './router.js?v=1.3.411';
-import { renderAppHeader } from '../components/app-header.js?v=1.3.411';
-import { renderBottomNav } from '../components/bottom-nav.js?v=1.3.411';
-import { renderLoginScreen } from '../components/login-screen.js?v=1.3.411';
-import { showStatusModal,isStatusModalOpen } from '../components/status-modal.js?v=1.3.411';
-import { showToast } from '../components/toast.js?v=1.3.411';
-import { hideActionPopup } from '../components/action-popup.js?v=1.3.411';
-import { escapeHtml } from './utils.js?v=1.3.411';
-import { startCalendarNotifications } from './notifications.js?v=1.3.411';
-import { disableDeviceNotifications, enableDeviceNotifications, readDeviceNotificationState } from './notification-client.js?v=1.3.411';
+import { normalizeRoute, safeReturnRoute } from './route-policy.js?v=1.3.412';
+import { requireAccess, getAuthContext as accessContext, resolveDefaultRoute } from './access-context.js?v=1.3.412';
+import { authProvider } from './auth.js?v=1.3.412';
+import { verifySession,refreshSession,revokeSession,listenAuthState,getAuthContext } from './session-manager.js?v=1.3.412';
+import { startRouter,stopRouter,refreshRoute,invalidateRoute,canNavigateBack,navigateBack } from './router.js?v=1.3.412';
+import { renderAppHeader } from '../components/app-header.js?v=1.3.412';
+import { renderBottomNav } from '../components/bottom-nav.js?v=1.3.412';
+import { renderLoginScreen } from '../components/login-screen.js?v=1.3.412';
+import { showStatusModal,isStatusModalOpen } from '../components/status-modal.js?v=1.3.412';
+import { showToast } from '../components/toast.js?v=1.3.412';
+import { hideActionPopup } from '../components/action-popup.js?v=1.3.412';
+import { escapeHtml } from './utils.js?v=1.3.412';
+import { startCalendarNotifications } from './notifications.js?v=1.3.412';
+import { disableDeviceNotifications, enableDeviceNotifications, readDeviceNotificationState } from './notification-client.js?v=1.3.412';
 
 const page=document.getElementById('page-root'),header=document.getElementById('header-root'),nav=document.getElementById('nav-root'),loading=document.getElementById('page-loading');
 let modal,session,stopNotifications,timer,working=false,started=false,applicantMounted=false;
@@ -90,9 +90,33 @@ function mask(value) {
   loading.hidden=true;
 }
 function closeModal() {modal?.close();modal=null;}
+function stopCalendarWatch(){stopNotifications?.();stopNotifications=null;}
+function scheduleSessionRefresh(){
+  clearTimeout(timer);
+  if(document.hidden || !session?.authenticated)return;
+  const expires=Date.parse(session.session_expiry);
+  if(!Number.isFinite(expires))return;
+  // Renew shortly before expiry, rather than verifying every ten seconds.
+  const delay=Math.min(2147483647,Math.max(1000,expires-Date.now()-60000));
+  timer=setTimeout(()=>void resume(),delay);
+}
+function refreshAfterPermissionChange(){
+  clearTimeout(permissionsRefresh);
+  const retry=()=>{
+    permissionsRefresh=null;
+    if(!session?.authenticated)return;
+    // The router refuses navigation during a status operation. Keep the old
+    // page invalidated, then re-enter its guard after that operation closes.
+    if(document.hidden || isStatusModalOpen()){
+      permissionsRefresh=setTimeout(retry,250);return;
+    }
+    void refreshRoute();
+  };
+  permissionsRefresh=setTimeout(retry,0);
+}
 function loginScreen(reason='') {
   reason=({logout:'ออกจากระบบแล้ว กรุณายืนยัน LINE ใหม่',session_expired:'Session หมดอายุ ต้องยืนยัน LINE ใหม่',inactive:'บัญชีถูกระงับ กรุณาติดต่อ Admin',not_found:'ไม่พบบัญชีพนักงาน กรุณายืนยัน LINE ใหม่',invalid_identity:'ข้อมูลตัวตนไม่ตรงกัน ต้องยืนยัน LINE ใหม่',permissions_changed:'สิทธิ์ถูกเปลี่ยน กรุณายืนยัน LINE ใหม่',data_conflict:'ข้อมูลสิทธิ์ไม่สอดคล้อง กรุณาติดต่อ Admin'})[reason]||reason;
-  stopRouter();stopNotifications?.();session=null;started=false;applicantMounted=false;
+  stopRouter();stopCalendarWatch();session=null;started=false;applicantMounted=false;
   header.replaceChildren();nav.replaceChildren();
   const publicPath=location.hash.replace(/^#/, '');
   if(!['','/','/login','/login/line','/register','/register/status','/unauthorized','/account-blocked','/not-found'].includes(publicPath))history.replaceState(null,'','#/login');
@@ -152,32 +176,31 @@ function unavailable() {
   page.querySelector('[data-access-logout]').onclick=()=>void logout();
 }
 listenAuthState(event=>{
-  clearTimeout(timer);stopNotifications?.();
+  clearTimeout(timer);
   if(event.state==='checking') {
+    stopCalendarWatch();
     hideActionPopup();
     mask(true);
     if(modal?.isOpen())modal.update({message:event.phase,tone:'working'});
     else modal=showStatusModal({message:event.phase,tone:'working'});
     return;
   }
-  closeModal();
+  if(!event.background)closeModal();
   if(event.state==='authenticated') {
-    session=event.context;mask(false);
+    session=event.context;if(!document.hidden)mask(false);
     if(event.changed){
+      stopCalendarWatch();
       invalidateRoute();header.replaceChildren();nav.replaceChildren();mask(true);
       showToast('สิทธิ์ของคุณมีการเปลี่ยนแปลง กำลังตรวจหน้าที่เข้าได้');
-      clearTimeout(permissionsRefresh);permissionsRefresh=setTimeout(()=>void refreshRoute(),0);
+      refreshAfterPermissionChange();
     }
-    stopNotifications=startCalendarNotifications(session.user,showToast);
-    const delay=Math.min(10000,Math.max(1000,Date.parse(session.session_expiry)-Date.now()-60000));
-    timer=setTimeout(()=>{
-      if(document.hidden)return;
-      if(isStatusModalOpen()){timer=setTimeout(()=>void resume(),1000);return;}
-      void resume();
-    },delay);
+    if(!document.hidden && !stopNotifications)stopNotifications=startCalendarNotifications(session.user,showToast);
+    scheduleSessionRefresh();
   } else if(event.applicant) {
+    stopCalendarWatch();
     session=event.applicant;mask(false);
   } else {
+    stopCalendarWatch();
     clearTimeout(permissionsRefresh);
     if(event.state==='error'){unavailable();return;}
     if(!working&&event.state==='unauthenticated')rememberReturn();
@@ -188,23 +211,23 @@ listenAuthState(event=>{
   }
 });
 async function resume() {
-  if(working)return;
+  if(working || document.hidden)return;
   // LINE may complete in Chrome while the installed app remains open. Re-read
   // the shared encrypted session when that app becomes visible again.
   if(!session && !getAuthContext()){await boot();return;}
   // Re-render through the same guard so removed rights cannot leave an old page mounted.
   try {
     if(session?.applicant) {await boot();return;}
-    await (Date.parse(session.session_expiry)-Date.now()<60000?refreshSession():verifySession());
+    await (Date.parse(session.session_expiry)-Date.now()<=60000?refreshSession({background:true}):verifySession({background:true}));
   }catch{}
 }
 document.addEventListener('visibilitychange',()=>{
-  if(document.hidden){mask(true);stopNotifications?.();return;}
+  if(document.hidden){clearTimeout(timer);stopCalendarWatch();return;}
   void resume();
 });
 window.addEventListener('focus',()=>void resume());
 window.addEventListener('pageshow',event=>{if(event.persisted){working=false;mask(true);void boot();}});
-window.addEventListener('pagehide',()=>{mask(true);stopRouter();started=false;clearTimeout(timer);stopNotifications?.();});
+window.addEventListener('pagehide',()=>{mask(true);stopRouter();started=false;clearTimeout(timer);clearTimeout(permissionsRefresh);stopCalendarWatch();});
 window.addEventListener('hashchange',()=>{if(!session?.authenticated && !applicantMounted){rememberReturn();void boot();}});
 async function bootOnce() {
   try {
@@ -212,7 +235,7 @@ async function bootOnce() {
     if(!session)return;
     if(session.applicant) {
       stopRouter();started=false;
-      applicantMounted=true;const {mountRegistration}=await import('../pages/registration/index.js?v=1.3.411');
+      applicantMounted=true;const {mountRegistration}=await import('../pages/registration/index.js?v=1.3.412');
       if(!session?.applicant||!applicantMounted)return;
       const registrationRoot=document.createElement('div');page.replaceChildren(registrationRoot);
       await mountRegistration(registrationRoot,{logout});

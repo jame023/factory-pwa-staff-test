@@ -1,5 +1,5 @@
-import { APP_MODE } from "../js/config.js?v=1.3.411";
-import { escapeHtml } from "../js/utils.js?v=1.3.411";
+import { APP_MODE } from "../js/config.js?v=1.3.412";
+import { escapeHtml } from "../js/utils.js?v=1.3.412";
 
 export function renderLoginScreen(message = "") {
   const mock = APP_MODE === "mock";

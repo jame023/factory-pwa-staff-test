@@ -1,7 +1,7 @@
-import { APP_MODE, APP_NAME, ROLE_LABELS } from "../js/config.js?v=1.3.411";
-import { escapeHtml } from "../js/utils.js?v=1.3.411";
-import { notificationBellMarkup } from '../js/notification-badge.js?v=1.3.411';
-import { iconMarkup } from '../js/ui-icons.js?v=1.3.411';
+import { APP_MODE, APP_NAME, ROLE_LABELS } from "../js/config.js?v=1.3.412";
+import { escapeHtml } from "../js/utils.js?v=1.3.412";
+import { notificationBellMarkup } from '../js/notification-badge.js?v=1.3.412';
+import { iconMarkup } from '../js/ui-icons.js?v=1.3.412';
 
 export function renderAppHeader(user) {
   return '<div class="app-header"><div class="header-inner sip-header-layout">' +

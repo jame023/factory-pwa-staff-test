@@ -1,12 +1,12 @@
-import { iconMarkup, routeIcon } from '../../js/ui-icons.js?v=1.3.411';
-import { getAuthContext, canAccessRoute, selectActiveGroup, availableWorkspaces } from '../../js/access-context.js?v=1.3.411';
-import { ROUTES, normalizeRoute, workspaceGroups, groupRoute } from '../../js/route-policy.js?v=1.3.411';
-import { escapeHtml } from '../../js/utils.js?v=1.3.411';
-import { showStatusModal } from '../../components/status-modal.js?v=1.3.411';
-import { getMachineAdminSession } from '../../js/machine-admin-auth.js?v=1.3.411';
-import { createSupabaseMachineRepository } from '../../js/machine-admin-repository.js?v=1.3.411';
-import { createSupabaseItemNameRepository } from '../../js/item-name-admin-repository.js?v=1.3.411';
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '../../js/config.js?v=1.3.411';
+import { iconMarkup, routeIcon } from '../../js/ui-icons.js?v=1.3.412';
+import { getAuthContext, canAccessRoute, selectActiveGroup, availableWorkspaces } from '../../js/access-context.js?v=1.3.412';
+import { ROUTES, normalizeRoute, workspaceGroups, groupRoute } from '../../js/route-policy.js?v=1.3.412';
+import { escapeHtml } from '../../js/utils.js?v=1.3.412';
+import { showStatusModal } from '../../components/status-modal.js?v=1.3.412';
+import { getMachineAdminSession } from '../../js/machine-admin-auth.js?v=1.3.412';
+import { createSupabaseMachineRepository } from '../../js/machine-admin-repository.js?v=1.3.412';
+import { createSupabaseItemNameRepository } from '../../js/item-name-admin-repository.js?v=1.3.412';
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '../../js/config.js?v=1.3.412';
 const adminMenuPresentation = Object.freeze({
   '/admin/system-status': {tone:'teal',hint:'ตรวจเครื่องอ่านบัตร รายงานอัตโนมัติ และการส่งแจ้งเตือน',icon:'<path d="M3 12h4l3-8 4 16 3-8h4"/>'},
   '/admin/employees': {tone:'blue',hint:'ข้อมูลพนักงานและสถานะการใช้งาน',icon:'<circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6M21 21v-3a6 6 0 0 0-4-5.65"/>'},

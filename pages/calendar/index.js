@@ -1,13 +1,13 @@
-import { watchChanges, mockLiveEnabled } from '../../js/live-updates.js?v=1.3.411';
-import * as calendarApi from "../../adapters/package08.js?v=1.3.411";
-import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.411";
-import { canManage } from "../../js/permissions.js?v=1.3.411";
-import { requireOnlineAction } from "../../js/offline.js?v=1.3.411";
-import { confirmAction } from "../../components/modal.js?v=1.3.411";
-import { APP_MODE } from "../../js/config.js?v=1.3.411";
-import { summarizeCalendarChanges } from "../../js/notification-client.js?v=1.3.411";
-import { getAuthContext } from '../../js/access-context.js?v=1.3.411';
-import { canonicalGroup, normalizeRoute } from '../../js/route-policy.js?v=1.3.411';
+import { watchChanges, mockLiveEnabled } from '../../js/live-updates.js?v=1.3.412';
+import * as calendarApi from "../../adapters/package08.js?v=1.3.412";
+import { bangkokToday, escapeHtml, thaiDate } from "../../js/utils.js?v=1.3.412";
+import { canManage } from "../../js/permissions.js?v=1.3.412";
+import { requireOnlineAction } from "../../js/offline.js?v=1.3.412";
+import { confirmAction } from "../../components/modal.js?v=1.3.412";
+import { APP_MODE } from "../../js/config.js?v=1.3.412";
+import { summarizeCalendarChanges } from "../../js/notification-client.js?v=1.3.412";
+import { getAuthContext } from '../../js/access-context.js?v=1.3.412';
+import { canonicalGroup, normalizeRoute } from '../../js/route-policy.js?v=1.3.412';
 
 const statuses = ["เต็มวัน","ครึ่งวัน","หยุด"];
 const dayTone = status => ({"เต็มวัน":"full","ครึ่งวัน":"half","หยุด":"holiday"})[status] || "";
