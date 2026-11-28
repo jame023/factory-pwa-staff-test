@@ -1,8 +1,8 @@
-import { createProductionReportService } from '../../js/production-report-service.js?v=1.3.410';
-import * as workApi from '../../adapters/package07.js?v=1.3.410';
-import { getAuthContext } from '../../js/access-context.js?v=1.3.410';
-import { requireOnlineAction } from '../../js/offline.js?v=1.3.410';
-import { escapeHtml as e, thaiDateTime } from '../../js/utils.js?v=1.3.410';
+import { createProductionReportService } from '../../js/production-report-service.js?v=1.3.411';
+import * as workApi from '../../adapters/package07.js?v=1.3.411';
+import { getAuthContext } from '../../js/access-context.js?v=1.3.411';
+import { requireOnlineAction } from '../../js/offline.js?v=1.3.411';
+import { escapeHtml as e, thaiDateTime } from '../../js/utils.js?v=1.3.411';
 
 const MAX_UPLOAD=512*1024, MAX_SOURCE=20*1024*1024;
 const TYPES=new Set(['image/jpeg','image/png','image/webp']);

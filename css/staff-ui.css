@@ -319,3 +319,76 @@
  .sip-ui #page-root nav.form-actions :is([data-screen-jump],[data-production-jump],[data-delivery-jump]){flex:none;white-space:nowrap;}
  .sip-ui #page-root :is([data-screen-section],[data-production-section],[data-delivery-section]){scroll-margin-top:calc(var(--sip-header-height,72px) + 90px);}
 }
+
+/* Responsive SIP header: brand, account context and device controls. */
+.sip-ui .app-header { color:#f4fbfd; background:#12364a; }
+.sip-ui .sip-header-layout {
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
+  min-height:80px; gap:16px; padding-block:14px;
+}
+.sip-ui .sip-header-layout .header-brand-row {
+  display:flex; align-items:center; justify-content:space-between; gap:16px; min-width:0;
+}
+.sip-ui .sip-header-layout .brand { flex:1 1 auto; min-width:0; gap:12px; }
+.sip-ui .sip-header-layout .brand-mark {
+  display:block; flex:0 0 48px; width:48px; height:48px;
+  object-fit:contain; border-radius:10px;
+}
+.sip-ui .sip-header-layout .brand-copy { min-width:0; }
+.sip-ui .sip-header-layout .brand-title {
+  display:block; color:#f4fbfd; font-size:1rem; line-height:1.4;
+  white-space:normal; word-break:normal; overflow-wrap:normal;
+}
+.sip-ui .sip-header-layout .header-tools {
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end;
+  min-width:0; gap:12px 20px;
+}
+.sip-ui .sip-header-layout :is(.header-context,.header-actions) {
+  display:flex; flex-wrap:wrap; align-items:center; min-width:0; gap:8px;
+}
+.sip-ui .sip-header-layout .workspace-switch {
+  display:block; min-width:0; max-width:100%; padding:4px 0;
+  color:#f4fbfd; background:transparent; border:0; border-radius:0;
+  font-size:.86rem; font-weight:700; line-height:1.5; overflow-wrap:anywhere;
+}
+.sip-ui .sip-header-layout .badge-info {
+  color:#e7f5fa; background:#214b62; font-size:.72rem;
+}
+.sip-ui .sip-header-layout .button {
+  min-height:44px; border-radius:10px; font-size:.78rem; line-height:1.4;
+}
+.sip-ui .sip-header-layout .notification-inbox-bell {
+  position:relative; display:inline-flex; align-items:center; justify-content:center;
+  flex:0 0 44px; width:44px; min-width:44px; height:44px; padding:8px;
+}
+.sip-ui .sip-header-layout .header-action-icon { display:inline-flex; flex:none; }
+.sip-ui .sip-header-layout .header-action-icon svg { width:18px; height:18px; }
+.sip-ui .sip-header-layout .notification-header-toggle {
+  gap:8px; white-space:normal; flex-wrap:wrap; justify-content:center;
+}
+.sip-ui .sip-header-layout .notification-switch-track { flex:none; }
+.sip-ui .sip-header-layout [data-device-notification-state] { overflow-wrap:anywhere; }
+.sip-ui .sip-header-layout :is(.button,.brand):focus-visible {
+  outline:3px solid #83e2ed; outline-offset:3px;
+}
+@media(max-width:1100px) {
+  .sip-ui .sip-header-layout { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; }
+  .sip-ui .sip-header-layout .header-tools { justify-content:space-between; }
+}
+@media(max-width:600px) {
+  .sip-ui .sip-header-layout { padding:12px max(12px,env(safe-area-inset-right)) 12px max(12px,env(safe-area-inset-left)); gap:10px; }
+  .sip-ui .sip-header-layout .brand-title { font-size:1rem; }
+  .sip-ui .sip-header-layout .header-tools { display:grid; grid-template-columns:minmax(0,1fr); gap:10px; }
+  .sip-ui .sip-header-layout .header-context { padding-top:8px; border-top:1px solid #426779; }
+  .sip-ui .sip-header-layout .workspace-switch { flex:1 1 0; }
+  .sip-ui .sip-header-layout .mode-pill { display:none; }
+  .sip-ui .sip-header-layout .header-actions { display:grid; grid-template-columns:minmax(0,1fr) auto; }
+  .sip-ui .sip-header-layout .header-actions .button { min-width:0; padding:8px 10px; }
+  .sip-ui .sip-header-layout .header-actions [data-auth-logout] { font-size:.78rem; }
+}
+@media(max-width:359px) {
+  .sip-ui .sip-header-layout .brand-mark { width:40px; height:40px; flex-basis:40px; }
+  .sip-ui .sip-header-layout .brand { gap:8px; }
+  .sip-ui .sip-header-layout .brand-title { font-size:.9rem; }
+  .sip-ui .sip-header-layout .header-action-icon { display:none; }
+}

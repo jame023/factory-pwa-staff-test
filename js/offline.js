@@ -23,7 +23,7 @@ export function watchConnection() {
 export async function registerServiceWorker() {
   if (!("serviceWorker" in navigator) || location.protocol === "file:") return null;
   try {
-const registration = await navigator.serviceWorker.register("./sw.js?v=1.3.410", { scope: "./" });
+const registration = await navigator.serviceWorker.register("./sw.js?v=1.3.411", { scope: "./" });
     const showUpdate = () => {
       if (!registration.waiting) return;
       updateReady = true;

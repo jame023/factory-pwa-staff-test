@@ -1,5 +1,5 @@
-import { escapeHtml } from './utils.js?v=1.3.410';
-import { iconMarkup } from './ui-icons.js?v=1.3.410';
+import { escapeHtml } from './utils.js?v=1.3.411';
+import { iconMarkup } from './ui-icons.js?v=1.3.411';
 
 let state = { count: null, error: false };
 

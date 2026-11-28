@@ -1,9 +1,9 @@
-import { escapeHtml } from '../../js/utils.js?v=1.3.410';
-import { showStatusModal, isStatusModalOpen } from '../../components/status-modal.js?v=1.3.410';
-import { confirmAction } from '../../components/modal.js?v=1.3.410';
-import { createSupabaseMachineRepository } from '../../js/machine-admin-repository.js?v=1.3.410';
-import { APP_MODE, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '../../js/config.js?v=1.3.410';
-import { getMachineAdminSession, loginToMachineAdmin, logoutFromMachineAdmin } from '../../js/machine-admin-auth.js?v=1.3.410';
+import { escapeHtml } from '../../js/utils.js?v=1.3.411';
+import { showStatusModal, isStatusModalOpen } from '../../components/status-modal.js?v=1.3.411';
+import { confirmAction } from '../../components/modal.js?v=1.3.411';
+import { createSupabaseMachineRepository } from '../../js/machine-admin-repository.js?v=1.3.411';
+import { APP_MODE, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from '../../js/config.js?v=1.3.411';
+import { getMachineAdminSession, loginToMachineAdmin, logoutFromMachineAdmin } from '../../js/machine-admin-auth.js?v=1.3.411';
 
 const GROUPS = Object.freeze(['สกรีน', 'ผลิต', 'ขนส่ง', 'ออฟฟิศ', 'ผู้บริหาร', 'Admin']);
 const DATE = new Intl.DateTimeFormat('th-TH', { timeZone: 'Asia/Bangkok', dateStyle: 'medium', timeStyle: 'short' });

@@ -1,2 +1,2 @@
-import { renderIndependentOutput } from './independent-output.js?v=1.3.410';
+import { renderIndependentOutput } from './independent-output.js?v=1.3.411';
 export function render(root,context) { return renderIndependentOutput(root,context,'ผลิต'); }
